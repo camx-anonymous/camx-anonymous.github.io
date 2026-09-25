@@ -3,3 +3,4 @@ CLAUDE.local.md
 .claude/
 .DS_Store
 _build/
+__pycache__/
