@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAMX Projection Overlays</title>
+<meta name="description" content="Gripper URDF / camera-axis projections through each dataset's own poses and intrinsics, for validating the CAMX camera and end-effector calibration.">
+<link rel="stylesheet" href="../site.css">
+<style>
+p.sub{margin:4px 0}
+h2{font-size:16px;margin:24px 0 4px;scroll-margin-top:12px}h2 small{color:var(--ink3);font-weight:normal;font-size:12.5px;margin-left:8px}
+.pnote{color:var(--ink2);font-size:12.5px;margin:0 0 8px;max-width:1000px}
+.card .vid{cursor:pointer;aspect-ratio:16/5}
+.card .vid .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;text-shadow:0 0 12px #000}
+.card .vid .play span{background:rgba(0,0,0,.55);border-radius:999px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;padding-left:4px}
+.pending{padding:14px;border:1px dashed var(--line);border-radius:6px;color:var(--ink3);background:var(--chipbg);font-size:12.5px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:6px 0 20px}
+th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--line);vertical-align:top}th{background:var(--chipbg);color:var(--ink2);border-top:none}
+</style>
+</head>
+<body>
+<nav class="site-switch" aria-label="Switch site"><span class="lbl">Sites</span>
+  <a href="https://camx-anonymous.github.io/" aria-current="page">CAMX Dataset</a>
+  <a href="https://camx-anonymous.github.io/camuva-rollouts/">CAMUVA Rollouts</a>
+</nav>
+<header><div class="wrap">
+  <h1>CAMX Dataset <small>projection overlays · validation you can look at</small></h1>
+  <p class="sub">For each dataset family, a few episodes are re-rendered with the gripper's URDF (or, for rigs without a released URDF, the recorded camera path and world-up axis) projected through the dataset's <em>own</em> per-frame camera poses and intrinsics. If the drawn gripper sits on the real one in the wrist views, the end-effector pose, camera extrinsics and intrinsics shipped in the dataset are consistent. Every camera view is shown side by side in one clip.</p>
+  <p class="sub"><a href="../">← data manager</a></p>
+</div></header>
+<main class="wrap">
+  <div class="toolbar" id="modes"></div>
+  <div id="content"></div>
+  <h2 id="pending">Not rendered yet</h2>
+  <p class="pnote">Projects in the training tree without an overlay clip so far. Rendering needs a gripper profile (URDF + mount transform) for the rig; for single-camera fisheye rigs it uses the fitted Kannala-Brandt model. These are queued.</p>
+  <table><thead><tr><th>Project</th><th>Embodiment</th><th>Datasets</th><th>Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
+  <footer>Clips are 10 fps, ~45 s, re-encoded to 360p for the web (source renders are 480p). Acceptance chips follow the curation protocol: <b>pass</b> = wrist-view median error ≤ 10 px, p90 ≤ 20 px at 480 rows; <b>unmeasured</b> = no automatic finger detector for the rig yet (visual check only).</footer>
+</main>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtH=h=>h==null?'–':h>=100?Math.round(h).toLocaleString():h>=10?h.toFixed(1):h.toFixed(2);
+let D,mode='all';
+fetch('../data/datasets.json').then(r=>r.json()).then(d=>{D=d;render();if(location.hash){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView()}});
+function render(){const projs=D.projects.filter(p=>p.overlays.length);const modes={urdf:'gripper URDF',"camera-path":'camera path + up axis',none:'no drawing'};
+  const cnt={};projs.forEach(p=>p.overlays.forEach(o=>cnt[o.mode]=(cnt[o.mode]||0)+1));
+  document.getElementById('modes').innerHTML=`<span class="k">Overlay mode</span> <span class="chip btn${mode==='all'?' on':''}" data-m="all">all (${projs.reduce((a,p)=>a+p.overlays.length,0)})</span>`+Object.entries(cnt).map(([m,n])=>`<span class="chip btn${mode===m?' on':''}" data-m="${m}">${modes[m]||m} (${n})</span>`).join('')+`<span class="sp"></span><span class="chip">${projs.length} of ${D.projects.length} projects rendered</span>`;
+  document.querySelectorAll('#modes .btn').forEach(b=>b.onclick=()=>{mode=b.dataset.m;render()});
+  let h='';
+  projs.forEach(p=>{const ovs=p.overlays.filter(o=>mode==='all'||o.mode===mode);if(!ovs.length)return;const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];
+    h+=`<h2 id="${esc(p.key.replace('/','_'))}">${esc(p.key)}<small>${esc(emb)} · ${p.datasets} datasets · ${fmtH(p.hours)} h · ${p.overlays.length} clips</small></h2>`;
+    if(p.notes)h+=`<p class="pnote">${esc(p.notes)}</p>`;
+    h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`;const src=D.overlay_base+file+'.mp4';
+      const grips=Object.entries(o.grippers).map(([s,g])=>`${s}: ${esc(g.model)}${g.profile?' → '+esc(g.profile):''}${g.urdf?'':' <span class="chip">not drawn: no URDF</span>'}`).join('<br>');
+      return `<div class="card"><div class="vid" data-src="${src}"><img src="posters/${file}.jpg" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
+        <div class="title">${esc(o.dataset)} · ep ${o.episode}</div>
+        <div class="meta"><span class="chip ${o.accept}">${o.accept}</span> <span class="chip">${o.mode==='urdf'?'URDF projection':o.mode==='camera-path'?'camera path + up axis':o.mode}</span>${o.fisheye?' <span class="chip">fisheye (KB4)</span>':''} <span class="chip">${o.seconds}s</span>
+        ${o.task?`<div><span class="k">task</span> ${esc(o.task)}</div>`:''}
+        <div><span class="k">views</span> ${o.views.map(esc).join(' · ')}</div>
+        ${grips?`<div><span class="k">grippers</span> ${grips}</div>`:''}
+        <div><span class="k">rendered from</span> export ${esc(o.export_id||'pre-protocol')} · release ${esc((o.rendered_from||'').slice(0,10))} · <a href="${src}">mp4</a></div></div></div>`}).join('')+'</div>';});
+  document.getElementById('content').innerHTML=h;
+  document.querySelectorAll('.vid').forEach(v=>v.onclick=()=>{if(v.querySelector('video'))return;v.innerHTML=`<video controls autoplay loop muted playsinline src="${v.dataset.src}"></video>`});
+  document.getElementById('pendingBody').innerHTML=D.projects.filter(p=>!p.overlays.length).map(p=>{const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const n=p.notes||'';let why='render pending';
+    if(/conversion tree|not in the camx_480p training tree/i.test(n))why='converted after the last render pass';else if(/rolled into the UMI|handheld/i.test(n)&&/single/.test(Object.keys(p.forms).join()))why='single fisheye / GoPro camera: needs the rig\'s lens fit before drawing';
+    return `<tr><td><a href="../#${esc(p.key)}">${esc(p.key)}</a></td><td>${esc(emb)}</td><td>${p.datasets}</td><td>${fmtH(p.hours)}</td><td>${why}</td></tr>`}).join('');}
+</script>
+</body>
+</html>

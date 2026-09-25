@@ -1,0 +1,43 @@
+/* Shared chrome for camx-anonymous.github.io (CAMX data manager, overlays) and /camuva-rollouts/.
+   Source of truth lives in the camx-anonymous.github.io repo; the rollouts site loads it by absolute URL. */
+:root{color-scheme:light;
+  --bg:#fcfcfb;--panel:#ffffff;--line:#e4e3df;--ink:#0b0b0b;--ink2:#52514e;--ink3:#8a8985;--accent:#2a78d6;--chipbg:#f0efec;--barbg:#e9e8e4;
+  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--good:#0ca30c;--warn:#fab219;--serious:#ec835a;--crit:#d03b3b;--sel:#e8f0fc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#1a1a19;--panel:#222221;--line:#3a3a37;--ink:#fff;--ink2:#c3c2b7;--ink3:#8f8e86;--accent:#3987e5;--chipbg:#2e2e2c;--barbg:#33332f;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--sel:#26303f}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#1a1a19;--panel:#222221;--line:#3a3a37;--ink:#fff;--ink2:#c3c2b7;--ink3:#8f8e86;--accent:#3987e5;--chipbg:#2e2e2c;--barbg:#33332f;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--sel:#26303f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1500px;margin:0 auto;padding:0 16px}
+
+/* site switcher: CAMX Dataset <-> CAMUVA Rollouts */
+.site-switch{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:6px 16px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12.5px}
+.site-switch .lbl{color:var(--ink3);margin-right:6px;text-transform:uppercase;letter-spacing:.04em;font-size:11px}
+.site-switch a{color:var(--ink2);text-decoration:none;padding:2px 10px;border-radius:999px;border:1px solid transparent}
+.site-switch a:hover{color:var(--accent)}
+.site-switch a[aria-current="page"]{background:var(--accent);color:#fff;font-weight:600}
+
+/* page header */
+header{padding:16px 0 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+h1{font-size:24px;margin:0 0 2px}h1 small{font-weight:normal;color:var(--ink2);font-size:14px;margin-left:8px}
+.sub{color:var(--ink2);margin:0 0 10px;max-width:1000px}
+nav.links{display:flex;flex-wrap:wrap;gap:8px}nav.links a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--ink);text-decoration:none;font-size:13px}
+nav.links a:hover{border-color:var(--accent);color:var(--accent)}
+h2{font-size:16px;margin:22px 0 8px}h2 small{color:var(--ink3);font-weight:normal;font-size:12.5px;margin-left:8px}
+
+/* shared controls */
+.chip{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--chipbg);color:var(--ink2);border:1px solid transparent;white-space:nowrap;user-select:none}
+.chip.on{background:var(--accent);color:#fff}.chip.btn{cursor:pointer}.chip .c{opacity:.65;margin-left:4px}
+.chip.pass{background:var(--good);color:#fff}.chip.fail{background:var(--crit);color:#fff}.chip.warn{background:var(--warn);color:#000}.chip.stale{background:var(--serious);color:#fff}
+button{font:inherit;font-size:13px;padding:5px 11px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 8px}.toolbar .spacer,.toolbar .sp{flex:1}.toolbar .stat{color:var(--ink2);font-size:13px}.toolbar .stat b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px}
+@media (max-width:480px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px}
+.card .vid{position:relative;background:#000;border-radius:4px;overflow:hidden}
+.card .vid img,.card .vid video{width:100%;height:100%;object-fit:contain;display:block}
+.card .title{font-weight:600;margin:8px 0 4px;word-break:break-all}.card .meta{font-size:12px;color:var(--ink2)}.card .meta div{margin-top:3px}
+.k{color:var(--ink3);font-weight:600}.muted{color:var(--ink3)}.small{font-size:11.5px}
+footer{color:var(--ink3);font-size:12px;margin:40px 0 60px}
+.hidden{display:none!important}

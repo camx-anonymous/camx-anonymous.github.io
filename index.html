@@ -3,58 +3,250 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CAMX Dataset</title>
-<meta name="description" content="CAMX Dataset project page (anonymous submission).">
+<title>CAMX Data Manager</title>
+<meta name="description" content="Browse, filter and batch-download the CAMX cross-embodiment dataset (anonymous submission).">
+<link rel="stylesheet" href="site.css">
 <style>
-  :root { --bg:#fff; --fg:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#2156d9; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#111113; --fg:#f2f2f7; --muted:#a1a1a6; --line:#2c2c2e; --accent:#6b9bff; } }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
-  main { max-width:820px; margin:0 auto; padding:64px 16px; }
-  h1 { font-size:2.4rem; line-height:1.15; margin:0 0 8px; }
-  .authors { color:var(--muted); margin:0 0 28px; }
-  .links { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:40px; }
-  .links a { border:1px solid var(--line); border-radius:999px; padding:6px 16px; color:var(--fg); text-decoration:none; }
-  .links a:hover { border-color:var(--accent); color:var(--accent); }
-  h2 { font-size:1.3rem; margin:40px 0 10px; padding-top:20px; border-top:1px solid var(--line); }
-  pre { background:color-mix(in srgb, var(--line) 50%, transparent); padding:14px; border-radius:8px; overflow-x:auto; font-size:14px; }
-  footer { color:var(--muted); font-size:14px; margin-top:56px; }
-  /* site switcher (shared between camx-dataset and camuva-rollouts) */
-  .site-switch { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; padding:10px 16px; border-bottom:1px solid var(--line); font-size:14px; }
-  .site-switch a { color:var(--muted); text-decoration:none; padding:4px 12px; border-radius:999px; }
-  .site-switch a:hover { color:var(--fg); }
-  .site-switch a[aria-current="page"] { background:color-mix(in srgb, var(--accent) 15%, transparent); color:var(--accent); font-weight:600; }
+.chip.static{cursor:default}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}button.primary:hover{opacity:.9;color:#fff}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile .v{font-size:22px;font-weight:600;letter-spacing:-.02em}.tile .k{color:var(--ink2);font-size:12px}
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+.bars{display:grid;grid-template-columns:max-content 1fr max-content;gap:3px 10px;align-items:center;font-size:12.5px}
+.bars .lab{color:var(--ink2);white-space:nowrap}.bars .bar{height:10px;border-radius:0 4px 4px 0;min-width:2px}.bars .val{color:var(--ink2);font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink2);margin:0 0 8px}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:16px;margin-top:10px}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+aside{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px;align-self:start;position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto}
+@media (max-width:900px){aside{position:static;max-height:none}}
+aside h3{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink3);margin:12px 0 4px}
+aside details{border-top:1px solid var(--line);padding:4px 0}aside details summary{cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink3);padding:6px 0;list-style:none}
+aside details summary::before{content:"▸ ";color:var(--accent)}aside details[open] summary::before{content:"▾ "}
+aside summary .n{float:right;color:var(--accent);font-weight:600;text-transform:none;letter-spacing:0}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+input[type=text],input[type=number],select{width:100%;padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th,td{text-align:left;vertical-align:middle;padding:6px 8px;border-top:1px solid var(--line)}th{color:var(--ink2);font-weight:600;border-top:none;background:var(--chipbg);cursor:pointer;white-space:nowrap;user-select:none}
+th.sorted::after{content:" ▾";color:var(--accent)}th.sorted.asc::after{content:" ▴"}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.proj td{font-weight:600;cursor:pointer;background:color-mix(in srgb,var(--chipbg) 55%,transparent)}tr.proj:hover td{background:var(--chipbg)}
+tr.leaf td{font-weight:normal;color:var(--ink2)}tr.leaf td.name{color:var(--ink);padding-left:28px}tr.leaf:hover td{background:var(--chipbg)}
+tr.selected td{background:var(--sel)!important}
+.tog{display:inline-block;width:14px;color:var(--accent)}
+.emb{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:0}
+.cams{white-space:nowrap}.cams span{display:inline-block;padding:0 5px;border-radius:4px;background:var(--chipbg);margin-right:3px;font-size:11px}
+.overlaylink{font-size:11px;text-decoration:none;border:1px solid var(--accent);border-radius:999px;padding:0 7px;white-space:nowrap}
+.dl{position:sticky;bottom:0;margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:8px 8px 0 0;padding:10px 12px;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:5}
+.dl .head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.dl .head b{font-size:15px}
+.dl .body{display:none;margin-top:8px}.dl.open .body{display:block}
+.tabs{display:flex;gap:4px;margin:6px 0}.tabs button{border-radius:6px 6px 0 0}.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+pre{margin:0;background:var(--chipbg);padding:10px;border-radius:0 6px 6px 6px;font-size:12px;overflow:auto;max-height:260px;white-space:pre}
+.drawer{position:fixed;top:0;right:0;width:min(520px,100vw);height:100vh;background:var(--panel);border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(0,0,0,.15);padding:14px 16px;overflow:auto;z-index:20;transform:translateX(100%);transition:transform .15s}
+.drawer.open{transform:none}.drawer h3{margin:0 0 6px;font-size:15px;word-break:break-all}.drawer dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 10px;font-size:12.5px}.drawer dt{color:var(--ink3)}.drawer dd{margin:0;word-break:break-word}
+.close{float:right}
 </style>
 </head>
 <body>
-<nav class="site-switch" aria-label="Switch site">
+<nav class="site-switch" aria-label="Switch site"><span class="lbl">Sites</span>
   <a href="https://camx-anonymous.github.io/" aria-current="page">CAMX Dataset</a>
   <a href="https://camx-anonymous.github.io/camuva-rollouts/">CAMUVA Rollouts</a>
 </nav>
-<main>
-  <p id="hello" style="font-weight:600;color:var(--accent)">Hello, world! 👋 This site is live.</p>
-  <h1>CAMX Dataset</h1>
-  <p class="authors">Anonymous Authors · Under Review</p>
+<header><div class="wrap">
+  <h1>CAMX Dataset <small>data manager</small></h1>
+  <p class="sub">Anonymous Authors · Under Review · a cross-embodiment collection with per-frame camera poses and gripper state in one LeRobot-v3 layout</p>
   <nav class="links">
     <a href="#">Paper (coming soon)</a>
-    <a href="#">Dataset (coming soon)</a>
-    <a href="https://github.com/camx-anonymous/camx-dataset">Code</a>
+    <a href="#download">Batch download</a>
+    <a href="overlays/">Projection overlays (URDF / camera-axis validation)</a>
+    <a href="https://github.com/camx-anonymous/camx-anonymous.github.io">Code</a>
+    <a href="data/datasets.json">datasets.json</a>
   </nav>
+</div></header>
 
-  <h2>Abstract</h2>
-  <p>Abstract coming soon.</p>
+<main class="wrap">
+  <div class="tiles" id="tiles"></div>
+  <div class="chart">
+    <div class="legend" id="legend"></div>
+    <div class="bars" id="embBars"></div>
+  </div>
 
-  <h2>Dataset</h2>
-  <p>Dataset details, statistics, and download instructions coming soon.</p>
+  <div class="layout">
+    <aside id="filters">
+      <div style="display:flex;justify-content:space-between;align-items:center"><strong>Filters</strong><button id="reset">Reset</button></div>
+      <h3>Search</h3><input type="text" id="q" placeholder="path, task, robot, camera model…">
+      <div id="facets"></div>
+      <details open><summary>Hours per dataset</summary><div class="row2"><input type="number" id="hmin" placeholder="min h" step="0.1" min="0"><input type="number" id="hmax" placeholder="max h" step="0.1" min="0"></div></details>
+      <details><summary>Episodes per dataset</summary><div class="row2"><input type="number" id="emin" placeholder="min" min="0"><input type="number" id="emax" placeholder="max" min="0"></div></details>
+    </aside>
 
-  <h2>Citation</h2>
-  <pre>@misc{camx2026,
-  title  = {CAMX Dataset},
-  author = {Anonymous},
-  year   = {2026}
-}</pre>
+    <section>
+      <div class="toolbar">
+        <span class="stat">Filtered: <b id="fCount"></b></span>
+        <span class="stat">Selected: <b id="sCount"></b></span>
+        <span class="spacer"></span>
+        <button id="selAll">Select filtered</button><button id="deselAll">Deselect filtered</button>
+        <button id="expAll">Expand all</button><button id="colAll">Collapse all</button>
+      </div>
+      <table id="tbl"><thead><tr>
+        <th style="width:26px"></th>
+        <th data-k="name">Project / dataset</th>
+        <th data-k="embodiment">Embodiment</th>
+        <th data-k="form">Form factor</th>
+        <th data-k="datasets" class="num">Datasets</th>
+        <th data-k="episodes" class="num">Episodes</th>
+        <th data-k="hours" class="num">Hours</th>
+        <th data-k="fps" class="num">FPS</th>
+        <th data-k="n_views" class="num">Views</th>
+        <th>Cameras</th>
+        <th>Overlay</th>
+      </tr></thead><tbody id="tbody"></tbody></table>
+      <p class="small muted" id="buildInfo"></p>
+    </section>
+  </div>
 
-  <footer>This page is anonymized for review.</footer>
+  <div class="dl" id="download">
+    <div class="head">
+      <b>Batch downloader</b>
+      <span class="stat"><b id="dlCount">0</b> datasets · <b id="dlHours">0</b> h · est. <b id="dlSize">0</b></span>
+      <span class="spacer"></span>
+      <button id="dlToggle">Show</button>
+    </div>
+    <div class="body">
+      <div class="toolbar">
+        <label>HF repo <input type="text" id="repo" style="width:260px;display:inline-block"></label>
+        <button id="exportJson">Export JSON</button>
+        <button id="importJson">Import JSON</button><input type="file" id="importFile" accept="application/json" class="hidden">
+        <button id="clearSel">Clear selection</button>
+        <span class="spacer"></span>
+        <button class="primary" id="copyCmd">Copy</button>
+        <button id="saveCmd">Save file</button>
+      </div>
+      <div class="tabs"><button class="on" data-t="hf">hf CLI</button><button data-t="py">Python</button><button data-t="sh">bash</button><button data-t="paths">paths</button></div>
+      <pre id="cmd"></pre>
+      <p class="small muted">Downloads are per dataset directory <code>&lt;family&gt;/&lt;project&gt;/&lt;dataset&gt;/</code> (meta/, data/, videos/). Sizes are estimates from the 480p tree measurement, spread over datasets by frame count.</p>
+    </div>
+  </div>
+  <footer>This page is anonymized for review. Data: <span id="footInfo"></span></footer>
 </main>
+
+<div class="drawer" id="drawer"><button class="close" id="drawerClose">✕</button><div id="drawerBody"></div></div>
+
+<script>
+const MORPH=['Handheld, robot-free','Single-arm robot','Bimanual robot','Humanoid / mobile bimanual'];
+const MCOL={'Handheld, robot-free':'var(--s1)','Single-arm robot':'var(--s2)','Bimanual robot':'var(--s3)','Humanoid / mobile bimanual':'var(--s4)'};
+const fmt=n=>n==null?'–':n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?(n/1e3).toFixed(1)+'k':n.toLocaleString();
+const fmtH=h=>h==null?'–':h>=100?Math.round(h).toLocaleString():h>=10?h.toFixed(1):h.toFixed(2);
+const fmtB=b=>!b?'–':b>=1e12?(b/1e12).toFixed(2)+' TB':b>=1e9?(b/1e9).toFixed(1)+' GB':(b/1e6).toFixed(0)+' MB';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let D, P={}, L=[], sel=new Set(), open=new Set(), sortK='hours', sortAsc=false, tab='hf';
+const F={q:'',hmin:null,hmax:null,emin:null,emax:null, sets:{}};
+const FACETS=[
+ ['morph','Morphology',r=>r.morph],
+ ['form','Form factor',r=>r.form],
+ ['embodiment','Embodiment',r=>r.embodiment],
+ ['source','Data source',r=>r.source],
+ ['family','camx_480p family',r=>r.family],
+ ['n_views','# camera views',r=>String(r.n_views)],
+ ['camkind','Camera composition',r=>[r.wrist?'wrist camera':'no wrist camera',r.external?'external camera':'no external camera',r.fisheye?'fisheye':'pinhole only',r.mobile?'mobile base':null].filter(Boolean)],
+ ['cammodel','Camera model',r=>[...new Set(r.cams.map(c=>c.model||'unknown'))]],
+ ['res','Resolution',r=>r.res],
+ ['fps','FPS',r=>String(Math.round(r.fps))],
+ ['state','State channels',r=>[r.eef?'eef / camera pose':'no eef pose',r.joints?'joint positions':null,r.gripper?'gripper width':null].filter(Boolean)],
+ ['valid','Validation',r=>[r.fk_urdf?'FK URDF in meta':'no FK URDF',(P[r.project].overlays.length?'overlay rendered':'no overlay yet'),r.released?'released (_SUCCESS)':'unreleased',r.quality?'quality flags':null].filter(Boolean)],
+ ['skill','Skills (project-level)',r=>Object.keys(P[r.project].skills||{})],
+];
+function load(){fetch('data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=d.datasets;
+  try{const s=JSON.parse(localStorage.getItem('camx.sel')||'[]');s.forEach(x=>sel.add(x));}catch(e){}
+  document.getElementById('repo').value=d.download.hf_repo;
+  document.getElementById('buildInfo').textContent=`Built ${d.built} from ${d.root} · inventory ${d.inventory_updated} · skills/durations ${d.stats_as_of}`;
+  document.getElementById('footInfo').textContent=`${d.totals.datasets} datasets, ${d.totals.projects} projects, ${d.totals.embodiments} embodiments`;
+  tiles();facets();render();});}
+function tiles(){const t=D.totals;document.getElementById('tiles').innerHTML=[['Hours',fmtH(t.hours)],['Episodes',fmt(t.episodes)],['Frames',fmt(t.frames)],['Datasets',t.datasets],['Projects',t.projects],['Embodiments',t.embodiments],['Overlay clips',t.overlays]].map(([k,v])=>`<div class="tile"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+  const by={};L.forEach(r=>{const o=by[r.embodiment]||(by[r.embodiment]={h:0,m:{}});o.h+=r.hours;o.m[r.morph]=(o.m[r.morph]||0)+r.hours});
+  const arr=Object.entries(by).sort((a,b)=>b[1].h-a[1].h);const max=arr[0][1].h;
+  document.getElementById('legend').innerHTML='<b style="color:var(--ink)">Hours by embodiment</b> '+MORPH.map(m=>`<span><i style="background:${MCOL[m]}"></i>${m}</span>`).join('');
+  document.getElementById('embBars').innerHTML=arr.map(([e,o])=>{const dom=Object.entries(o.m).sort((a,b)=>b[1]-a[1])[0][0];return `<span class="lab">${esc(e)}</span><div><div class="bar" style="width:${(100*o.h/max).toFixed(1)}%;background:${MCOL[dom]}" title="${esc(e)}: ${fmtH(o.h)} h"></div></div><span class="val">${fmtH(o.h)} h</span>`}).join('');}
+function facets(){const el=document.getElementById('facets');el.innerHTML='';FACETS.forEach(([k,label,fn],i)=>{const det=document.createElement('details');det.open=i<3;det.innerHTML=`<summary>${label}<span class="n" id="fn_${k}"></span></summary><div class="chips" id="fc_${k}"></div>`;el.appendChild(det);F.sets[k]=new Set();});
+  el.addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;const k=c.dataset.k,v=c.dataset.v;const s=F.sets[k];s.has(v)?s.delete(v):s.add(v);render();});}
+function facetCounts(rows){FACETS.forEach(([k,label,fn])=>{const cnt={};rows.forEach(r=>{let v=fn(r);(Array.isArray(v)?v:[v]).forEach(x=>{if(x!=null)cnt[x]=(cnt[x]||0)+1})});
+  const s=F.sets[k];Object.keys(cnt).length; s.forEach(v=>{if(!(v in cnt))cnt[v]=0});
+  let keys=Object.keys(cnt);keys.sort(k==='n_views'||k==='fps'?(a,b)=>+a-+b:(a,b)=>cnt[b]-cnt[a]||a.localeCompare(b));
+  document.getElementById('fc_'+k).innerHTML=keys.map(v=>`<span class="chip${s.has(v)?' on':''}" data-k="${k}" data-v="${esc(v)}">${esc(v)}<span class="c">${cnt[v]}</span></span>`).join('');
+  document.getElementById('fn_'+k).textContent=s.size?s.size:'';});}
+function passes(r,skip){for(const [k,label,fn] of FACETS){if(k===skip)continue;const s=F.sets[k];if(!s.size)continue;let v=fn(r);v=Array.isArray(v)?v:[v];if(!v.some(x=>s.has(String(x))))return false;}
+  if(F.hmin!=null&&r.hours<F.hmin)return false;if(F.hmax!=null&&r.hours>F.hmax)return false;if(F.emin!=null&&r.episodes<F.emin)return false;if(F.emax!=null&&r.episodes>F.emax)return false;
+  if(F.q){const q=F.q.toLowerCase();const hay=(r.id+' '+r.robot_type+' '+r.embodiment+' '+r.source+' '+r.cams.map(c=>c.model).join(' ')+' '+(P[r.project].notes||'')).toLowerCase();if(!hay.includes(q))return false;}
+  return true;}
+let filtered=[];
+function render(){filtered=L.filter(r=>passes(r));
+  // facet counts use the rows passing every OTHER facet (so a facet's own chips stay clickable)
+  FACETS.forEach(([k])=>{});facetCounts(L.filter(r=>passes(r,null)));
+  const groups={};filtered.forEach(r=>(groups[r.project]||(groups[r.project]=[])).push(r));
+  const rows=Object.entries(groups).map(([k,rs])=>{const p=P[k];const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const fpsSet=[...new Set(rs.map(r=>Math.round(r.fps)))].sort((a,b)=>a-b);
+    return {key:k,name:k,embodiment:emb,form:Object.keys(p.forms).sort((a,b)=>p.forms[b]-p.forms[a])[0],datasets:rs.length,episodes:rs.reduce((a,r)=>a+r.episodes,0),hours:rs.reduce((a,r)=>a+r.hours,0),fps:fpsSet.length==1?fpsSet[0]:fpsSet[0]+'–'+fpsSet[fpsSet.length-1],n_views:[...new Set(rs.map(r=>r.n_views))].sort((a,b)=>a-b).join('/'),rs,p,morph:rs[0].morph}});
+  const cmp=(a,b)=>{let x=a[sortK],y=b[sortK];if(typeof x==='string'||typeof y==='string'){x=String(x);y=String(y);return sortAsc?x.localeCompare(y):y.localeCompare(x)}return sortAsc?x-y:y-x};
+  rows.sort(cmp);
+  const tb=document.getElementById('tbody');let h='';
+  rows.forEach(g=>{const all=g.rs.every(r=>sel.has(r.id)),some=g.rs.some(r=>sel.has(r.id));const isOpen=open.has(g.key);
+    const ov=g.p.overlays.length;const cams=camSummary(g.rs);
+    h+=`<tr class="proj${all?' selected':''}" data-p="${esc(g.key)}"><td><input type="checkbox" ${all?'checked':''} ${!all&&some?'data-ind=1':''} data-selp="${esc(g.key)}"></td><td class="name"><span class="tog">${isOpen?'▾':'▸'}</span>${esc(g.key)} <span class="muted small">${esc(g.p.sources.join(', '))}</span></td><td><i class="emb" style="background:${MCOL[g.morph]}"></i>${esc(g.embodiment)}${Object.keys(g.p.embodiments).length>1?' <span class="muted small">+'+(Object.keys(g.p.embodiments).length-1)+'</span>':''}</td><td>${esc(g.form)}</td><td class="num">${g.datasets}</td><td class="num">${fmt(g.episodes)}</td><td class="num">${fmtH(g.hours)}</td><td class="num">${g.fps}</td><td class="num">${g.n_views}</td><td class="cams">${cams}</td><td>${ov?`<a class="overlaylink" href="overlays/#${esc(g.key.replace('/','_'))}">${ov} clip${ov>1?'s':''} · ${g.p.overlays[0].mode==='urdf'?'URDF':g.p.overlays[0].mode==='camera-path'?'camera path':'–'}</a>`:'<span class="muted small">not rendered yet</span>'}</td></tr>`;
+    if(isOpen){g.rs.sort((a,b)=>{if(sortK in a){const x=a[sortK],y=b[sortK];if(typeof x==='string')return sortAsc?x.localeCompare(y):y.localeCompare(x);return sortAsc?x-y:y-x}return a.name.localeCompare(b.name)}).forEach(r=>{
+      h+=`<tr class="leaf${sel.has(r.id)?' selected':''}" data-id="${esc(r.id)}"><td><input type="checkbox" ${sel.has(r.id)?'checked':''} data-sel="${esc(r.id)}"></td><td class="name">${esc(r.name)}${r.released?'':' <span class="chip static warn" title="no meta/_SUCCESS marker">unreleased</span>'}</td><td class="small">${esc(r.robot_type)}</td><td class="small">${esc(r.form)}</td><td class="num muted">1</td><td class="num">${fmt(r.episodes)}</td><td class="num">${fmtH(r.hours)}</td><td class="num">${r.fps}</td><td class="num">${r.n_views}</td><td class="cams">${r.cams.map(c=>`<span title="${esc(c.model||'')} ${c.w}x${c.h}">${esc(c.name)}${c.fisheye?' ◎':''}</span>`).join('')}</td><td class="small muted">${r.fk_urdf?'FK '+esc(r.fk_urdf):''}</td></tr>`;});}
+  });
+  tb.innerHTML=h||'<tr><td colspan="11" class="muted" style="padding:30px;text-align:center">No datasets match these filters.</td></tr>';
+  tb.querySelectorAll('input[data-ind]').forEach(i=>i.indeterminate=true);
+  document.querySelectorAll('th[data-k]').forEach(th=>{th.classList.toggle('sorted',th.dataset.k===sortK);th.classList.toggle('asc',th.dataset.k===sortK&&sortAsc)});
+  const fh=filtered.reduce((a,r)=>a+r.hours,0),fe=filtered.reduce((a,r)=>a+r.episodes,0);
+  document.getElementById('fCount').textContent=`${filtered.length} datasets · ${rows.length} projects · ${fmtH(fh)} h · ${fmt(fe)} episodes`;
+  updateSel();}
+function camSummary(rs){const w=new Set(rs.map(r=>r.wrist)),e=new Set(rs.map(r=>r.external)),fe=rs.some(r=>r.fisheye);const rng=s=>{const a=[...s].sort((x,y)=>x-y);return a.length>1?a[0]+'–'+a[a.length-1]:a[0]};return `<span title="wrist cameras">wrist ${rng(w)}</span><span title="external / head cameras">ext ${rng(e)}</span>${fe?'<span title="at least one fisheye view">fisheye</span>':''}`;}
+function updateSel(){const rows=L.filter(r=>sel.has(r.id));const h=rows.reduce((a,r)=>a+r.hours,0),b=rows.reduce((a,r)=>a+(r.bytes_est||0),0);
+  document.getElementById('sCount').textContent=`${rows.length} datasets · ${fmtH(h)} h`;document.getElementById('dlCount').textContent=rows.length;document.getElementById('dlHours').textContent=fmtH(h);document.getElementById('dlSize').textContent=fmtB(b);
+  try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))}catch(e){}
+  cmdText();}
+function cmdText(){const rows=L.filter(r=>sel.has(r.id)).sort((a,b)=>a.id.localeCompare(b.id));const repo=document.getElementById('repo').value.trim()||D.download.hf_repo;let t='';
+  if(!rows.length)t='# select datasets above (project rows select every dataset of the project)';
+  else if(tab==='hf')t=`# pip install -U huggingface_hub\n# ${rows.length} datasets, ${fmtH(rows.reduce((a,r)=>a+r.hours,0))} h, est. ${fmtB(rows.reduce((a,r)=>a+(r.bytes_est||0),0))}\nhf download ${repo} --repo-type dataset --local-dir camx_480p \\\n`+rows.map(r=>`  --include "${r.id}/*"`).join(' \\\n');
+  else if(tab==='py')t=`from huggingface_hub import snapshot_download\n\nDATASETS = [\n${rows.map(r=>`    "${r.id}",`).join('\n')}\n]\nsnapshot_download(\n    repo_id="${repo}", repo_type="dataset", local_dir="camx_480p",\n    allow_patterns=[d + "/*" for d in DATASETS],\n)`;
+  else if(tab==='sh')t=`#!/bin/bash\n# one hf call per dataset, resumable; re-run to fill gaps\nset -e\nREPO=${repo}\nwhile read d; do\n  hf download "$REPO" --repo-type dataset --local-dir camx_480p --include "$d/*"\ndone <<'EOF'\n${rows.map(r=>r.id).join('\n')}\nEOF`;
+  else t=rows.map(r=>r.id).join('\n');
+  document.getElementById('cmd').textContent=t;}
+document.addEventListener('DOMContentLoaded',()=>{load();
+  const $=id=>document.getElementById(id);
+  $('q').addEventListener('input',e=>{F.q=e.target.value.trim();render()});
+  ['hmin','hmax','emin','emax'].forEach(k=>$(k).addEventListener('input',e=>{F[k]=e.target.value===''?null:+e.target.value;render()}));
+  $('reset').onclick=()=>{F.q='';$('q').value='';['hmin','hmax','emin','emax'].forEach(k=>{F[k]=null;$(k).value=''});Object.values(F.sets).forEach(s=>s.clear());render()};
+  $('tbody').addEventListener('click',e=>{const cb=e.target.closest('input[type=checkbox]');
+    if(cb){if(cb.dataset.selp){const rs=L.filter(r=>r.project===cb.dataset.selp&&passes(r));const on=cb.checked;rs.forEach(r=>on?sel.add(r.id):sel.delete(r.id));}else{cb.checked?sel.add(cb.dataset.sel):sel.delete(cb.dataset.sel);}render();return;}
+    const pr=e.target.closest('tr.proj');if(pr){if(e.target.closest('a'))return;open.has(pr.dataset.p)?open.delete(pr.dataset.p):open.add(pr.dataset.p);render();return;}
+    const lf=e.target.closest('tr.leaf');if(lf)drawer(lf.dataset.id);});
+  document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{if(sortK===th.dataset.k)sortAsc=!sortAsc;else{sortK=th.dataset.k;sortAsc=sortK==='name'||sortK==='embodiment'||sortK==='form'}render()});
+  $('selAll').onclick=()=>{filtered.forEach(r=>sel.add(r.id));render()};$('deselAll').onclick=()=>{filtered.forEach(r=>sel.delete(r.id));render()};$('clearSel').onclick=()=>{sel.clear();render()};
+  $('expAll').onclick=()=>{filtered.forEach(r=>open.add(r.project));render()};$('colAll').onclick=()=>{open.clear();render()};
+  $('dlToggle').onclick=()=>{const d=$('download');d.classList.toggle('open');$('dlToggle').textContent=d.classList.contains('open')?'Hide':'Show'};
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));cmdText()});
+  $('repo').addEventListener('input',cmdText);
+  $('copyCmd').onclick=()=>navigator.clipboard.writeText($('cmd').textContent).then(()=>{$('copyCmd').textContent='Copied';setTimeout(()=>$('copyCmd').textContent='Copy',1200)});
+  $('saveCmd').onclick=()=>{const ext={hf:'sh',py:'py',sh:'sh',paths:'txt'}[tab];dl(`camx_download.${ext}`,$('cmd').textContent,'text/plain')};
+  $('exportJson').onclick=()=>{const rows=L.filter(r=>sel.has(r.id));dl('camx_selection.json',JSON.stringify({repo:$('repo').value,exported:new Date().toISOString(),datasets:rows.map(r=>({id:r.id,project:r.project,embodiment:r.embodiment,source:r.source,episodes:r.episodes,hours:r.hours,fps:r.fps,views:r.n_views,bytes_est:r.bytes_est}))},null,1),'application/json')};
+  $('importJson').onclick=()=>$('importFile').click();
+  $('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const j=JSON.parse(t);const ids=(j.datasets||j).map(x=>typeof x==='string'?x:x.id);const known=new Set(L.map(r=>r.id));let n=0;ids.forEach(i=>{if(known.has(i)){sel.add(i);n++}});alert(`Imported ${n} of ${ids.length} datasets`);render()}catch(err){alert('Not a selection JSON: '+err)}});e.target.value=''};
+  $('drawerClose').onclick=()=>$('drawer').classList.remove('open');
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')$('drawer').classList.remove('open')});
+  if(!$('download').classList.contains('open')&&sel.size){$('download').classList.add('open');$('dlToggle').textContent='Hide'}
+});
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const ov=p.overlays.filter(o=>o.dataset===r.id);
+  const kv=[['Path',r.id],['Embodiment',r.embodiment],['Robot type',r.robot_type],['Data source',r.source],['Form factor',r.form],['Setup',r.setup],['Episodes',fmt(r.episodes)],['Frames',fmt(r.frames)],['Hours',fmtH(r.hours)],['FPS',r.fps],['Tasks',r.tasks],['Resolution',r.res.join(', ')],
+    ['Cameras',r.cams.map(c=>`${c.name} — ${c.model||'unknown model'}, ${c.w}×${c.h}${c.fisheye?', fisheye':''} (${c.role})`).join('<br>')],
+    ['State',[r.eef?'eef / camera pose':null,r.joints?'joint positions':null,r.gripper?'gripper width':null].filter(Boolean).join(', ')||'–'],['FK URDF',r.fk_urdf||'–'],['Export id',r.export_id||'–'],['Released',r.released?'yes (meta/_SUCCESS)':'no'],['Quality flags',r.quality?'yes':'no'],['Est. size (480p)',fmtB(r.bytes_est)],
+    ['Overlay clips',ov.length?ov.map(o=>`<a href="overlays/#${o.key}">${esc(o.slug)}</a> (${o.mode})`).join('<br>'):(p.overlays.length?`${p.overlays.length} for this project — <a href="overlays/#${p.overlays[0].key}">open</a>`:'not rendered yet')],
+    ['Project notes',p.notes||'–'],['Project skills',p.skills?Object.entries(p.skills).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`${k} (${fmt(v)})`).join(', '):'–']];
+  document.getElementById('drawerBody').innerHTML=`<h3>${esc(r.id)}</h3><p class="small"><button data-sel-one="${esc(r.id)}">${sel.has(r.id)?'Deselect':'Select for download'}</button></p><dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${k==='Cameras'||k==='Overlay clips'?v:esc(v)}</dd>`).join('')}</dl>`;
+  document.querySelector('[data-sel-one]').onclick=e=>{const i=e.target.dataset.selOne;sel.has(i)?sel.delete(i):sel.add(i);render();drawer(i)};
+  document.getElementById('drawer').classList.add('open');}
+</script>
 </body>
 </html>
