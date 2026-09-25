@@ -48,6 +48,10 @@ _building: dict[tuple[str, int], threading.Event] = {}
 MAX_SCENES = int(os.environ.get("CAMX_OVERLAY_MAX_SCENES", "8"))
 _jobs: dict[str, dict] = {}
 _pool = ThreadPoolExecutor(max_workers=int(os.environ.get("CAMX_OVERLAY_WORKERS", "2")))
+# public exposure limits: bounded concurrent frame renders, bounded clip queue / length
+_render_sem = threading.BoundedSemaphore(int(os.environ.get("CAMX_OVERLAY_RENDERS", "6")))
+MAX_CLIP_SECONDS = float(os.environ.get("CAMX_OVERLAY_MAX_CLIP_SECONDS", "60"))
+MAX_QUEUED_JOBS = int(os.environ.get("CAMX_OVERLAY_MAX_QUEUED", "12"))
 
 
 def _valid_rel(rel: str) -> str:
@@ -124,7 +128,8 @@ async def frame(dataset: str, episode: int = 0, frame: int = 0, views: str | Non
     sc = await asyncio.to_thread(get_scene, rel, episode)
 
     def work():
-        img = sc.render_frame(frame, _parse_views(views), draw_urdf=bool(urdf), draw_axes_mode=axes, draw_path_mode=path, wire=bool(wire))
+        with _render_sem:
+            img = sc.render_frame(frame, _parse_views(views), draw_urdf=bool(urdf), draw_axes_mode=axes, draw_path_mode=path, wire=bool(wire))
         if 0.1 <= scale < 0.999:
             img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
         ok, buf = cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, int(q)])
@@ -174,11 +179,15 @@ def _run_job(key: str, req: ClipReq):
 @app.post("/api/clip")
 def clip(req: ClipReq):
     _valid_rel(req.dataset)
+    req.seconds = max(0.5, min(float(req.seconds), MAX_CLIP_SECONDS))
+    req.out_fps = max(1.0, min(float(req.out_fps), 30.0))
     key = _job_key(req)
     cached = CACHE / f"{key}.json"
     if key not in _jobs and cached.is_file() and (CACHE / f"{key}.mp4").is_file():
         _jobs[key] = json.load(open(cached))
     if key not in _jobs:
+        if sum(1 for j in _jobs.values() if j.get("status") in ("queued", "building scene", "rendering")) >= MAX_QUEUED_JOBS:
+            raise HTTPException(429, "clip queue is full; try again in a minute")
         _jobs[key] = {"key": key, "request": req.model_dump(), "status": "queued", "progress": 0.0, "submitted": time.time()}
         _pool.submit(_run_job, key, req)
     return _jobs[key]
