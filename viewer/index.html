@@ -105,8 +105,10 @@ async function connect(){
   $('bstat').textContent='…';$('bstat').className='chip';
   let ok=false;
   try{await api('/api/health');ok=true}catch(e){}
-  if(!ok&&!B){for(const c of ['http://127.0.0.1:19529','http://localhost:19529']){try{const r=await fetch(c+'/api/health');if(r.ok){B=c;$('backend').value=B;ok=true;break}}catch(e){}}}
-  if(!ok){$('bstat').textContent='unreachable';$('bstat').className='chip bad';$('list').innerHTML='<div class="m">Backend not reachable. Run <code>backend/server.py</code> on the data machine (or tunnel it: <code>ssh -L 19529:127.0.0.1:19529 &lt;desktop&gt;</code>) and set its URL above.</div>';return}
+  if(!ok&&!B){const cands=['http://127.0.0.1:19529','http://localhost:19529'];
+    try{const j=await (await fetch('../backend.json',{cache:'no-store'})).json();if(j.url)cands.unshift(j.url.replace(/\/$/,''))}catch(e){}
+    for(const c of cands){try{const r=await fetch(c+'/api/health');if(r.ok){B=c;$('backend').value=B;ok=true;break}}catch(e){}}}
+  if(!ok){$('bstat').textContent='unreachable';$('bstat').className='chip bad';$('list').innerHTML='<div class="m">Backend not reachable: the public tunnel (<code>backend.json</code>) is down or blocked. Run <code>backend/run.sh</code> + <code>backend/tunnel.sh</code> on the data machine, or tunnel it yourself (<code>ssh -L 19529:127.0.0.1:19529 &lt;desktop&gt;</code>) and set the URL above.</div>';return}
   $('bstat').textContent='connected';$('bstat').className='chip ok';
   DS=(await api('/api/datasets')).datasets;filterList();
 }
