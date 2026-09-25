@@ -30,8 +30,8 @@ registry and fisheye calibrations; the rasteriser is CPU-only, no Rerun viewer n
 
 ```
 backend/run.sh                 # nohup on :19529, log in _build/logs/server.log (venv /data/venvs/camx-overlay)
-open http://<desktop>:19529/viewer/     # or tunnel: ssh -L 19529:127.0.0.1:19529 <desktop>, then the GitHub Pages viewer
-                                        # page connects to http://127.0.0.1:19529 automatically
+backend/tunnel.sh              # public Cloudflare quick tunnel (anonymous *.trycloudflare.com); writes + pushes backend.json,
+                               # which the Pages viewer reads to find the backend (falls back to localhost / a manual URL)
 python backend/overlay_render.py <family>/<project>/<dataset> --episode N --frame F --out f.jpg   # CLI, same renderer
 ```
 
