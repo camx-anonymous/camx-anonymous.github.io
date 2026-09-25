@@ -26,13 +26,13 @@ th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--line);vertical-
 <header><div class="wrap">
   <h1>CAMX Dataset <small>projection overlays · validation you can look at</small></h1>
   <p class="sub">For each dataset family, a few episodes are re-rendered with the gripper's URDF (or, for rigs without a released URDF, the recorded camera path and world-up axis) projected through the dataset's <em>own</em> per-frame camera poses and intrinsics. If the drawn gripper sits on the real one in the wrist views, the end-effector pose, camera extrinsics and intrinsics shipped in the dataset are consistent. Every camera view is shown side by side in one clip.</p>
-  <p class="sub"><a href="../">← data manager</a> · these are the fixed validation picks; to see <em>any</em> dataset and episode rendered live, use the <a href="../viewer/">overlay viewer</a>.</p>
+  <p class="sub"><a href="../">← data manager</a> · a few example episodes per project, picked from the validation set; clips stream from the <code>overlays-v1</code> release.</p>
 </div></header>
 <main class="wrap">
   <div class="toolbar" id="modes"></div>
   <div id="content"></div>
-  <h2 id="pending">Not rendered yet</h2>
-  <p class="pnote">Projects in the training tree without an overlay clip so far. Rendering needs a gripper profile (URDF + mount transform) for the rig; for single-camera fisheye rigs it uses the fitted Kannala-Brandt model. These are queued.</p>
+  <h2 id="pending">No example clip</h2>
+  <p class="pnote">Projects in the training tree without an example overlay in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
   <table><thead><tr><th>Project</th><th>Embodiment</th><th>Datasets</th><th>Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
   <footer>Clips are 10 fps, ~45 s, re-encoded to 360p for the web (source renders are 480p). Acceptance chips follow the curation protocol: <b>pass</b> = wrist-view median error ≤ 10 px, p90 ≤ 20 px at 480 rows; <b>unmeasured</b> = no automatic finger detector for the rig yet (visual check only).</footer>
 </main>
@@ -60,7 +60,7 @@ function render(){const projs=D.projects.filter(p=>p.overlays.length);const mode
         <div><span class="k">rendered from</span> export ${esc(o.export_id||'pre-protocol')} · release ${esc((o.rendered_from||'').slice(0,10))} · <a href="${src}">mp4</a></div></div></div>`}).join('')+'</div>';});
   document.getElementById('content').innerHTML=h;
   document.querySelectorAll('.vid').forEach(v=>v.onclick=()=>{if(v.querySelector('video'))return;v.innerHTML=`<video controls autoplay loop muted playsinline src="${v.dataset.src}"></video>`});
-  document.getElementById('pendingBody').innerHTML=D.projects.filter(p=>!p.overlays.length).map(p=>{const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const n=p.notes||'';let why='render pending';
+  document.getElementById('pendingBody').innerHTML=D.projects.filter(p=>!p.overlays.length).map(p=>{const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const n=p.notes||'';let why='no clip in this release';
     if(/conversion tree|not in the camx_480p training tree/i.test(n))why='converted after the last render pass';else if(/rolled into the UMI|handheld/i.test(n)&&/single/.test(Object.keys(p.forms).join()))why='single fisheye / GoPro camera: needs the rig\'s lens fit before drawing';
     return `<tr><td><a href="../#${esc(p.key)}">${esc(p.key)}</a></td><td>${esc(emb)}</td><td>${p.datasets}</td><td>${fmtH(p.hours)}</td><td>${why}</td></tr>`}).join('');}
 </script>
