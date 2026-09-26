@@ -21,3 +21,7 @@ This repository is anonymized for review.
 ```
 python3 tools/build_site_data.py            # scans camx_480p, joins the inventory + stats, writes data/datasets.json
 ```
+
+The build ends with an anonymisation pass driven by a local, uncommitted term list (`.claude/scrub.json`, or
+`$CAMX_SCRUB`); the build fails if any listed term survives. `--scrub-only` re-runs just that pass over the
+existing `data/datasets.json`.

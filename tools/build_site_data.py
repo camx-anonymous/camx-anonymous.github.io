@@ -8,14 +8,53 @@ Sources (desktop001 only):
   * camx_480p_browser/mv_urdf/videos/<project>/<slug>/meta.json   (projection overlay clips)
 
 Usage: python3 tools/build_site_data.py [--root /data/camx_480p]
+       python3 tools/build_site_data.py --scrub-only   # re-run the anonymisation pass over data/datasets.json
 """
 import argparse, collections, glob, json, os, re, sys, datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 INVENTORY = os.path.expanduser('~/projects/camera-cross-embodiment/camx/figures/dataset_inventory.json')
-STATS = '/data/camx_480p_browser/stats/stats.json'
-OVERLAYS = '/data/camx_480p_browser/mv_urdf/videos'
+BROWSER = os.environ.get('CAMX_BROWSER', '/data/camx_480p_browser')
+STATS = os.path.join(BROWSER, 'stats', 'stats.json')
+OVERLAYS = os.path.join(BROWSER, 'mv_urdf', 'videos')
+
+# --- anonymisation ---------------------------------------------------------------------------------------------
+# The site is published anonymously: no author names, no institutions. Every string that reaches datasets.json goes
+# through scrub_text(); dataset ids in ID_RENAMES are renamed (the HF download layout must use the same names).
+# The term list is deliberately kept out of the repo: $CAMX_SCRUB (default .claude/scrub.json, gitignored) holds
+#   {"replace": [[regex, replacement], ...], "renames": {"old/dataset/id": "new/dataset/id"}, "forbidden": regex}
+SCRUB_FILE = os.environ.get('CAMX_SCRUB', os.path.join(REPO, '.claude', 'scrub.json'))
+if os.path.isfile(SCRUB_FILE):
+    _sc = json.load(open(SCRUB_FILE))
+else:
+    print(f'warning: {SCRUB_FILE} not found, anonymisation pass is a no-op', file=sys.stderr); _sc = {}
+SCRUB = [tuple(x) for x in _sc.get('replace', [])]
+ID_RENAMES = _sc.get('renames', {})
+FORBIDDEN = re.compile(_sc.get('forbidden') or r'(?!x)x', re.I)
+
+
+def scrub_text(s):
+    for pat, rep in SCRUB: s = re.sub(pat, rep, s, flags=re.I)
+    return s
+
+
+def scrub(obj):
+    if isinstance(obj, str): return scrub_text(obj)
+    if isinstance(obj, list): return [scrub(x) for x in obj]
+    if isinstance(obj, dict): return {k: scrub(v) for k, v in obj.items()}
+    return obj
+
+
+def anonymise(out):
+    out = scrub(out)
+    out['root'] = os.path.basename(out.get('root', '').rstrip('/')) or 'camx_480p'
+    for r in out['datasets']:
+        if r['id'] in ID_RENAMES:
+            r['id'] = ID_RENAMES[r['id']]; r['name'] = '/'.join(r['id'].split('/')[2:])
+    hits = sorted({m.group(0).lower() for m in FORBIDDEN.finditer(json.dumps(out))})
+    if hits: sys.exit(f'anonymisation failed, still present: {hits}')
+    return out
 
 # project (family/project) -> inventory "source"; projects spanning two embodiments resolve per leaf robot_type
 SOURCE_OF = {
@@ -108,9 +147,14 @@ def scan_leaves(root):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--root', default='/data/camx_480p')
+    ap.add_argument('--root', default=os.environ.get('CAMX_ROOT', '/data/camx_480p'))
     ap.add_argument('--out', default=os.path.join(REPO, 'data', 'datasets.json'))
+    ap.add_argument('--scrub-only', action='store_true', help='only re-run the anonymisation pass over --out')
     a = ap.parse_args()
+    if a.scrub_only:
+        out = anonymise(json.load(open(a.out)))
+        json.dump(out, open(a.out, 'w'), separators=(',', ':'))
+        print(json.dumps(out['totals']), file=sys.stderr); return
     inv = json.load(open(INVENTORY))
     inv_rows = {(e['embodiment'], e['source']): e for e in inv['entries'] if e.get('status') == 'counted'}
     stats = json.load(open(STATS))
@@ -221,6 +265,7 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
+    out = anonymise(out)
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)
