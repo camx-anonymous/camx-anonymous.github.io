@@ -128,6 +128,10 @@ input[type=checkbox]{accent-color:var(--ink);width:14px;height:14px;margin:0;ver
 .dl .side .sum{font:400 12.5px/1.6 var(--mono);color:var(--ink3);margin:6px 0 14px}
 .dl .side label{display:block;font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin:14px 0 6px}
 .dl .side .btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.dl .side .seg{display:flex;gap:0}
+.dl .side .seg button{flex:1;justify-content:center;border-radius:0;padding:8px 6px;font-size:12.5px}
+.dl .side .seg button:first-child{border-radius:7px 0 0 7px}.dl .side .seg button:last-child{border-radius:0 7px 7px 0;margin-left:-1px}
+.dl .side .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);position:relative;z-index:1}
 .dl .hint{font:400 12px/1.55 var(--mono);color:var(--ink3);margin-top:10px}
 .selpill{position:fixed;right:20px;bottom:20px;z-index:15;background:var(--ink);color:var(--bg);border-radius:999px;padding:10px 16px 10px 18px;font:500 12.5px/1 var(--mono);display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-md);text-decoration:none;transform:translateY(120%);opacity:0;transition:transform .2s,opacity .2s}
 .selpill{visibility:hidden}.selpill.show{transform:none;opacity:1;visibility:visible}
@@ -265,18 +269,20 @@ input[type=checkbox]{accent-color:var(--ink);width:14px;height:14px;margin:0;ver
     <div class="sec-head">
       <div class="eyebrow">04 · Batch download</div>
       <h2>One command for the selection.</h2>
-      <p>The datasets you tick in the browser become an <code>hf download</code> call, a Python snippet or a resumable bash loop. Selections persist in this browser and can be exported as JSON to share with collaborators.</p>
+      <p>The datasets you tick in the browser become an <code>hf download</code> call, a Python snippet or a resumable bash loop. By default each selected dataset contributes one sample episode (episode 0); switch the scope to fetch whole dataset directories. Selections persist in this browser and can be exported as JSON to share with collaborators.</p>
     </div>
     <div class="dl">
       <div>
         <div class="tabs"><button class="on" data-t="hf">hf CLI</button><button data-t="py">Python</button><button data-t="sh">bash</button><button data-t="paths">paths</button></div>
         <pre id="cmd"></pre>
-        <p class="hint">Downloads are per dataset directory <code>&lt;family&gt;/&lt;project&gt;/&lt;dataset&gt;/</code> (meta/, data/, videos/). Sizes are estimates from the 480p tree measurement, spread over datasets by frame count.</p>
+        <p class="hint" id="dlHint"></p>
       </div>
       <div class="side">
         <div class="big"><span id="dlCount">0</span><small>datasets</small></div>
         <div class="sum"><b id="dlHours">0</b> h · est. <b id="dlSize">–</b></div>
         <div class="btns"><button class="primary" id="copyCmd">Copy command</button><button id="saveCmd">Save file</button></div>
+        <label>Scope</label>
+        <div class="seg" id="scope"><button class="on" data-s="sample">1 episode / dataset</button><button data-s="full">Full datasets</button></div>
         <label for="repo">Hugging Face repo</label>
         <input type="text" id="repo">
         <label>Selection</label>
@@ -326,7 +332,14 @@ const fmtB=b=>!b?'–':b>=1e12?(b/1e12).toFixed(2)+' TB':b>=1e9?(b/1e9).toFixed(
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const taskText=t=>Array.isArray(t)?t.join('||'):String(t);
 const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + up axis':m;
-let D, P={}, L=[], sel=new Set(), open=new Set(), sortK='hours', sortAsc=false, tab='hf';
+let D, P={}, L=[], sel=new Set(), open=new Set(), sortK='hours', sortAsc=false, tab='hf', scope='sample';
+// LeRobot v3 packs consecutive episodes into chunk-XXX/file-XXX files; episode 0 always lives in the first data file and the first video file of every view.
+const SAMPLE=['meta/*','data/chunk-000/file-000.parquet','videos/*/chunk-000/file-000.mp4'];
+const SAMPLE_CAP={data:1e8,video:2e8}; // LeRobot v3 default packed-file sizes (100 MB parquet, 200 MB mp4): upper bound of a one-episode sample
+const patterns=r=>scope==='full'?[r.id+'/*']:SAMPLE.map(x=>r.id+'/'+x);
+const rowBytes=r=>scope==='full'?(r.bytes_est||0):Math.min(r.bytes_est||0,SAMPLE_CAP.data+r.n_views*SAMPLE_CAP.video);
+const rowHours=r=>scope==='full'?r.hours:(r.episodes?r.hours/r.episodes:0);
+function syncScope(){document.querySelectorAll('#scope button').forEach(b=>b.classList.toggle('on',b.dataset.s===scope))}
 const F={q:'',hmin:null,hmax:null,emin:null,emax:null, sets:{}};
 const FACETS=[
  ['morph','Morphology',r=>r.morph],
@@ -345,6 +358,8 @@ const FACETS=[
 ];
 function load(){fetch('data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=d.datasets;
   try{const s=JSON.parse(localStorage.getItem('camx.sel')||'[]');s.forEach(x=>sel.add(x));}catch(e){}
+  try{const sc=localStorage.getItem('camx.scope');if(sc==='full'||sc==='sample')scope=sc;}catch(e){}
+  syncScope();
   document.getElementById('repo').value=d.download.hf_repo;
   document.getElementById('buildInfo').textContent=`Built ${d.built} from ${d.root} · inventory ${d.inventory_updated} · skills/durations ${d.stats_as_of}`;
   document.getElementById('footInfo').textContent=`${d.totals.datasets} datasets, ${d.totals.projects} projects, ${d.totals.embodiments} embodiments`;
@@ -410,20 +425,25 @@ function render(){filtered=L.filter(r=>passes(r));
   document.getElementById('fCount').textContent=`${filtered.length} datasets · ${rows.length} projects · ${fmtH(fh)} h · ${fmt(fe)} episodes`;
   updateSel();}
 function camSummary(rs){const w=new Set(rs.map(r=>r.wrist)),e=new Set(rs.map(r=>r.external)),fe=rs.some(r=>r.fisheye);const rng=s=>{const a=[...s].sort((x,y)=>x-y);return a.length>1?a[0]+'–'+a[a.length-1]:a[0]};return `<span title="wrist cameras">wrist ${rng(w)}</span><span title="external / head cameras">ext ${rng(e)}</span>${fe?'<span title="at least one fisheye view">fisheye</span>':''}`;}
-function updateSel(){const rows=L.filter(r=>sel.has(r.id));const h=rows.reduce((a,r)=>a+r.hours,0),b=rows.reduce((a,r)=>a+(r.bytes_est||0),0);
-  document.getElementById('sCount').textContent=`${rows.length} datasets · ${fmtH(h)} h`;document.getElementById('dlCount').textContent=rows.length;document.getElementById('dlHours').textContent=fmtH(h);document.getElementById('dlSize').textContent=fmtB(b);
-  document.getElementById('selPillText').textContent=`${rows.length} selected · ${fmtH(h)} h · ${fmtB(b)} — get the download command`;
+function updateSel(){const rows=L.filter(r=>sel.has(r.id));const fullH=rows.reduce((a,r)=>a+r.hours,0),h=rows.reduce((a,r)=>a+rowHours(r),0),b=rows.reduce((a,r)=>a+rowBytes(r),0);const sm=scope!=='full'&&rows.length>0,lb=sm?'≤ ':'';
+  document.getElementById('sCount').textContent=`${rows.length} datasets · ${fmtH(fullH)} h`;document.getElementById('dlCount').textContent=rows.length;document.getElementById('dlHours').textContent=(sm?'≈ ':'')+fmtH(h);document.getElementById('dlSize').textContent=lb+fmtB(b);
+  document.getElementById('selPillText').textContent=`${rows.length} selected · ${scope==='full'?'':'1 episode each · '}${lb}${fmtB(b)} — get the download command`;
   try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))}catch(e){}
   pill();cmdText();}
 let dlVisible=false;
 function pill(){document.getElementById('selPill').classList.toggle('show',sel.size>0&&!dlVisible)}
 function cmdText(){const rows=L.filter(r=>sel.has(r.id)).sort((a,b)=>a.id.localeCompare(b.id));const repo=document.getElementById('repo').value.trim()||D.download.hf_repo;let t='';
+  const full=scope==='full',b=rows.reduce((a,r)=>a+rowBytes(r),0),h=rows.reduce((a,r)=>a+rowHours(r),0);
+  const head=full?`# ${rows.length} datasets, ${fmtH(h)} h, est. ${fmtB(b)}`:`# ${rows.length} datasets, 1 sample episode each (episode 0), ≈ ${fmtH(h)} h, est. ≤ ${fmtB(b)}`;
   if(!rows.length)t='# tick datasets in the browser above (a project row selects every dataset of the project)';
-  else if(tab==='hf')t=`# pip install -U huggingface_hub\n# ${rows.length} datasets, ${fmtH(rows.reduce((a,r)=>a+r.hours,0))} h, est. ${fmtB(rows.reduce((a,r)=>a+(r.bytes_est||0),0))}\nhf download ${repo} --repo-type dataset --local-dir camx_480p \\\n`+rows.map(r=>`  --include "${r.id}/*"`).join(' \\\n');
-  else if(tab==='py')t=`from huggingface_hub import snapshot_download\n\nDATASETS = [\n${rows.map(r=>`    "${r.id}",`).join('\n')}\n]\nsnapshot_download(\n    repo_id="${repo}", repo_type="dataset", local_dir="camx_480p",\n    allow_patterns=[d + "/*" for d in DATASETS],\n)`;
-  else if(tab==='sh')t=`#!/bin/bash\n# one hf call per dataset, resumable; re-run to fill gaps\nset -e\nREPO=${repo}\nwhile read d; do\n  hf download "$REPO" --repo-type dataset --local-dir camx_480p --include "$d/*"\ndone <<'EOF'\n${rows.map(r=>r.id).join('\n')}\nEOF`;
-  else t=rows.map(r=>r.id).join('\n');
-  document.getElementById('cmd').textContent=t;}
+  else if(tab==='hf')t=`# pip install -U huggingface_hub\n${head}\nhf download ${repo} --repo-type dataset --local-dir camx_480p \\\n`+rows.map(r=>patterns(r).map(x=>`--include "${x}"`).join(' ')).map(l=>'  '+l).join(' \\\n');
+  else if(tab==='py')t=`from huggingface_hub import snapshot_download\n\n${head}\nDATASETS = [\n${rows.map(r=>`    "${r.id}",`).join('\n')}\n]\n${full?'PATTERNS = ["*"]  # whole dataset directories (meta/, data/, videos/)':'# the files that hold episode 0: meta/ plus the first packed data file and the first video file of every view\nPATTERNS = ['+SAMPLE.map(x=>`"${x}"`).join(', ')+']'}\nsnapshot_download(\n    repo_id="${repo}", repo_type="dataset", local_dir="camx_480p",\n    allow_patterns=[f"{d}/{p}" for d in DATASETS for p in PATTERNS],\n)`;
+  else if(tab==='sh')t=`#!/bin/bash\n# one hf call per dataset, resumable; re-run to fill gaps\n${head}\nset -e\nREPO=${repo}\nwhile read d; do\n  hf download "$REPO" --repo-type dataset --local-dir camx_480p \\\n    ${(full?['*']:SAMPLE).map(x=>`--include "$d/${x}"`).join(' ')}\ndone <<'EOF'\n${rows.map(r=>r.id).join('\n')}\nEOF`;
+  else t=rows.flatMap(patterns).join('\n');
+  document.getElementById('cmd').textContent=t;
+  document.getElementById('dlHint').textContent=full
+    ?'Downloads are per dataset directory <family>/<project>/<dataset>/ (meta/, data/, videos/). Sizes are estimates from the 480p tree measurement, spread over datasets by frame count.'
+    :'Per dataset: meta/ plus data/chunk-000/file-000.parquet and videos/<view>/chunk-000/file-000.mp4, the files that hold episode 0. LeRobot v3 packs consecutive episodes into ~100 MB parquet / ~200 MB video files, so neighbouring episodes ride along; the size shown is that upper bound and the hours are for episode 0 alone.';}
 document.addEventListener('DOMContentLoaded',()=>{load();
   const $=id=>document.getElementById(id);
   $('q').addEventListener('input',e=>{F.q=e.target.value.trim();render()});
@@ -438,11 +458,12 @@ document.addEventListener('DOMContentLoaded',()=>{load();
   $('expAll').onclick=()=>{filtered.forEach(r=>open.add(r.project));render()};$('colAll').onclick=()=>{open.clear();render()};
   document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));cmdText()});
   $('repo').addEventListener('input',cmdText);
+  document.querySelectorAll('#scope button').forEach(b=>b.onclick=()=>{scope=b.dataset.s;try{localStorage.setItem('camx.scope',scope)}catch(e){}syncScope();updateSel()});
   $('copyCmd').onclick=()=>navigator.clipboard.writeText($('cmd').textContent).then(()=>{$('copyCmd').textContent='Copied';setTimeout(()=>$('copyCmd').textContent='Copy command',1200)});
   $('saveCmd').onclick=()=>{const ext={hf:'sh',py:'py',sh:'sh',paths:'txt'}[tab];dl(`camx_download.${ext}`,$('cmd').textContent,'text/plain')};
-  $('exportJson').onclick=()=>{const rows=L.filter(r=>sel.has(r.id));dl('camx_selection.json',JSON.stringify({repo:$('repo').value,exported:new Date().toISOString(),datasets:rows.map(r=>({id:r.id,project:r.project,embodiment:r.embodiment,source:r.source,episodes:r.episodes,hours:r.hours,fps:r.fps,views:r.n_views,bytes_est:r.bytes_est}))},null,1),'application/json')};
+  $('exportJson').onclick=()=>{const rows=L.filter(r=>sel.has(r.id));dl('camx_selection.json',JSON.stringify({repo:$('repo').value,scope,exported:new Date().toISOString(),datasets:rows.map(r=>({id:r.id,project:r.project,embodiment:r.embodiment,source:r.source,episodes:r.episodes,hours:r.hours,fps:r.fps,views:r.n_views,bytes_est:r.bytes_est}))},null,1),'application/json')};
   $('importJson').onclick=()=>$('importFile').click();
-  $('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const j=JSON.parse(t);const ids=(j.datasets||j).map(x=>typeof x==='string'?x:x.id);const known=new Set(L.map(r=>r.id));let n=0;ids.forEach(i=>{if(known.has(i)){sel.add(i);n++}});alert(`Imported ${n} of ${ids.length} datasets`);render()}catch(err){alert('Not a selection JSON: '+err)}});e.target.value=''};
+  $('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const j=JSON.parse(t);if(j.scope==='full'||j.scope==='sample'){scope=j.scope;try{localStorage.setItem('camx.scope',scope)}catch(e){}syncScope()}const ids=(j.datasets||j).map(x=>typeof x==='string'?x:x.id);const known=new Set(L.map(r=>r.id));let n=0;ids.forEach(i=>{if(known.has(i)){sel.add(i);n++}});alert(`Imported ${n} of ${ids.length} datasets`);render()}catch(err){alert('Not a selection JSON: '+err)}});e.target.value=''};
   const closeDrawer=()=>{$('drawer').classList.remove('open');$('scrim').classList.remove('show')};
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});

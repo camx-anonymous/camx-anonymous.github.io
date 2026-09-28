@@ -9,7 +9,9 @@ This repository is anonymized for review.
 - `index.html` — the data manager: stats, faceted filters (morphology, form factor, embodiment, source,
   # camera views, camera composition/model, resolution, FPS, state channels, validation status, skills,
   hours / episodes per dataset), a project-grouped sortable table, and the batch downloader
-  (JSON import/export, `hf` CLI / Python / bash generators).
+  (`hf` CLI / Python / bash generators, JSON import/export). Its default scope fetches one sample episode per
+  selected dataset: `meta/` plus the first packed data and video file of each view, which hold episode 0;
+  a toggle switches to whole dataset directories.
 - `overlays/` — camera-projection validation clips, a few example episodes per project: the gripper URDF
   (or the camera path + up axis where no URDF is released) projected through each dataset's own poses and
   intrinsics. Clips are served from the `overlays-v1` GitHub release; posters live in `overlays/posters/`.
