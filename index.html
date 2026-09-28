@@ -126,12 +126,14 @@ footer{margin:0}
 .drawer.open{transform:none;visibility:visible;transition:transform .18s cubic-bezier(.22,1,.36,1)}
 .drawer .kicker{font:400 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.02em;color:var(--accent);margin:0 0 10px}
 .drawer h3{margin:0 0 4px;font:500 20px/1.25 var(--sans);letter-spacing:-.02em;padding-right:40px}
+.drawer .meta{display:flex;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--ink3);margin:0 0 6px}
+.drawer .meta .cat{color:var(--accent)}
+.drawer .dim{color:var(--ink4)}
 .drawer .path{font:400 12.5px/1.5 var(--mono);color:var(--ink3);word-break:break-all;margin:0 0 16px}
 .drawer .acts{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px}
 .drawer dl{display:grid;grid-template-columns:max-content 1fr;gap:9px 16px;font-size:13.5px;margin:18px 0 0}
 .drawer dt{font:500 11px/1.7 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
 .drawer dd{margin:0;word-break:break-word;color:var(--ink2)}
-.drawer pre{margin-top:18px;font-size:12px;line-height:1.7;padding:14px 16px;white-space:pre-wrap;word-break:break-all}
 .drawer .close{position:absolute;top:14px;right:14px;width:32px;height:32px;padding:0;justify-content:center;border-radius:999px}
 .scrim{position:fixed;inset:0;background:rgba(20,15,5,.25);z-index:29;opacity:0;pointer-events:none;transition:opacity .18s}
 .scrim.show{opacity:1;pointer-events:auto}
@@ -330,19 +332,21 @@ function dl(name,text,type){const a=document.createElement('a');a.href=URL.creat
 
 /* ---------- dataset drawer ---------- */
 function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const ov=p.overlays.filter(o=>o.dataset===r.id);
-  const kv=[['Morphology',ML[r.morph]||r.morph],['Platform',r.embodiment],['Robot type',r.robot_type],['Data source',r.source],['Form factor',r.form],['Setup',r.setup],['Episodes',fmt(r.episodes)],['Frames',fmt(r.frames)],['Hours',fmtH(r.hours)],['FPS',r.fps],['Tasks',r.tasks],['Resolution',r.res.join(', ')],
-    ['Cameras',r.cams.map(c=>`${esc(c.name)} — ${esc(c.model||'unknown model')}, ${c.w}×${c.h}${c.fisheye?', fisheye':''} (${c.role})`).join('<br>')],
-    ['State',[r.eef?'eef / camera pose':null,r.joints?'joint positions':null,r.gripper?'gripper width':null].filter(Boolean).join(', ')||'–'],['FK URDF',r.fk_urdf||'–'],['Released',r.released?'yes (meta/_SUCCESS)':'no'],['Quality flags',r.quality?'yes':'no'],['Est. size (480p)',fmtB(r.bytes_est)],
-    ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> · ${fmtDur(r.sample.seconds)}, ${r.sample.frames.toLocaleString()} frames, ${fmtB(r.sample.bytes)}`:'not published yet'],
-    ['Validation clips',ov.length?ov.map(o=>`<a href="overlays/#${esc(o.key)}">ep ${o.episode}</a> (${esc(modeName(o.mode))})`).join('<br>'):(p.overlays.length?`${p.overlays.length} for this project — <a href="overlays/#${esc(p.overlays[0].key)}">open</a>`:'no example clip')],
-    ['Project notes',p.notes||'–'],['Project skills',p.skills?Object.entries(p.skills).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`${k} (${fmt(v)})`).join(', '):'–']];
-  const raw=new Set(['Cameras','Sample','Validation clips']);const on=sel.has(r.id);
-  $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(human(r.name))}</h3><p class="path">${esc(r.id)}</p>
-    <div class="acts"><button type="button" class="${on?'':'primary'}" id="selOne">${on?'Remove from download':'Add to download'}</button><button type="button" id="copyOne">Copy command</button></div>
-    <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${raw.has(k)?v:esc(v)}</dd>`).join('')}</dl>
-    <pre id="cmdOne">${oneCmd(r).split('\n').map(l=>l.startsWith('#')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n')}</pre>`;
+  const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
+  const state=[r.eef?'camera pose':null,r.joints?'joint positions':null,r.gripper?'gripper width':null].filter(Boolean).join(', ');
+  const kv=[hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
+    ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
+    state?['State',esc(state)]:null,
+    ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
+    ov.length?[ov.length>1?'Validation clips':'Validation clip',ov.map(o=>`<a href="overlays/#${esc(o.key)}">ep ${o.episode}</a>`).join(' · ')]:null].filter(Boolean);
+  const on=sel.has(r.id);
+  $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(human(r.name))}</h3>
+    <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
+    <p class="path">${esc(r.id)}</p>
+    <div class="acts"><button type="button" class="${on?'':'primary'}" id="selOne">${on?'Remove from download':'Add to download'}</button>${r.sample?'<button type="button" id="copyOne">Copy sample command</button>':''}</div>
+    <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   $('selOne').onclick=()=>{on?sel.delete(r.id):sel.add(r.id);persist();downloads();drawer(r.id)};
-  $('copyOne').onclick=()=>navigator.clipboard.writeText($('cmdOne').textContent).then(()=>{$('copyOne').textContent='Copied';setTimeout(()=>$('copyOne').textContent='Copy command',1200)});
+  const cp=$('copyOne');if(cp)cp.onclick=()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)});
   $('drawer').classList.add('open');$('scrim').classList.add('show')}
 function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
 
