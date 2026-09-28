@@ -20,13 +20,7 @@
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --serif:'Newsreader','Iowan Old Style','Times New Roman',Times,serif;
   --w-text:880px;--w-wide:1400px;--pad-x:24px;--r:10px}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
-  --bg:#171512;--panel:#1f1c18;--panel2:#26221d;--chipbg:#2a2621;--barbg:#2f2a24;
-  --line:rgba(255,240,215,.13);--line2:rgba(255,240,215,.07);--line-hi:rgba(255,240,215,.26);
-  --ink:#ece7dd;--ink2:#c2bab0;--ink3:#8f867a;--ink4:#5f584f;
-  --accent:#d9784a;--accent-rgb:217,120,74;--accent-soft:rgba(217,120,74,.14);--accent-line:rgba(217,120,74,.4);--sel:rgba(217,120,74,.13);
-  --s1:#6b95d6;--s2:#e0a04a;--s3:#5fb58f;--s4:#ab86d2;--good:#4fae78;--warn:#e0b040;--serious:#e08a55;--crit:#e05a4a;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.3),0 2px 8px -2px rgba(0,0,0,.35);--shadow-md:0 8px 24px -8px rgba(0,0,0,.5),0 2px 6px -2px rgba(0,0,0,.3)}}
+/* Light is the default regardless of OS preference; dark only when a page sets <html data-theme="dark">. */
 :root[data-theme="dark"]{color-scheme:dark;
   --bg:#171512;--panel:#1f1c18;--panel2:#26221d;--chipbg:#2a2621;--barbg:#2f2a24;
   --line:rgba(255,240,215,.13);--line2:rgba(255,240,215,.07);--line-hi:rgba(255,240,215,.26);
