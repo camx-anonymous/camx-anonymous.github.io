@@ -39,7 +39,13 @@ ID_RENAMES = _sc.get('renames', {})
 FORBIDDEN = re.compile(_sc.get('forbidden') or r'(?!x)x', re.I)
 
 
+# Label fixes applied to every string (before the anonymisation pass): upstream metadata (inventory, info.json
+# robot_type, stats platforms) still carries these spellings, so a rebuild must not bring them back.
+LABEL_FIXES = [(r'RB-Y1m', 'RB-Y1'), (r'GenRobot DAS handheld gripper \(bimanual\)', 'GenRobot (bimanual)')]
+
+
 def scrub_text(s):
+    for pat, rep in LABEL_FIXES: s = re.sub(pat, rep, s)
     for pat, rep in SCRUB: s = re.sub(pat, rep, s, flags=re.I)
     return s
 
@@ -47,7 +53,7 @@ def scrub_text(s):
 def scrub(obj):
     if isinstance(obj, str): return scrub_text(obj)
     if isinstance(obj, list): return [scrub(x) for x in obj]
-    if isinstance(obj, dict): return {k: scrub(v) for k, v in obj.items()}
+    if isinstance(obj, dict): return {scrub(k): scrub(v) for k, v in obj.items()}  # keys hold labels too (embodiments, platforms)
     return obj
 
 
