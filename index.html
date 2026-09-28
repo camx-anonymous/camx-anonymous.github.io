@@ -96,11 +96,6 @@
 .code .hint{font:400 12px/1.55 var(--mono);color:var(--code-cm);padding:12px 20px 14px;margin:0;border-top:1px solid rgba(255,255,255,.08)}
 .dlrow .ds .lk{all:unset;cursor:pointer;font:400 12px/1 var(--mono);color:var(--ink3);margin-left:10px}
 .dlrow .ds .lk:hover{color:var(--accent)}
-.fmt{margin-top:40px;scroll-margin-top:80px}
-.fmt .t{font:400 13px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.02em;color:var(--ink3)}
-.fmt dl{display:grid;grid-template-columns:max-content 1fr;gap:10px 18px;font-size:14px;line-height:1.55;color:var(--ink2);margin:14px 0 0;max-width:560px}
-.fmt dt{font:500 11px/1.7 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
-.fmt dd{margin:0}
 .dlist{display:flex;flex-direction:column;border-top:1px solid var(--line-hi)}
 .dlrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:20px;padding:18px 0;border-bottom:1px solid var(--line-hi)}
 .dlrow .nm{font-size:16px;font-weight:500}
@@ -143,7 +138,6 @@ footer{margin:0}
     <nav aria-label="Sections">
       <a href="#browse">Browse</a>
       <a href="#download">Download</a>
-      <a href="#format">Data format</a>
       <a href="overlays/">Validation clips</a>
       <a href="https://camx-anonymous.github.io/camuva-rollouts/">CAMUVA Rollouts</a>
     </nav>
@@ -187,16 +181,6 @@ footer{margin:0}
         <p class="p">Get the full release, one morphology, or the datasets you picked while browsing. Every dataset is a LeRobot-v3 directory on Hugging Face: 480p MP4 per camera view with synchronized camera poses, end-effector pose, gripper state and a task label. By default the command fetches one sample episode per dataset; switch the scope for whole directories.</p>
         <div class="code" id="code"></div>
         <input type="file" id="importFile" accept="application/json" class="hidden">
-        <div class="fmt" id="format">
-          <div class="t">Data format</div>
-          <dl>
-            <dt>Layout</dt><dd><code>&lt;family&gt;/&lt;project&gt;/&lt;dataset&gt;/</code> with <code>meta/</code>, <code>data/</code> parquet and per-view <code>videos/</code>, so a download can be scoped to any subtree.</dd>
-            <dt>Camera</dt><dd>Per-frame camera-to-world pose and intrinsics for every view; fisheye views carry a Kannala-Brandt fit.</dd>
-            <dt>State</dt><dd>End-effector pose in the same world frame, gripper width, and joint positions where the source recorded them.</dd>
-            <dt>Video</dt><dd>480p MP4 per camera view, decoded through the standard LeRobot readers.</dd>
-            <dt>Validation</dt><dd>The gripper's URDF is projected through the shipped poses and intrinsics back onto the wrist views. If it sits on the real gripper, the calibration is consistent. <a href="overlays/">See the clips.</a></dd>
-          </dl>
-        </div>
       </div>
       <div class="dlist" id="dlist"></div>
     </div>
