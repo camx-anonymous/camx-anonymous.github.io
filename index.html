@@ -78,30 +78,39 @@
 
 /* ---------- download ---------- */
 #download{background:var(--panel2);border-top:1px solid var(--line);scroll-margin-top:60px}
-.dlgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;padding-top:96px;padding-bottom:96px}
-@media (max-width:640px){.dlgrid{padding-top:56px;padding-bottom:56px;gap:40px}}
-.dlgrid>div{min-width:0}
-.dlgrid h2{margin:0}
-.dlgrid .p{font-size:16px;line-height:1.55;color:var(--ink2);margin:14px 0 0;max-width:440px;text-wrap:pretty}
-.code{margin-top:28px;border-radius:8px;background:var(--code-bg);color:var(--code-fg);overflow:hidden}
+.dl{padding-top:96px;padding-bottom:96px}
+@media (max-width:640px){.dl{padding-top:56px;padding-bottom:56px}}
+.dlhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px 24px;flex-wrap:wrap;margin-bottom:24px}
+.dlhead h2{margin:0}
+.dlhead .p{font-size:16px;line-height:1.5;color:var(--ink2);margin:10px 0 0;max-width:600px;text-wrap:pretty}
+.lk{all:unset;cursor:pointer;font:400 12.5px/1 var(--mono);color:var(--ink3)}
+.lk:hover{color:var(--accent)}
+.dlhead .lk{padding:8px 0}
+.slices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.slice{position:relative;display:flex;flex-direction:column;gap:12px;min-width:0;padding:18px 18px 16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;transition:border-color .12s,box-shadow .12s}
+.slice:hover{border-color:var(--line-hi);box-shadow:var(--shadow-sm)}
+.slice:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.slice.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.slice .nm{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:15px;font-weight:500}
+.slice .tick{flex:none;width:16px;height:16px;border-radius:50%;border:1px solid var(--line-hi);display:flex;align-items:center;justify-content:center}
+.slice.on .tick{background:var(--accent);border-color:var(--accent)}
+.slice.on .tick::after{content:"";width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
+.slice .sz{font-size:26px;font-weight:500;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.slice .sz small{display:block;font:400 12px/1 var(--mono);color:var(--ink3);margin-top:8px;letter-spacing:0}
+.slice .ds{font:400 12px/1.5 var(--mono);color:var(--ink3)}
+.slice .acts{display:flex;gap:14px;margin-top:-4px}
+.code{margin-top:16px;border-radius:var(--r);background:var(--code-bg);color:var(--code-fg);overflow:hidden}
 .code .bar{display:flex;align-items:center;gap:2px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
 .code .bar button{all:unset;cursor:pointer;font:500 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;border-radius:4px}
 .code .bar button:hover{color:var(--code-fg)}
-.code .bar button.on{background:rgba(255,255,255,.1);color:var(--code-fg)}
-.code .bar .sl{margin-left:auto;font:400 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%}
-.code .bar .cp{color:var(--code-fg);border:1px solid rgba(255,255,255,.18)}
-.code pre{border-radius:0;padding:14px 20px 18px;max-height:360px}
+.code .bar button.on{background:rgba(255,255,255,.1);color:var(--code-fg);cursor:default}
+.code .bar .st{margin-left:auto;font:400 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.code .bar .st b{font-weight:500;color:var(--code-fg)}
+.code .bar .cp{color:var(--code-fg);border:1px solid rgba(255,255,255,.18);margin-left:6px}
+.code pre{border-radius:0;padding:16px 20px 18px;max-height:420px}
 .code .hint{font:400 12px/1.55 var(--mono);color:var(--code-cm);padding:12px 20px 14px;margin:0;border-top:1px solid rgba(255,255,255,.08)}
-.dlrow .ds .lk{all:unset;cursor:pointer;font:400 12px/1 var(--mono);color:var(--ink3);margin-left:10px}
-.dlrow .ds .lk:hover{color:var(--accent)}
-.dlist{display:flex;flex-direction:column;border-top:1px solid var(--line-hi)}
-.dlrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:20px;padding:18px 0;border-bottom:1px solid var(--line-hi)}
-.dlrow .nm{font-size:16px;font-weight:500}
-.dlrow .ds{font-size:13px;color:var(--ink3);margin-top:3px}
-.dlrow .sz{font:400 13px/1 var(--mono);color:var(--ink2);white-space:nowrap}
-.dlrow button{font-size:13px;padding:7px 12px;border:1px solid var(--ink);border-radius:5px}
-.dlrow.on button{background:var(--ink);color:var(--bg)}
-@media (max-width:480px){.dlrow{grid-template-columns:minmax(0,1fr) auto;gap:10px 16px}.dlrow .sz{grid-column:1;font-size:12px}.dlrow button{grid-row:1/3}}
+@media (max-width:640px){.code .bar .st{order:3;flex-basis:100%;max-width:none;margin:4px 0 0}}
+@media (max-width:480px){.slices{grid-template-columns:1fr 1fr;gap:8px}.slice{padding:14px}.slice .sz{font-size:22px}}
 
 /* ---------- footer ---------- */
 footer{margin:0}
@@ -172,14 +181,17 @@ footer{margin:0}
   </section>
 
   <section id="download">
-    <div class="wrap dlgrid">
-      <div>
-        <h2>Download</h2>
-        <p class="p">Pick the whole corpus, one morphology, or the datasets you added while browsing. Every dataset has a one-episode sample: episode 0 as a complete LeRobot-v3 directory, 480p MP4 per camera view with synchronized camera poses, end-effector pose, gripper state and a task label, archived on this repository's GitHub releases. The command below fetches and unpacks the samples of that slice; it skips what is already on disk, so re-run it to fill gaps.</p>
-        <div class="code" id="code"></div>
+    <div class="wrap dl">
+      <div class="dlhead">
+        <div>
+          <h2>Download</h2>
+          <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command.</p>
+        </div>
+        <button type="button" class="lk" id="importSel">Import a selection (JSON)</button>
         <input type="file" id="importFile" accept="application/json" class="hidden">
       </div>
-      <div class="dlist" id="dlist"></div>
+      <div class="slices" id="dlist"></div>
+      <div class="code" id="code"></div>
     </div>
   </section>
 
@@ -277,26 +289,27 @@ function render(){const rows=filtered();crumbs(rows);const show=rows.slice(0,S.s
   const m=$('more');if(m)m.onclick=()=>{S.shown+=PAGE;render()}}
 
 /* ---------- download: slices + command block ---------- */
-/* a slice is a set of datasets; the command fetches the one-episode sample archive of each one from the GitHub releases */
+/* a slice is a set of datasets shown as a card; the command fetches the one-episode sample archive of each one from the GitHub releases */
 function sizeOf(rows){const sm=sampled(rows);return {n:sm.length,miss:rows.length-sm.length,b:sm.reduce((a,r)=>a+r.sample.bytes,0),s:sm.reduce((a,r)=>a+r.sample.seconds,0)}}
 function slices(){const out=[];
-  if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length} dataset${rows.length>1?'s':''} picked while browsing`,rows,sel:true})}
-  const a=agg(L);out.push({id:'full',name:'Full release',desc:`All four morphologies · ${L.length.toLocaleString()} datasets · ${fmtH(a.h)} h`,rows:L});
-  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const b=agg(rows);const plats=new Set(rows.map(r=>r.embodiment)).size;
-    out.push({id:m.id,name:m.label,desc:`${plats} platform${plats>1?'s':''} · ${rows.length.toLocaleString()} datasets · ${fmtH(b.h)} h`,rows})});
+  if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length.toLocaleString()} dataset${rows.length>1?'s':''} picked while browsing`,rows,sel:true})}
+  out.push({id:'full',name:'Full release',desc:`${L.length.toLocaleString()} datasets · ${MORPHS.length} morphologies`,rows:L});
+  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const plats=new Set(rows.map(r=>r.embodiment)).size;
+    out.push({id:m.id,name:m.label,desc:`${rows.length.toLocaleString()} datasets · ${plats} platform${plats>1?'s':''}`,rows})});
   return out}
+function sliceCard(s){const z=sizeOf(s.rows),on=s.id===S.slice;
+  return `<div class="slice${on?' on':''}" role="button" tabindex="0" aria-pressed="${on}" data-s="${esc(s.id)}"><div class="nm"><span>${esc(s.name)}</span><span class="tick"></span></div><div class="sz">${fmtB(z.b)}<small>${fmtDur(z.s)} of video</small></div><div class="ds">${esc(s.desc)}</div>${s.sel?'<div class="acts"><button type="button" class="lk" id="exportSel">export JSON</button><button type="button" class="lk" id="clearSel">clear</button></div>':''}</div>`}
 function downloads(){const ss=slices();if(!ss.some(s=>s.id===S.slice))S.slice='full';
-  $('dlist').innerHTML=ss.map(s=>{const z=sizeOf(s.rows);return `<div class="dlrow${s.id===S.slice?' on':''}" data-s="${esc(s.id)}"><div><div class="nm">${esc(s.name)}</div><div class="ds">${esc(s.desc)}${s.sel?'<button type="button" class="lk" id="exportSel">export JSON</button><button type="button" class="lk" id="clearSel">clear</button>':''}</div></div><span class="sz" title="total size of the ${z.n.toLocaleString()} sample archives (one episode per dataset)">${fmtB(z.b)}</span><button type="button" data-s="${esc(s.id)}">${s.id===S.slice?'Shown below':'Get command'}</button></div>`}).join('')
-    +`<div class="dlrow"><div><div class="nm">Import a selection</div><div class="ds">Load a JSON file exported from this page<button type="button" class="lk" id="importSel">import JSON</button></div></div><span class="sz"></span><span></span></div>`;
-  $('dlist').querySelectorAll('button[data-s]').forEach(b=>b.onclick=()=>{S.slice=b.dataset.s;downloads();$('code').scrollIntoView({behavior:'smooth',block:'nearest'})});
+  $('dlist').innerHTML=ss.map(sliceCard).join('');
+  const pick=id=>{S.slice=id;downloads()};
+  $('dlist').querySelectorAll('.slice').forEach(el=>{el.onclick=e=>{if(!e.target.closest('.lk'))pick(el.dataset.s)};el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(el.dataset.s)}}});
   const c=$('clearSel');if(c)c.onclick=()=>{sel.clear();persist();downloads()};
   const x=$('exportSel');if(x)x.onclick=()=>{const rows=L.filter(r=>sel.has(r.id));dl('camx_selection.json',JSON.stringify({samples:D.download.samples,exported:new Date().toISOString(),datasets:rows.map(r=>({id:r.id,project:r.project,embodiment:r.embodiment,source:r.source,episodes:r.episodes,hours:r.hours,fps:r.fps,views:r.n_views,sample:r.sample?r.sample.url:null}))},null,1),'application/json')};
-  $('importSel').onclick=()=>$('importFile').click();
   code(ss.find(s=>s.id===S.slice))}
 function cmdText(s){const sm=sampled(s.rows).sort((a,b)=>a.id.localeCompare(b.id));const z=sizeOf(s.rows);
   if(!sm.length)return `# none of the ${s.rows.length.toLocaleString()} datasets in this slice has a published sample yet`;
   return `#!/bin/bash
-# CAMX one-episode samples · ${s.name}: ${sm.length.toLocaleString()} datasets, episode 0 of each, ${fmtDur(z.s)} of data, ${fmtB(z.b)}
+# CAMX one-episode samples · ${s.name}: ${sm.length.toLocaleString()} datasets, episode 0 of each, ${fmtDur(z.s)} of video, ${fmtB(z.b)}
 # each archive unpacks to <family>/<project>/<dataset>/{meta,data,videos} (LeRobot v3); datasets already on disk are skipped
 set -e
 mkdir -p camx_samples && cd camx_samples
@@ -308,8 +321,8 @@ ${sm.map(r=>r.id+' '+r.sample.url).join('\n')}
 EOF`}
 function code(s){const z=sizeOf(s.rows);
   const body=cmdText(s).split('\n').map(l=>l.startsWith('#')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n');
-  const hint='Archives are hosted on the GitHub releases of this repository; the size is the exact total of the archives and the duration is that of the sampled episodes.'+(z.miss?` ${z.miss.toLocaleString()} dataset${z.miss===1?' has':'s have'} no published sample yet and ${z.miss===1?'is':'are'} left out.`:'');
-  $('code').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bash · GitHub releases</button><span class="sl">${esc(s.name)}</span><button type="button" class="cp" id="save">Save .sh</button><button type="button" class="cp" id="copy">Copy</button></div><pre id="cmd">${body}</pre><p class="hint">${esc(hint)}</p>`;
+  const hint='Run it in a terminal; it skips datasets already on disk, so re-run it to fill gaps.'+(z.miss?` ${z.miss.toLocaleString()} dataset${z.miss===1?' has':'s have'} no published sample yet and ${z.miss===1?'is':'are'} left out.`:'');
+  $('code').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bash · GitHub releases</button><span class="st"><b>${esc(s.name)}</b> · ${z.n.toLocaleString()} sample${z.n===1?'':'s'} · ${fmtB(z.b)} · ${fmtDur(z.s)}</span><button type="button" class="cp" id="save">Save .sh</button><button type="button" class="cp" id="copy">Copy</button></div><pre id="cmd">${body}</pre><p class="hint">${esc(hint)}</p>`;
   $('save').onclick=()=>dl('camx_samples.sh',$('cmd').textContent,'text/x-shellscript');
   $('copy').onclick=()=>navigator.clipboard.writeText($('cmd').textContent).then(()=>{$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy',1200)})}
 function persist(){try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))}catch(e){}}
@@ -334,6 +347,7 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
 function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
 
 document.addEventListener('DOMContentLoaded',()=>{load();
+  $('importSel').onclick=()=>$('importFile').click();
   $('tree').addEventListener('click',e=>{const b=e.target.closest('button[data-cat]');if(!b)return;S.cat=b.dataset.cat;S.robot=b.dataset.robot||null;S.shown=PAGE;tree();render()});
   $('q').addEventListener('input',e=>{S.q=e.target.value.trim();S.shown=PAGE;render()});
   $('cards').addEventListener('click',e=>{const t=e.target.closest('.thumb[data-src]');
