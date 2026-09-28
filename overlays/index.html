@@ -3,17 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CAMX Projection Overlays</title>
-<meta name="description" content="Gripper URDF projections (or a primitive gripper stand-in with tool-centre axes where no URDF exists) through each dataset's own poses and intrinsics, for validating the CAMX camera and end-effector calibration.">
+<title>CAMX Gripper Projection</title>
+<meta name="description" content="The gripper projected through each dataset's own camera poses and intrinsics, for validating the CAMX camera and end-effector calibration.">
 <link rel="stylesheet" href="../site.css">
 <style>
 main>header{padding-top:64px;padding-bottom:8px}
-header .eyebrow{margin-bottom:16px}
 header h1{max-width:900px}
 .crumbs{font:400 12.5px/1.6 var(--mono);color:var(--ink3);margin:0 0 22px}
 .crumbs a{color:var(--ink2)}
-.modes{margin:18px 0 8px;padding:14px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);position:sticky;top:61px;background:var(--bg);z-index:5}
-.proj{padding-top:44px;scroll-margin-top:130px}
+.proj{padding-top:44px;scroll-margin-top:80px}
 .proj h2{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:0 0 6px}
 .proj h2 small{margin:0}
 .pnote{color:var(--ink2);font-size:14px;line-height:1.6;margin:0 0 16px;max-width:var(--w-text);text-wrap:pretty}
@@ -30,8 +28,6 @@ th{font:500 10.5px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em
 td.num{text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--ink2);white-space:nowrap}
 td.why{color:var(--ink2)}
 footer p{margin:0 0 6px}
-.axes b{font-family:var(--mono);font-weight:500;padding:0 3px;border-radius:3px;color:#fff}
-.axes .x{background:#c8372d}.axes .y{background:#2e8b3d}.axes .z{background:#2b5fc7}
 </style>
 </head>
 <body>
@@ -49,14 +45,12 @@ footer p{margin:0 0 6px}
 <main class="wide">
 <header>
   <p class="crumbs"><a href="../">CAMX Dataset</a> / validation clips</p>
-  <div class="eyebrow">Projection overlays · validation you can look at</div>
-  <h1>The gripper drawn back onto its own cameras.</h1>
-  <p class="sub">For each dataset family, a few episodes are re-rendered with the gripper's URDF (or, for rigs without a released URDF, a primitive stand-in: two fingers hinged behind the tool centre that open and close with the recorded jaw width, plus the tool-centre frame as <span class="axes"><b class="x">x</b><b class="y">y</b><b class="z">z</b></span> axes) projected through the dataset's <em>own</em> per-frame camera poses and intrinsics. If the drawn gripper sits on the real one in the wrist views, the end-effector pose, camera extrinsics and intrinsics shipped in the dataset are consistent. Every camera view is stitched side by side in one clip. A few example episodes per project, picked from the validation set; clips stream from the <code>overlays-v1</code> release.</p>
+  <h1>Gripper Projection</h1>
+  <p class="sub">A few validation episodes per project, with the gripper projected through the dataset's own per-frame camera poses and intrinsics. If the drawn gripper sits on the real one, the shipped end-effector pose, camera extrinsics and intrinsics are consistent. All camera views are stitched side by side in one clip.</p>
   <nav class="links">
     <a href="../#browser">Browse the datasets</a>
   </nav>
 </header>
-  <div class="toolbar modes" id="modes"></div>
   <div id="content"></div>
   <section class="pending" id="pending">
     <div class="eyebrow">Queue</div>
@@ -64,20 +58,17 @@ footer p{margin:0 0 6px}
     <p class="pnote">Projects in the training tree without an example overlay in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
     <table><thead><tr><th>Project</th><th>Embodiment</th><th class="num">Datasets</th><th class="num">Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
   </section>
-  <footer><p>Clips are 10 fps, ~45 s, re-encoded to 360p for the web (source renders are 480p).</p><p>Primitive stand-ins (rigs without a URDF): the bar between the fingertips spans the recorded jaw width, the fingers hinge behind the tool centre, and the axes at the tool centre are <span class="axes"><b class="x">x</b> forward, <b class="y">y</b> along the jaw, <b class="z">z</b> toward the camera</span>.</p><p>Acceptance chips follow the curation protocol: <b>pass</b> = wrist-view median error ≤ 10 px, p90 ≤ 20 px at 480 rows; <b>unmeasured</b> = no automatic finger detector for the rig yet (visual check only).</p></footer>
+  <footer><p>Clips are 10 fps, ~45 s, re-encoded to 360p for the web (source renders are 480p).</p><p>Acceptance chips follow the curation protocol: <b>pass</b> = wrist-view median error ≤ 10 px, p90 ≤ 20 px at 480 rows; <b>unmeasured</b> = no automatic finger detector for the rig yet (visual check only).</p></footer>
 </main>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmtH=h=>h==null?'–':h>=100?Math.round(h).toLocaleString():h>=10?h.toFixed(1):h.toFixed(2);
 const taskList=t=>(Array.isArray(t)?t:String(t).split('||')).map(x=>String(x).trim()).filter(Boolean);
-let D,mode='all';
+let D;
 fetch('../data/datasets.json').then(r=>r.json()).then(d=>{D=d;render();if(location.hash){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView()}});
-function render(){const projs=D.projects.filter(p=>p.overlays.length);const modes={urdf:'gripper URDF',primitive:'primitive gripper + xyz axes',"camera-path":'camera path + up axis',none:'no drawing'};const chipOf={urdf:'URDF projection',primitive:'primitive gripper + RGB xyz axes',"camera-path":'camera path + up axis',none:'no drawing'};
-  const cnt={};projs.forEach(p=>p.overlays.forEach(o=>cnt[o.mode]=(cnt[o.mode]||0)+1));
-  document.getElementById('modes').innerHTML=`<span class="k">Overlay mode</span> <span class="chip btn${mode==='all'?' on':''}" data-m="all">all<span class="c">${projs.reduce((a,p)=>a+p.overlays.length,0)}</span></span>`+Object.entries(cnt).map(([m,n])=>`<span class="chip btn${mode===m?' on':''}" data-m="${m}">${modes[m]||m}<span class="c">${n}</span></span>`).join('')+`<span class="sp"></span><span class="stat">${projs.length} of ${D.projects.length} projects rendered</span>`;
-  document.querySelectorAll('#modes .btn').forEach(b=>b.onclick=()=>{mode=b.dataset.m;render()});
+function render(){const projs=D.projects.filter(p=>p.overlays.length);const chipOf={urdf:'URDF projection',primitive:'primitive gripper',"camera-path":'camera path + up axis',none:'no drawing'};
   let h='';
-  projs.forEach(p=>{const ovs=p.overlays.filter(o=>mode==='all'||o.mode===mode);if(!ovs.length)return;const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];
+  projs.forEach(p=>{const ovs=p.overlays;const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];
     h+=`<section class="proj" id="${esc(p.key.replace('/','_'))}"><h2>${esc(p.key)}<small>${esc(emb)} · ${p.datasets} datasets · ${fmtH(p.hours)} h · ${p.overlays.length} clip${p.overlays.length>1?'s':''}</small></h2>`;
     if(p.notes)h+=`<p class="pnote">${esc(p.notes)}</p>`;
     h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`;const src=D.overlay_base+file+'.mp4';
