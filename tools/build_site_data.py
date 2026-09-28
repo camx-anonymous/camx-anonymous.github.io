@@ -9,6 +9,8 @@ Sources (desktop001 only):
 
 Usage: python3 tools/build_site_data.py [--root /data/camx_480p]
        python3 tools/build_site_data.py --scrub-only   # re-run the anonymisation pass over data/datasets.json
+       python3 tools/build_site_data.py --attach-samples-only   # merge the published one-episode samples
+                                                                # ($CAMX_SAMPLES/{index,published}.jsonl) into it
 """
 import argparse, collections, glob, json, os, re, sys, datetime
 
@@ -159,14 +161,43 @@ def scan_leaves(root):
     return out
 
 
+SAMPLES = os.environ.get('CAMX_SAMPLES', '/data/camx_samples')
+RELEASES = 'https://github.com/camx-anonymous/camx-anonymous.github.io/releases'
+
+
+def attach_samples(out, samples_dir):
+    """Merge the one-episode sample archives (tools/build_samples.py + tools/publish_samples.py) into the rows:
+    r['sample'] = {url, bytes, frames, seconds} for every dataset whose archive is on a GitHub release."""
+    idx = {}
+    for name in ('index.jsonl', 'published.jsonl'):
+        p = os.path.join(samples_dir, name)
+        if not os.path.exists(p): print(f'warning: {p} not found, no samples attached', file=sys.stderr); return out
+        for line in open(p):
+            r = json.loads(line); idx.setdefault(r['id'], {}).update(r)
+    n = 0
+    for r in out['datasets']:
+        s = idx.get(r['id'])
+        r['sample'] = None
+        if s and s.get('ok') and s.get('url'):
+            r['sample'] = {'url': s['url'], 'bytes': s['bytes'], 'frames': s['frames'], 'seconds': s['seconds']}; n += 1
+    out['download'] = {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<project>/<dataset>/{meta,data,videos}'}
+    out['totals']['samples'] = n
+    print(f'{n} of {len(out["datasets"])} datasets have a published sample', file=sys.stderr)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--root', default=os.environ.get('CAMX_ROOT', '/data/camx_480p'))
     ap.add_argument('--out', default=os.path.join(REPO, 'data', 'datasets.json'))
     ap.add_argument('--scrub-only', action='store_true', help='only re-run the anonymisation pass over --out')
+    ap.add_argument('--attach-samples-only', action='store_true',
+                    help=f'only merge the published sample archives ({SAMPLES}) into --out')
     a = ap.parse_args()
-    if a.scrub_only:
-        out = anonymise(json.load(open(a.out)))
+    if a.scrub_only or a.attach_samples_only:
+        out = json.load(open(a.out))
+        if a.attach_samples_only: out = attach_samples(out, SAMPLES)
+        out = anonymise(out)
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     inv = json.load(open(INVENTORY))
@@ -275,13 +306,13 @@ def main():
     total_h = sum(r['hours'] for r in rows)
     out = {'built': datetime.datetime.now().astimezone().strftime('%Y-%m-%d %H:%M %Z'), 'root': a.root,
            'inventory_updated': inv.get('updated'), 'stats_as_of': stats.get('as_of'),
-           'download': {'hf_repo': 'camx-anonymous/camx_480p', 'repo_type': 'dataset', 'layout': '<family>/<project>/<dataset>/{meta,data,videos}'},
-           'overlay_base': 'https://github.com/camx-anonymous/camx-anonymous.github.io/releases/download/overlays-v1/',
+           'download': {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<project>/<dataset>/{meta,data,videos}'},
+           'overlay_base': RELEASES + '/download/overlays-v1/',
            'totals': {'datasets': len(rows), 'projects': len(projects), 'episodes': sum(r['episodes'] for r in rows),
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = anonymise(out)
+    out = anonymise(attach_samples(out, SAMPLES))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)
