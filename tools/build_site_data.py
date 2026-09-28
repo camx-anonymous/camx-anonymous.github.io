@@ -18,6 +18,9 @@ INVENTORY = os.path.expanduser('~/projects/camera-cross-embodiment/camx/figures/
 BROWSER = os.environ.get('CAMX_BROWSER', '/data/camx_480p_browser')
 STATS = os.path.join(BROWSER, 'stats', 'stats.json')
 OVERLAYS = os.path.join(BROWSER, 'mv_urdf', 'videos')
+# Extra clip trees (colon-separated dirs laid out as <project_key>/<slug>/meta.json, e.g. the output of
+# tools/overlay_picks.py): a project present in an extra tree REPLACES that project's clips from OVERLAYS.
+OVERLAYS_EXTRA = [d for d in os.environ.get('CAMX_OVERLAYS_EXTRA', '').split(':') if d]
 
 # --- anonymisation ---------------------------------------------------------------------------------------------
 # The site is published anonymously: no author names, no institutions. Every string that reaches datasets.json goes
@@ -129,6 +132,17 @@ def cam_role(name):
     return 'other'
 
 
+def overlay_metas():
+    """meta.json paths of every example clip: the shared tree, then the CAMX_OVERLAYS_EXTRA trees project by project."""
+    by_proj = {}
+    for root in [OVERLAYS] + OVERLAYS_EXTRA:
+        found = {}
+        for m in sorted(glob.glob(os.path.join(root, '*', '*', 'meta.json'))):
+            found.setdefault(m.split('/')[-3], []).append(m)
+        by_proj.update(found)
+    return [m for k in sorted(by_proj) for m in by_proj[k]]
+
+
 def scan_leaves(root):
     out = []
     def walk(d, depth):
@@ -237,14 +251,16 @@ def main():
                    'overlays': []})
 
     # overlay clips
-    for m in sorted(glob.glob(os.path.join(OVERLAYS, '*', '*', 'meta.json'))):
+    for m in overlay_metas():
         d = json.load(open(m)); pkey, slug = m.split('/')[-3:-1]
         proj = d.get('project')
         if proj not in projects: continue
         st = os.path.join(os.path.dirname(m), 'stitched.mp4')
         grips = {s: {'model': g.get('model'), 'profile': g.get('profile'), 'urdf': bool(g.get('urdf_present'))}
                  for s, g in (d.get('grippers') or {}).items() if g.get('model')}
-        mode = 'urdf' if any(g['urdf'] for g in grips.values()) else ('camera-path' if 'dataclaw' in pkey else 'none')
+        # overlay_mode is written by tools/overlay_picks.py ('primitive' = hinged stand-in fingers + TCP axes for rigs
+        # without a URDF); the shared tree's meta.json has no such field, so fall back on the gripper profiles.
+        mode = d.get('overlay_mode') or ('urdf' if any(g['urdf'] for g in grips.values()) else ('camera-path' if 'dataclaw' in pkey else 'none'))
         try: tasks = json.loads(d.get('tasks') or '[]')
         except Exception: tasks = [d.get('tasks')]
         projects[proj]['overlays'].append({
