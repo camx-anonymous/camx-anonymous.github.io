@@ -89,7 +89,7 @@ EMBODIMENT_RULES = [
     (r'RB-Y1|Rainbow', 'Rainbow RB-Y1m'), (r'DataClaw', 'DataClaw'), (r'XARM', 'xArm'),
     (r'UMI|iPhUMI|FastUMI|Dobb-E|AetheRock|Vitamin|ViTaMIn|HuMI', 'UMI'),
 ]
-MORPH_OF_FORM = [('handheld', 'Handheld, robot-free'), ('mobile', 'Humanoid / mobile bimanual'),
+MORPH_OF_FORM = [('handheld', 'Handheld, robot-free'), ('mobile', 'Mobile manipulator'),
                  ('bimanual', 'Bimanual robot'), ('single-arm', 'Single-arm robot')]
 CAM_ROLE = [(r'wrist|hand|left_main|right_main|gripper|eef|cam_(left|right)|(^|_)(left|right)(_|$)', 'wrist'),
             (r'head|top|front|third|exterior|scene|neck|base|side|back|overhead|global|external|main', 'external')]

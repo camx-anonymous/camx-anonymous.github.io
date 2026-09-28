@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CAMX — Cross-Embodiment Robot Manipulation Dataset</title>
-<meta name="description" content="CAMX: real-world robot manipulation across handheld, single-arm, bimanual and humanoid embodiments, re-exported into one camera-aware LeRobot-v3 layout. Browse every dataset and get the download command (anonymous submission).">
+<meta name="description" content="CAMX: real-world robot manipulation across handheld, single-arm, bimanual and mobile-manipulator embodiments, re-exported into one camera-aware LeRobot-v3 layout. Browse every dataset and get the download command (anonymous submission).">
 <link rel="stylesheet" href="site.css">
 <style>
 /* ---------- hero ---------- */
@@ -155,7 +155,7 @@ footer{margin:0}
   <section class="hero wrap" id="overview">
     <div class="eyebrow"><span>Open dataset</span><span>·</span><span>Anonymous submission</span><span>·</span><span>Under review</span></div>
     <h1>Real-world manipulation, across four morphologies.</h1>
-    <p class="lede">Handheld grippers, single arms, bimanual rigs and mobile humanoids, re-exported into one camera-aware LeRobot-v3 layout with per-frame camera poses, so one policy can learn from all of them.</p>
+    <p class="lede">Handheld grippers, single arms, bimanual rigs and mobile manipulators, re-exported into one camera-aware LeRobot-v3 layout with per-frame camera poses, so one policy can learn from all of them.</p>
     <div class="ctas">
       <a class="button accent lg" href="#browse">Browse datasets</a>
       <a class="button lg" href="#download">Download</a>
@@ -229,7 +229,7 @@ const MORPHS=[
   {id:'Handheld, robot-free',label:'Handheld'},
   {id:'Single-arm robot',label:'Single arm'},
   {id:'Bimanual robot',label:'Bimanual'},
-  {id:'Humanoid / mobile bimanual',label:'Humanoid / mobile'}];
+  {id:'Mobile manipulator',label:'Mobile manipulator'}];
 const ML=Object.fromEntries(MORPHS.map(m=>[m.id,m.label]));
 const PAGE=24;
 const fmt=n=>n==null?'–':n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?(n/1e3).toFixed(1)+'k':n.toLocaleString();
