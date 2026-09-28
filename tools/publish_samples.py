@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Upload the one-episode sample archives (tools/build_samples.py) to GitHub releases of this repo.
 
-One release per dataset family, tag samples-v1-<family>, so no release holds more than ~1,300 assets. Assets that a
-release already has are skipped, so the script is resumable. Every uploaded asset is recorded in
+One release per dataset family, tag samples-v1-<family>; GitHub caps a release at 1,000 assets, so a family with more
+samples spills over into samples-v1-<family>-2, -3, ... Assets that a release already has are skipped, so the script
+is resumable. Every uploaded asset is recorded in
 <out>/published.jsonl as {id, asset, url, bytes}; tools/build_site_data.py --attach-samples merges that file into
 data/datasets.json.
 
@@ -17,6 +18,7 @@ import requests
 OWNER, REPO_NAME = 'camx-anonymous', 'camx-anonymous.github.io'
 API = f'https://api.github.com/repos/{OWNER}/{REPO_NAME}'
 TAG = 'samples-v1'
+LIMIT = 1000  # GitHub refuses (422) the 1,001st asset of a release
 
 
 def token():
@@ -34,30 +36,51 @@ def api(sess, method, url, **kw):
     return r
 
 
-def ensure_release(sess, family):
-    tag = f'{TAG}-{family}'
+def tag_of(family, part):
+    return f'{TAG}-{family}' + ('' if part == 1 else f'-{part}')
+
+
+def get_release(sess, tag):
     r = api(sess, 'GET', f'{API}/releases/tags/{tag}')
-    if r.status_code == 404:
-        body = (f'One-episode samples (episode 0) of every `{family}/*` dataset, one `.tar.gz` per dataset that unpacks '
-                'to `<family>/<project>/<dataset>/{meta,data,videos}` in the LeRobot-v3 layout. '
-                'Pick datasets and get a download command at https://camx-anonymous.github.io/#download')
-        r = api(sess, 'POST', f'{API}/releases', json={'tag_name': tag, 'name': f'One-episode samples: {family}',
-                                                       'body': body, 'draft': False, 'prerelease': False})
-        if r.status_code >= 300: sys.exit(f'cannot create release {tag}: {r.status_code} {r.text[:300]}')
-        print(f'created release {tag}', file=sys.stderr)
-    elif r.status_code >= 300:
-        sys.exit(f'cannot read release {tag}: {r.status_code} {r.text[:300]}')
-    rel = r.json()
+    if r.status_code == 404: return None
+    if r.status_code >= 300: sys.exit(f'cannot read release {tag}: {r.status_code} {r.text[:300]}')
+    return r.json()
+
+
+def create_release(sess, family, part):
+    tag = tag_of(family, part)
+    body = (f'One-episode samples (episode 0) of every `{family}/*` dataset, one `.tar.gz` per dataset that unpacks '
+            'to `<family>/<project>/<dataset>/{meta,data,videos}` in the LeRobot-v3 layout. '
+            + (f'Part {part}: GitHub caps a release at {LIMIT:,} assets. ' if part > 1 else '')
+            + 'Pick datasets and get a download command at https://camx-anonymous.github.io/#download')
+    name = f'One-episode samples: {family}' + (f' ({part})' if part > 1 else '')
+    r = api(sess, 'POST', f'{API}/releases', json={'tag_name': tag, 'name': name, 'body': body, 'draft': False, 'prerelease': False})
+    if r.status_code >= 300: sys.exit(f'cannot create release {tag}: {r.status_code} {r.text[:300]}')
+    print(f'created release {tag}', file=sys.stderr)
+    return r.json()
+
+
+def release_assets(sess, rel):
     assets = {}
     page = 1
     while True:
         r = api(sess, 'GET', f'{API}/releases/{rel["id"]}/assets', params={'per_page': 100, 'page': page})
-        if r.status_code >= 300: sys.exit(f'cannot list assets of {tag}: {r.status_code}')
+        if r.status_code >= 300: sys.exit(f'cannot list assets of {rel["tag_name"]}: {r.status_code}')
         batch = r.json()
         for a in batch: assets[a['name']] = a
         if len(batch) < 100: break
         page += 1
-    return rel, assets
+    return assets
+
+
+def family_releases(sess, family):
+    """Every existing samples-v1-<family>[-N] release with its assets, in part order (created on demand by main)."""
+    parts = []
+    while True:
+        rel = get_release(sess, tag_of(family, len(parts) + 1))
+        if rel is None: break
+        parts.append([rel, release_assets(sess, rel)])
+    return parts
 
 
 def upload(sess, rel, path, name):
@@ -67,7 +90,7 @@ def upload(sess, rel, path, name):
     for attempt in range(4):
         r = sess.post(url, params={'name': name}, data=data, headers={'Content-Type': 'application/gzip'}, timeout=900)
         if r.status_code < 300: return r.json()
-        if r.status_code == 422: return None  # already there (name taken)
+        if r.status_code == 422: return None  # already there (name taken) or the release is full
         time.sleep(10 * (attempt + 1))
     raise RuntimeError(f'{name}: {r.status_code} {r.text[:200]}')
 
@@ -93,15 +116,23 @@ def main():
     todo = []
     with open(pub_path, 'a') as pub:
         for family, rs in sorted(by_family.items()):
-            rel, assets = ensure_release(sess, family)
+            parts = family_releases(sess, family) or [[create_release(sess, family, 1), {}]]
+            have = {name: a_ for _, assets in parts for name, a_ in assets.items()}
+            pending = []
             for r in rs:
                 if r['id'] in published: continue
-                if r['asset'] in assets:  # uploaded by an earlier run whose record was lost
-                    a_ = assets[r['asset']]
+                if r['asset'] in have:  # uploaded by an earlier run whose record was lost
+                    a_ = have[r['asset']]
                     p = {'id': r['id'], 'asset': a_['name'], 'url': a_['browser_download_url'], 'bytes': a_['size']}
                     pub.write(json.dumps(p) + '\n'); published[r['id']] = p; continue
-                todo.append((rel, r))
-            print(f'{family}: {len(rs)} samples, {len(assets)} assets already on {rel["tag_name"]}', file=sys.stderr)
+                pending.append(r)
+            fill = [len(assets) for _, assets in parts]  # assets per part once this run's uploads land
+            for r in pending:
+                if fill[-1] >= LIMIT:
+                    parts.append([create_release(sess, family, len(parts) + 1), {}]); fill.append(0)
+                todo.append((parts[-1][0], r)); fill[-1] += 1
+            print(f'{family}: {len(rs)} samples, ' + ', '.join(f'{len(a)} on {rel["tag_name"]}' for rel, a in parts)
+                  + f', {len(pending)} to upload', file=sys.stderr)
         print(f'{len(todo)} archives to upload', file=sys.stderr)
 
         def work(job):
