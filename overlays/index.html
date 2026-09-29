@@ -46,7 +46,7 @@ footer p{margin:0 0 6px}
 <header>
   <p class="crumbs"><a href="../">CAMX Dataset</a> / validation clips</p>
   <h1>Gripper Projection</h1>
-  <p class="sub">A few validation episodes per project, with the gripper projected through the dataset's own per-frame camera poses and intrinsics. If the drawn gripper sits on the real one, the shipped end-effector pose, camera extrinsics and intrinsics are consistent. All camera views are stitched side by side in one clip.</p>
+  <p class="sub">A few episodes per project with the gripper projected through the dataset's own camera poses and intrinsics. If the drawn gripper sits on the real one, the calibration is consistent.</p>
   <nav class="links">
     <a href="../#browser">Browse the datasets</a>
   </nav>
@@ -58,7 +58,7 @@ footer p{margin:0 0 6px}
     <p class="pnote">Projects in the training tree without an example overlay in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
     <table><thead><tr><th>Project</th><th>Embodiment</th><th class="num">Datasets</th><th class="num">Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
   </section>
-  <footer><p>Clips are 10 fps, ~45 s, re-encoded to 360p for the web (source renders are 480p).</p><p>Wrist tiles draw their own gripper directly from the end-effector pose in that camera; head, third and attached-camera tiles place every gripper through the dataset's world-frame camera trajectories. In the multi-view clips the left gripper's URDF is tinted green and the right one blue; at most four camera streams are shown per clip.</p><p>Acceptance chips follow the curation protocol: <b>pass</b> = wrist-view median error ≤ 10 px, p90 ≤ 20 px at 480 rows; <b>unmeasured</b> = no automatic finger detector for the rig yet (visual check only).</p></footer>
+  <footer><p>Clips are 10 fps, ~45 s, 360p. Wrist tiles draw the gripper from the end-effector pose in that camera; other tiles place it through the world-frame camera trajectories. Left gripper green, right gripper blue.</p></footer>
 </main>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -66,20 +66,16 @@ const fmtH=h=>h==null?'–':h>=100?Math.round(h).toLocaleString():h>=10?h.toFixe
 const taskList=t=>(Array.isArray(t)?t:String(t).split('||')).map(x=>String(x).trim()).filter(Boolean);
 let D;
 fetch('../data/datasets.json').then(r=>r.json()).then(d=>{D=d;render();if(location.hash){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView()}});
-function render(){const projs=D.projects.filter(p=>p.overlays.length);const chipOf={urdf:'URDF projection',primitive:'primitive gripper',"camera-path":'camera path + up axis',none:'no drawing'};
+function render(){const projs=D.projects.filter(p=>p.overlays.length);
   let h='';
   projs.forEach(p=>{const ovs=p.overlays;const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];
     h+=`<section class="proj" id="${esc(p.key.replace('/','_'))}"><h2>${esc(p.key)}<small>${esc(emb)} · ${p.datasets} datasets · ${fmtH(p.hours)} h · ${p.overlays.length} clip${p.overlays.length>1?'s':''}</small></h2>`;
-    if(p.notes)h+=`<p class="pnote">${esc(p.notes)}</p>`;
     h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`;const src=D.overlay_base+file+'.mp4';
-      const grips=Object.entries(o.grippers).map(([s,g])=>`${s}: ${esc(g.model)}${g.profile?' → '+esc(g.profile):''}${g.urdf?'':o.mode==='primitive'?' <span class="chip">primitive stand-in (no URDF)</span>':' <span class="chip">not drawn: no URDF</span>'}`).join('<br>');
       return `<div class="card"><div class="vid" data-src="${src}"><img src="posters/${file}.jpg" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
         <div class="title">${esc(o.dataset)} · ep ${o.episode}</div>
-        <div class="meta"><div class="row"><span class="chip ${o.accept}">${o.accept}</span><span class="chip">${chipOf[o.mode]||o.mode}</span>${o.fisheye?'<span class="chip">fisheye (KB4)</span>':''}<span class="chip">${o.seconds}s</span></div>
+        <div class="meta">${o.fisheye?'<div class="row"><span class="chip">fisheye</span></div>':''}
         ${o.task?`<div><span class="k">task</span>${esc(taskList(o.task).slice(0,3).join(' · '))}${taskList(o.task).length>3?' …':''}</div>`:''}
-        <div><span class="k">views</span>${o.views.map(esc).join(' · ')}</div>
-        ${grips?`<div><span class="k">grippers</span>${grips}</div>`:''}
-        <div><span class="k">rendered from</span>export ${esc(o.export_id||'pre-protocol')} · release ${esc((o.rendered_from||'').slice(0,10))} · <a href="${src}">mp4</a></div></div></div>`}).join('')+'</div></section>';});
+        <div><span class="k">views</span>${o.views.map(esc).join(' · ')}</div></div></div>`}).join('')+'</div></section>';});
   document.getElementById('content').innerHTML=h;
   document.querySelectorAll('.vid').forEach(v=>v.onclick=()=>{if(v.querySelector('video'))return;v.innerHTML=`<video controls autoplay loop muted playsinline src="${v.dataset.src}"></video>`});
   document.getElementById('pending').style.display=D.projects.some(p=>!p.overlays.length)?'':'none';
