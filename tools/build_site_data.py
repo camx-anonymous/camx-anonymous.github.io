@@ -194,6 +194,55 @@ def scan_leaves(root):
 
 SAMPLES = os.environ.get('CAMX_SAMPLES', '/data/camx_samples')
 RELEASES = 'https://github.com/camx-anonymous/camx-anonymous.github.io/releases'
+SITE = 'https://camx-anonymous.github.io/'
+DOWNLOAD = {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<project>/<dataset>/{meta,data,videos}',
+            'citations': SITE + 'data/citations.bib'}
+
+# --- sources: license + papers of every source dataset (hand-maintained data/sources.json) ---------------------------
+# {"sources": {"<source label>": {"homepage", "license": {"name", "url"} | null, "papers": [{"key", "title", "year",
+#  "arxiv", "url", "bibtex"}]}}}, keyed by the inventory "source" label that every row carries (SOURCE_OF). The site
+# shows them in the dataset record and in the download gate (cite + license confirmation); this script checks that
+# every source has an entry and no forbidden term, and writes data/citations.bib (CAMX + every source paper).
+SOURCES = os.path.join(REPO, 'data', 'sources.json')
+BIB = os.path.join(REPO, 'data', 'citations.bib')
+CAMX_BIB = '''@misc{camx2026,
+  title  = {CAMX: A Camera-Aware Cross-Embodiment Dataset},
+  author = {Anonymous Authors},
+  year   = {2026},
+  note   = {Under review}
+}'''
+
+
+def sources_pass(out):
+    out['download'] = dict(DOWNLOAD)
+    if not os.path.isfile(SOURCES):
+        print(f'warning: {SOURCES} not found, no licenses / citations on the site', file=sys.stderr); return out
+    text = open(SOURCES).read()
+    hits = sorted({m.group(0).lower() for m in FORBIDDEN.finditer(text)})
+    if hits: sys.exit(f'anonymisation failed in {SOURCES}, still present: {hits}')
+    j = json.loads(text); src = j['sources']; proj = j.get('projects', {})
+    used = collections.Counter(proj.get(r['project'], r['source']) for r in out['datasets'])
+    missing = sorted(k for k in used if k not in src)
+    if missing: print(f'warning: {len(missing)} sources without an entry in data/sources.json: {missing}', file=sys.stderr)
+    unused = sorted(k for k in src if k not in used)
+    if unused: print(f'warning: sources.json entries no dataset uses: {unused}', file=sys.stderr)
+    for k, v in src.items():
+        if not v.get('license'): print(f'warning: {k}: license not stated', file=sys.stderr)
+        if not v.get('papers'): print(f'warning: {k}: no paper listed', file=sys.stderr)
+    lines = ['% CAMX one-episode samples: CAMX plus every source dataset it re-exports.',
+             '% Each source keeps its own license; see data/sources.json or the record of each dataset on the site.', '', CAMX_BIB]
+    seen = set()
+    for k in sorted(src, key=str.lower):
+        for pp in src[k].get('papers') or []:
+            if pp['key'] in seen: continue
+            seen.add(pp['key'])
+            lic = (src[k].get('license') or {}).get('name')
+            lines += ['', f'% {k}' + (f' · {lic}' if lic else ''), pp['bibtex'].strip()]
+    open(BIB, 'w').write('\n'.join(lines) + '\n')
+    print(f'{len(src)} sources, {len(seen)} source papers -> {os.path.relpath(BIB, REPO)}', file=sys.stderr)
+    return out
+
+
 
 
 def attach_samples(out, samples_dir):
@@ -211,7 +260,6 @@ def attach_samples(out, samples_dir):
         r['sample'] = None
         if s and s.get('ok') and s.get('url'):
             r['sample'] = {'url': s['url'], 'bytes': s['bytes'], 'frames': s['frames'], 'seconds': s['seconds']}; n += 1
-    out['download'] = {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<project>/<dataset>/{meta,data,videos}'}
     out['totals']['samples'] = n
     print(f'{n} of {len(out["datasets"])} datasets have a published sample', file=sys.stderr)
     return out
@@ -221,14 +269,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--root', default=os.environ.get('CAMX_ROOT', '/data/camx_480p'))
     ap.add_argument('--out', default=os.path.join(REPO, 'data', 'datasets.json'))
-    ap.add_argument('--scrub-only', action='store_true', help='only re-run the anonymisation pass over --out')
+    ap.add_argument('--scrub-only', action='store_true',
+                    help='only re-run the anonymisation pass over --out (and the sources check + data/citations.bib)')
     ap.add_argument('--attach-samples-only', action='store_true',
                     help=f'only merge the published sample archives ({SAMPLES}) into --out')
     a = ap.parse_args()
     if a.scrub_only or a.attach_samples_only:
         out = json.load(open(a.out))
         if a.attach_samples_only: out = attach_samples(out, SAMPLES)
-        out = anonymise(merge_projects(out))
+        out = sources_pass(anonymise(merge_projects(out)))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     inv = json.load(open(INVENTORY))
@@ -337,13 +386,12 @@ def main():
     total_h = sum(r['hours'] for r in rows)
     out = {'built': datetime.datetime.now().astimezone().strftime('%Y-%m-%d %H:%M %Z'), 'root': a.root,
            'inventory_updated': inv.get('updated'), 'stats_as_of': stats.get('as_of'),
-           'download': {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<project>/<dataset>/{meta,data,videos}'},
            'overlay_base': RELEASES + '/download/overlays-v1/',
            'totals': {'datasets': len(rows), 'projects': len(projects), 'episodes': sum(r['episodes'] for r in rows),
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = anonymise(merge_projects(attach_samples(out, SAMPLES)))
+    out = sources_pass(anonymise(merge_projects(attach_samples(out, SAMPLES))))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)

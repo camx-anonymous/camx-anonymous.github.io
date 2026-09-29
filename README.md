@@ -23,6 +23,18 @@ This repository is anonymized for review.
   served from the `overlays-v1` GitHub release; posters live in `overlays/posters/`. The site is fully static
   (GitHub Pages); there is no rendering backend.
 - `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates.
+- `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the
+  rows (`projects` maps a family/project to a more specific entry where one source ships under two licenses,
+  e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7). Hand-maintained; author given names are
+  abbreviated to initials. The build checks it (every source has an entry, no forbidden term) and writes
+  `data/citations.bib` (CAMX plus every source paper) from it.
+- Download gate — every download action (the slice command's Copy / Save .sh, a record's "Copy sample command")
+  first opens a dialog listing the sources of exactly those samples with their license and papers, offers the
+  BibTeX of that set (Copy / Save .bib), and asks the user to confirm they will cite them and follow the
+  licenses; the command block stays locked until then. The shortcuts (Full release, one morphology) are
+  handled the same way, since the set is derived from the rows of the slice: confirming the full release
+  unlocks every slice for the session. Each record also shows its License and Cite rows. The generated
+  script repeats the list as a comment header and links `data/citations.bib`.
 
 ## Rebuilding the data
 
