@@ -28,7 +28,13 @@
 .crumbs button.cur{color:var(--ink)}
 .crumbs .sep{color:var(--line-hi)}
 .crumbs .n{font:400 12px/1 var(--mono);color:var(--ink4);margin-left:6px}
-.search{display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--line-hi);border-radius:6px;background:var(--panel);min-width:260px;height:42px;flex:0 1 320px}
+.bright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 1 340px;min-width:260px}
+.search{display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--line-hi);border-radius:6px;background:var(--panel);height:42px;width:100%}
+.selbar{font:400 12.5px/1.5 var(--mono);color:var(--ink4);text-align:right}
+.selbar b{font-weight:500;color:var(--ink)}
+.selbar a{color:var(--accent)}
+.crumbs .lk{margin-left:8px}
+@media (max-width:640px){.bright{align-items:flex-start;flex-basis:100%}.selbar{text-align:left}}
 .search:focus-within{border-color:var(--ink)}
 .search svg{width:12px;height:12px;stroke:var(--ink4);fill:none;stroke-width:1.8;flex:none}
 .search input{border:0;background:transparent;font:inherit;font-size:14px;color:var(--ink);outline:0;width:100%;min-width:0;padding:0}
@@ -46,15 +52,34 @@
 .tree .tick{width:12px;height:1px;background:var(--line-hi);flex:none}
 .tree .lvl1{margin-left:14px;border-left:1px solid var(--line-hi);display:flex;flex-direction:column;gap:2px;padding:4px 0}
 .tree .lvl1>div{display:flex;flex-direction:column}
-.tree .lvl1>div>button{margin-left:0}
+.tree .row{display:flex;align-items:center;gap:6px}
+.tree>.row{margin-left:-8px}
+.tree .row>button:first-child{flex:1;margin-left:0}
+.tree .row .ck{margin-right:2px}
 .tree .lvl2{margin-left:34px;border-left:1px solid var(--line);display:flex;flex-direction:column}
 .tree .lvl2 button{font-size:13px;font-weight:400;margin-left:0;gap:8px}
 .tree .lvl2 .tick{width:10px;background:var(--line)}
 .tree .lvl2 button .c{font-size:11px}
+.tree .lvl3{margin-left:20px;border-left:1px solid var(--line);display:flex;flex-direction:column;padding:2px 0 4px}
+.tree .lvl3 button{font-size:12.5px;color:var(--ink2);padding:5px 8px 5px 6px}
+.tree .lvl3 button.on{color:var(--accent)}
+.tree .lvl3 .tick{width:8px}
+/* tri-state tick boxes: tree rows select a whole group, cards select one dataset */
+button.ck,.tree button.ck{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:14px;height:14px;margin:0;padding:0;border:1px solid var(--line-hi);border-radius:3px;background:var(--panel);display:inline-flex;align-items:center;justify-content:center;transition:border-color .12s,background .12s}
+button.ck:hover,.tree button.ck:hover{border-color:var(--ink)}
+button.ck:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.ck[aria-checked="true"],.tree button.ck[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+button.ck[aria-checked="true"]::after{content:"";width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
+button.ck[aria-checked="mixed"],.tree button.ck[aria-checked="mixed"]{border-color:var(--accent)}
+button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;background:var(--accent)}
 .results{flex:999 1 480px;min-width:0}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:32px 20px}
 @media (max-width:480px){.cards{grid-template-columns:1fr 1fr;gap:24px 14px}}
-.dcard{display:flex;flex-direction:column;gap:12px;cursor:pointer;min-width:0}
+.dcard{position:relative;display:flex;flex-direction:column;gap:12px;cursor:pointer;min-width:0}
+.dcard .ck{position:absolute;top:8px;right:8px;z-index:2;width:22px;height:22px;background:rgba(255,255,255,.92);border-color:rgba(34,33,30,.3);box-shadow:0 1px 3px rgba(0,0,0,.08);opacity:0;transition:opacity .12s,border-color .12s,background .12s}
+.dcard:hover .ck,.dcard .ck[aria-checked="true"],.dcard .ck:focus-visible{opacity:1}
+@media (hover:none){.dcard .ck{opacity:1}}
+.dcard.on .thumb{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .dcard .thumb{position:relative;aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--chipbg) 0 8px,var(--panel2) 8px 16px);border:1px solid var(--line)}
 .dcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .dcard .thumb video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
@@ -98,7 +123,8 @@
 .slice .sz{font-size:26px;font-weight:500;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
 .slice .sz small{display:block;font:400 12px/1 var(--mono);color:var(--ink3);margin-top:8px;letter-spacing:0}
 .slice .ds{font:400 12px/1.5 var(--mono);color:var(--ink3)}
-.slice .acts{display:flex;gap:14px;margin-top:-4px}
+.slice .acts{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:-4px}
+.slice .acts .lk{white-space:nowrap}
 .code{margin-top:16px;border-radius:var(--r);background:var(--code-bg);color:var(--code-fg);overflow:hidden}
 .code .bar{display:flex;align-items:center;gap:2px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
 .code .bar button{all:unset;cursor:pointer;font:500 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;border-radius:4px}
@@ -171,7 +197,10 @@ footer{margin:0}
         <h2>Browse datasets</h2>
         <div class="crumbs" id="crumbs"></div>
       </div>
-      <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="q" placeholder='Search tasks, e.g. "fold shirt"' aria-label="Search datasets"></label>
+      <div class="bright">
+        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="q" placeholder='Search tasks or sources, e.g. "fold towel"' aria-label="Search datasets"></label>
+        <div class="selbar" id="selbar"></div>
+      </div>
     </div>
     <div class="browse">
       <aside class="tree" id="tree" aria-label="Morphologies and platforms"></aside>
@@ -187,7 +216,7 @@ footer{margin:0}
       <div class="dlhead">
         <div>
           <h2>Download</h2>
-          <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command.</p>
+          <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command. Take a whole slice, or tick platforms, sources and datasets while browsing to build your own.</p>
         </div>
         <button type="button" class="lk" id="importSel">Import a selection (JSON)</button>
         <input type="file" id="importFile" accept="application/json" class="hidden">
@@ -234,7 +263,7 @@ const human=s=>{s=String(s).replace(/_+/g,' ').replace(/\s+/g,' ').trim();return
 const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + up axis':m;
 const $=id=>document.getElementById(id);
 let D,P={},L=[],sel=new Set();
-const S={cat:'all',robot:null,q:'',shown:PAGE,slice:'full'};
+const S={cat:'all',robot:null,source:null,q:'',shown:PAGE,slice:'full'};
 // r.sample = {url, bytes, frames, seconds}: the episode-0 archive of the dataset on this repository's GitHub releases (null while unpublished)
 const sampled=rows=>rows.filter(r=>r.sample);
 const fmtDur=s=>!s?'–':s>=3600?(s/3600).toFixed(1)+' h':s>=60?Math.round(s/60)+' min':Math.round(s)+' s';
@@ -256,32 +285,53 @@ function stats(){const t=D.totals;$('stats').innerHTML=[[fmt(t.episodes),'episod
   .map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')}
 
 /* ---------- browse: tree, crumbs, cards ---------- */
+/* every tree row is a filter button plus a tick box that selects the whole group for download;
+   sources appear as a third level under the platform being browsed */
 function tree(){const all=agg(L);
-  let h=`<button class="${S.cat==='all'?'on':''}" data-cat="all"><span class="lab"><span class="dia"></span><span>All morphologies</span></span><span class="c">${fmtH(all.h)} h</span></button><div class="lvl1">`;
-  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const a=agg(rows);const embs={};rows.forEach(r=>{const e=embs[r.embodiment]||(embs[r.embodiment]={n:0,h:0});e.n++;e.h+=r.hours||0});
-    h+=`<div><button class="${S.cat===m.id&&!S.robot?'on':''}" data-cat="${esc(m.id)}"><span class="lab"><span class="tick"></span><span>${m.label}</span></span><span class="c">${fmtH(a.h)} h</span></button><div class="lvl2">`
-      +Object.entries(embs).sort((x,y)=>y[1].h-x[1].h).map(([e,v])=>`<button class="${S.cat===m.id&&S.robot===e?'on':''}" data-cat="${esc(m.id)}" data-robot="${esc(e)}" title="${esc(e)} · ${v.n} datasets"><span class="lab"><span class="tick"></span><span>${esc(e)}</span></span><span class="c">${fmtH(v.h)} h</span></button>`).join('')
-      +`</div></div>`});
+  let h=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>',fmtH(all.h)+' h',L,'all datasets')+'<div class="lvl1">';
+  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const a=agg(rows);const embs={};rows.forEach(r=>{const e=embs[r.embodiment]||(embs[r.embodiment]={n:0,h:0,rows:[]});e.n++;e.h+=r.hours||0;e.rows.push(r)});
+    h+='<div>'+row(S.cat===m.id&&!S.robot,{cat:m.id},'<span class="tick"></span><span>'+m.label+'</span>',fmtH(a.h)+' h',rows,m.label)+'<div class="lvl2">'
+      +Object.entries(embs).sort((x,y)=>y[1].h-x[1].h).map(([e,v])=>{const act=S.cat===m.id&&S.robot===e;
+        let o=row(act&&!S.source,{cat:m.id,robot:e},'<span class="tick"></span><span>'+esc(e)+'</span>',fmtH(v.h)+' h',v.rows,e,`${esc(e)} · ${v.n} datasets`);
+        if(act){const srcs={};v.rows.forEach(r=>{const x=srcs[r.source]||(srcs[r.source]={n:0,h:0,rows:[]});x.n++;x.h+=r.hours||0;x.rows.push(r)});
+          o+='<div class="lvl3">'+Object.entries(srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',fmtH(x.h)+' h',x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`)).join('')+'</div>'}
+        return o}).join('')+'</div></div>'});
   $('tree').innerHTML=h+'</div>'}
+function row(on,f,lab,c,rows,name,title){const d=Object.entries(f).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ');
+  return `<div class="row"><button type="button" class="${on?'on':''}" ${d}${title?` title="${title}"`:''}><span class="lab">${lab}</span><span class="c">${c}</span></button>${ck(state(rows),d,'Select '+name+' for download')}</div>`}
+function groupRows(d){return L.filter(r=>(d.cat==='all'||r.morph===d.cat)&&(!d.robot||r.embodiment===d.robot)&&(!d.source||r.source===d.source))}
 
-function filtered(){const q=S.q.toLowerCase();return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!q||hay(r).includes(q)))}
-function hay(r){return (r.id+' '+r.robot_type+' '+r.embodiment+' '+r.source+' '+r.morph+' '+r.form+' '+r.cams.map(c=>c.model).join(' ')+' '+(P[r.project].notes||'')).toLowerCase()}
+/* ---------- selection: dataset ids picked while browsing, fed to the "Your selection" download slice ---------- */
+const ck=(st,attrs,label)=>`<button type="button" class="ck" role="checkbox" aria-checked="${st}" aria-label="${esc(label)}" ${attrs}></button>`;
+function state(rows){let n=0;rows.forEach(r=>{if(sel.has(r.id))n++});return n===0?'false':n===rows.length?'true':'mixed'}
+function setSel(rows,on){rows.forEach(r=>on?sel.add(r.id):sel.delete(r.id));persist();if(on&&sel.size)S.slice='sel';refresh()}
+function refresh(){tree();crumbs(filtered());syncCards();downloads()}
+function syncCards(){$('cards').querySelectorAll('.dcard').forEach(c=>{const on=sel.has(c.dataset.id);c.classList.toggle('on',on);const k=c.querySelector('.ck');if(k)k.setAttribute('aria-checked',on)})}
+function selbar(){const n=sel.size;$('selbar').innerHTML=n?`<b>${n.toLocaleString()} dataset${n===1?'':'s'} selected</b> · <a href="#download">go to download</a> · <button type="button" class="lk" id="selClear">clear</button>`:'Tick a platform, source or dataset to add it to your download.';
+  const c=$('selClear');if(c)c.onclick=()=>setSel(L,false)}
 
-function crumbs(rows){const parts=[{l:'All',f:()=>{S.cat='all';S.robot=null}}];
-  if(S.cat!=='all')parts.push({l:ML[S.cat],f:()=>{S.robot=null}});
-  if(S.robot)parts.push({l:S.robot,f:()=>{}});
-  const a=agg(rows);
+function filtered(){const q=S.q.toLowerCase();return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source)&&(!q||hay(r).includes(q)))}
+function hay(r){return (r.id+' '+human(r.name)+' '+r.robot_type+' '+r.embodiment+' '+r.source+' '+r.morph+' '+r.form+' '+r.cams.map(c=>c.model).join(' ')+' '+(P[r.project].notes||'')).toLowerCase()}
+
+function crumbs(rows){const parts=[{l:'All',f:()=>{S.cat='all';S.robot=null;S.source=null}}];
+  if(S.cat!=='all')parts.push({l:ML[S.cat],f:()=>{S.robot=null;S.source=null}});
+  if(S.robot)parts.push({l:S.robot,f:()=>{S.source=null}});
+  if(S.source)parts.push({l:S.source,f:()=>{}});
+  const a=agg(rows),st=state(rows);
   $('crumbs').innerHTML=parts.map((p,i)=>`${i?'<span class="sep">/</span>':''}<button type="button" class="${i===parts.length-1?'cur':''}" data-i="${i}">${esc(p.l)}</button>`).join('')
-    +`<span class="n">${rows.length.toLocaleString()} datasets · ${fmt(a.ep)} episodes · ${fmtH(a.h)} h</span>`;
-  $('crumbs').querySelectorAll('button').forEach(b=>b.onclick=()=>{parts[+b.dataset.i].f();S.shown=PAGE;tree();render()})}
+    +`<span class="n">${rows.length.toLocaleString()} datasets · ${fmt(a.ep)} episodes · ${fmtH(a.h)} h</span>`
+    +(rows.length?`<button type="button" class="lk" id="selAll">${st==='true'?'Deselect all':'Select all '+rows.length.toLocaleString()}</button>`:'');
+  $('crumbs').querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>{parts[+b.dataset.i].f();S.shown=PAGE;tree();render()});
+  const sa=$('selAll');if(sa)sa.onclick=()=>setSel(rows,st!=='true');
+  selbar()}
 
 function thumb(r){const p=P[r.project];const own=p.overlays.find(o=>o.dataset===r.id);const o=own||p.overlays[0];if(!o)return null;const f=`${o.key}__${o.slug}`;
   return {o,own:!!own,poster:`overlays/posters/${f}.jpg`,src:D.overlay_base+f+'.mp4'}}
 
-function card(r){const t=thumb(r);
+function card(r){const t=thumb(r),on=sel.has(r.id);
   const th=t?`<div class="thumb has" data-src="${t.src}" title="Play the validation clip"><img src="${t.poster}" alt="" loading="lazy"><span class="tl">${t.own?`validation clip · ep ${t.o.episode}`:'project clip'}</span><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
     :`<div class="thumb"><span class="tl">no example clip</span><span class="dur">${fmtH(r.hours)} h</span></div>`;
-  return `<article class="dcard" data-id="${esc(r.id)}">${th}<div class="body"><div class="ttl">${esc(human(r.name))}</div>
+  return `<article class="dcard${on?' on':''}" data-id="${esc(r.id)}">${th}${ck(on,'','Select '+human(r.name)+' for download')}<div class="body"><div class="ttl">${esc(human(r.name))}</div>
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
     <div class="sub">${esc(r.project)} · ${fmt(r.episodes)} ep · ${r.n_views} view${r.n_views===1?'':'s'} · ${Math.round(r.fps)} fps</div></div></article>`}
 
@@ -294,18 +344,18 @@ function render(){const rows=filtered();crumbs(rows);const show=rows.slice(0,S.s
 /* a slice is a set of datasets shown as a card; the command fetches the one-episode sample archive of each one from the GitHub releases */
 function sizeOf(rows){const sm=sampled(rows);return {n:sm.length,miss:rows.length-sm.length,b:sm.reduce((a,r)=>a+r.sample.bytes,0),s:sm.reduce((a,r)=>a+r.sample.seconds,0)}}
 function slices(){const out=[];
-  if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length.toLocaleString()} dataset${rows.length>1?'s':''} picked while browsing`,rows,sel:true})}
+  if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length.toLocaleString()} dataset${rows.length>1?'s':''} ticked while browsing`,rows,sel:true})}
   out.push({id:'full',name:'Full release',desc:`${L.length.toLocaleString()} datasets · ${MORPHS.length} morphologies`,rows:L});
   MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const plats=new Set(rows.map(r=>r.embodiment)).size;
     out.push({id:m.id,name:m.label,desc:`${rows.length.toLocaleString()} datasets · ${plats} platform${plats>1?'s':''}`,rows})});
   return out}
 function sliceCard(s){const z=sizeOf(s.rows),on=s.id===S.slice;
-  return `<div class="slice${on?' on':''}" role="button" tabindex="0" aria-pressed="${on}" data-s="${esc(s.id)}"><div class="nm"><span>${esc(s.name)}</span><span class="tick"></span></div><div class="sz">${fmtB(z.b)}<small>${fmtDur(z.s)} of video</small></div><div class="ds">${esc(s.desc)}</div>${s.sel?'<div class="acts"><button type="button" class="lk" id="exportSel">export JSON</button><button type="button" class="lk" id="clearSel">clear</button></div>':''}</div>`}
+  return `<div class="slice${on?' on':''}" role="button" tabindex="0" aria-pressed="${on}" data-s="${esc(s.id)}"><div class="nm"><span>${esc(s.name)}</span><span class="tick"></span></div><div class="sz">${fmtB(z.b)}<small>${fmtDur(z.s)} of video</small></div><div class="ds">${esc(s.desc)}</div>${s.sel?'<div class="acts"><a class="lk" href="#browse">edit</a><button type="button" class="lk" id="exportSel">export JSON</button><button type="button" class="lk" id="clearSel">clear</button></div>':''}</div>`}
 function downloads(){const ss=slices();if(!ss.some(s=>s.id===S.slice))S.slice='full';
   $('dlist').innerHTML=ss.map(sliceCard).join('');
   const pick=id=>{S.slice=id;downloads()};
   $('dlist').querySelectorAll('.slice').forEach(el=>{el.onclick=e=>{if(!e.target.closest('.lk'))pick(el.dataset.s)};el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(el.dataset.s)}}});
-  const c=$('clearSel');if(c)c.onclick=()=>{sel.clear();persist();downloads()};
+  const c=$('clearSel');if(c)c.onclick=()=>setSel(L,false);
   const x=$('exportSel');if(x)x.onclick=()=>{const rows=L.filter(r=>sel.has(r.id));dl('camx_selection.json',JSON.stringify({samples:D.download.samples,exported:new Date().toISOString(),datasets:rows.map(r=>({id:r.id,project:r.project,embodiment:r.embodiment,source:r.source,episodes:r.episodes,hours:r.hours,fps:r.fps,views:r.n_views,sample:r.sample?r.sample.url:null}))},null,1),'application/json')};
   code(ss.find(s=>s.id===S.slice))}
 function cmdText(s){const sm=sampled(s.rows).sort((a,b)=>a.id.localeCompare(b.id));const z=sizeOf(s.rows);
@@ -337,29 +387,31 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
     ov.length?[ov.length>1?'Validation clips':'Validation clip',ov.map(o=>`<a href="overlays/#${esc(o.key)}">ep ${o.episode}</a>`).join(' · ')]:null].filter(Boolean);
-  const on=sel.has(r.id);
   $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(human(r.name))}</h3>
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
     <p class="path">${esc(r.id)}</p>
-    <div class="acts"><button type="button" class="${on?'':'primary'}" id="selOne">${on?'Remove from download':'Add to download'}</button>${r.sample?'<button type="button" id="copyOne">Copy sample command</button>':''}</div>
+    ${r.sample?'<div class="acts"><button type="button" id="copyOne">Copy sample command</button></div>':''}
     <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
-  $('selOne').onclick=()=>{on?sel.delete(r.id):sel.add(r.id);persist();downloads();drawer(r.id)};
   const cp=$('copyOne');if(cp)cp.onclick=()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)});
   $('drawer').classList.add('open');$('scrim').classList.add('show')}
 function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
 
 document.addEventListener('DOMContentLoaded',()=>{load();
   $('importSel').onclick=()=>$('importFile').click();
-  $('tree').addEventListener('click',e=>{const b=e.target.closest('button[data-cat]');if(!b)return;S.cat=b.dataset.cat;S.robot=b.dataset.robot||null;S.shown=PAGE;tree();render()});
+  $('tree').addEventListener('click',e=>{const b=e.target.closest('button[data-cat]');if(!b)return;
+    if(b.classList.contains('ck')){setSel(groupRows(b.dataset),b.getAttribute('aria-checked')!=='true');return}
+    S.cat=b.dataset.cat;S.robot=b.dataset.robot||null;S.source=b.dataset.source||null;S.shown=PAGE;tree();render()});
   $('q').addEventListener('input',e=>{S.q=e.target.value.trim();S.shown=PAGE;render()});
-  $('cards').addEventListener('click',e=>{const t=e.target.closest('.thumb[data-src]');
+  $('cards').addEventListener('click',e=>{const k=e.target.closest('.ck');
+    if(k){const id=k.closest('.dcard').dataset.id;setSel(L.filter(r=>r.id===id),!sel.has(id));return}
+    const t=e.target.closest('.thumb[data-src]');
     if(t){if(!t.querySelector('video'))t.innerHTML=`<video controls autoplay loop muted playsinline src="${t.dataset.src}"></video>`;return}
     const c=e.target.closest('.dcard');if(c)drawer(c.dataset.id)});
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
   $('citeBtn').onclick=()=>$('cite').classList.toggle('show');
   $('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const j=JSON.parse(t);
-    const ids=(j.datasets||j).map(x=>typeof x==='string'?x:x.id);const known=new Set(L.map(r=>r.id));let n=0;ids.forEach(i=>{if(known.has(i)){sel.add(i);n++}});persist();S.slice='sel';downloads();alert(`Imported ${n} of ${ids.length} datasets`)}catch(err){alert('Not a selection JSON: '+err)}});e.target.value=''};
+    const ids=(j.datasets||j).map(x=>typeof x==='string'?x:x.id);const known=new Set(L.map(r=>r.id));let n=0;ids.forEach(i=>{if(known.has(i)){sel.add(i);n++}});persist();S.slice='sel';refresh();alert(`Imported ${n} of ${ids.length} datasets`)}catch(err){alert('Not a selection JSON: '+err)}});e.target.value=''};
 });
 </script>
 </body>
