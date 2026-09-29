@@ -91,6 +91,31 @@ SOURCE_OF = {
     'ur/openneo_ur': 'OpenNeoData', 'wsg50/rh20t_cfg3': 'RH20T',
 }
 
+# projects shown as one on the site: the leaf ids (and so the sample archives) keep their own path, but rows, the
+# browse tree's source level, the overlays page and the project totals all fold the first into the second
+PROJECT_MERGE = {'genrobot/gripper_v4': 'genrobot/10kh'}
+
+
+def merge_projects(out):
+    for r in out['datasets']:
+        t = PROJECT_MERGE.get(r['project'])
+        if t: r['project'] = t; r['source'] = SOURCE_OF.get(t, t.split('/')[1])
+    by_key = {p['key']: p for p in out['projects']}
+    for src, dst in PROJECT_MERGE.items():
+        a, b = by_key.pop(src, None), by_key.get(dst)
+        if not a or not b: continue
+        for k in ('datasets', 'episodes', 'frames'): b[k] += a[k]
+        b['hours'] = round(b['hours'] + a['hours'], 2)
+        for k in ('embodiments', 'forms', 'views'):
+            for kk, v in a[k].items(): b[k][kk] = b[k].get(kk, 0) + v
+        for k in ('inventory_hours', 'inventory_bytes'):
+            if a.get(k) and b.get(k): b[k] += a[k]
+        b['overlays'] += a['overlays']
+    out['projects'] = sorted(by_key.values(), key=lambda p: p['key'])
+    out['totals']['projects'] = len(out['projects'])
+    return out
+
+
 # robot_type (info.json) -> inventory embodiment; first regex that matches wins
 EMBODIMENT_RULES = [
     (r'YAM', 'YAM'), (r'HiFi-UMI|SimpleAI UMI 4', 'HiFi-UMI'), (r'genrobot|GenRobot', 'GenRobot'),
@@ -203,7 +228,7 @@ def main():
     if a.scrub_only or a.attach_samples_only:
         out = json.load(open(a.out))
         if a.attach_samples_only: out = attach_samples(out, SAMPLES)
-        out = anonymise(out)
+        out = anonymise(merge_projects(out))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     inv = json.load(open(INVENTORY))
@@ -318,7 +343,7 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = anonymise(attach_samples(out, SAMPLES))
+    out = anonymise(merge_projects(attach_samples(out, SAMPLES)))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)

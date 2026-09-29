@@ -386,7 +386,7 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
   const kv=[hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
-    ov.length?[ov.length>1?'Validation clips':'Validation clip',ov.map(o=>`<a href="overlays/#${esc(o.key)}">ep ${o.episode}</a>`).join(' · ')]:null].filter(Boolean);
+    ov.length?[ov.length>1?'Validation clips':'Validation clip',ov.map(o=>`<a href="overlays/#${esc(p.key.replace('/','_'))}">ep ${o.episode}</a>`).join(' · ')]:null].filter(Boolean);
   $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(human(r.name))}</h3>
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
     <p class="path">${esc(r.id)}</p>
