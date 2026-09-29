@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Example overlay clips rendered here (every project of the training tree that the shared render tree does not carry).
+"""Example overlay clips rendered here (every project of the training tree; the shared render tree is no longer used).
 
 Two renderers of the camera-cross-embodiment checkout are driven:
   * ``bimanual``  = render_bimanual_urdf_overlay_video.py  (right main | left main, fisheye tools; the DataClaw / GenRobot picks)
@@ -198,8 +198,66 @@ def auto_picks(n=3):
     return out
 
 
+# ── the clips the shared render tree carried (2026-09-28: opaque grey Rerun meshes that hide the real gripper) ─────────
+# Same datasets / episodes / slugs as that tree, re-rendered here with the translucent tinted meshes + tool-centre axes of
+# every other clip. Lens sources as the shared tree used them: per-episode intrinsics from meta/episodes where the export
+# carries them (agibot 2026, abc, robomind, iphumi, openarm, rby1, droid), else the viz config FOVs.
+GENROBOT_10KH = dict(tool=BIMANUAL, profile='genrobot', mode='urdf', calib_fit='stretch', cross='on',
+                     urdf='DAS_Gripper_V4/urdf/DAS_Gripper_V4.urdf', gripper_profile='genrobot_das_v4',
+                     extra=['--own-exclude-visuals', 'base_link,link_imu,link_ca1,link_ca2,link_ca3', '--anchor-delta-xyz=0.0067,-0.0204,0.0142',
+                            '--anchor-delta-rpy=0,0,0.042', '--width-scale', '0.94', '--alpha', '0.45'],
+                     overlay='DAS Gripper V4 URDF anchored at its camera link (own gripper; the other gripper through the two world '
+                             'trajectories), Kannala-Brandt projection with the per-episode camera_info of the 10Kh MCAPs')
+def G10K(ds):   # the per-episode lens files of the 10Kh picks (calib/genrobot_episodes, from the MCAP camera_info)
+    return dict(GENROBOT_10KH, calib_left=f'genrobot_episodes/{ds}_ep0_left.json', calib_right=f'genrobot_episodes/{ds}_ep0_right.json')
+IPHUMI = MV(config='iphumi_bimanual.json')                     # per-episode K for the phone + attached streams; single-arm sets skip the absent side
+UMIFT = MV(config='iphumi_bimanual.json', profile='umift')      # UMI-FT gripper (the info.json model string is the rig's, iPhUMI)
+ROBOCOIN_CM, ROBOCOIN_GX = MV(config='robocoin_cobot_magic.json'), MV(config='robocoin_galaxea_r1_stereo.json')
+# MV-UMI: the gripper GoPro only. The release also carries a second GoPro stream (right_third_camera_rgb) but its
+# right_third_camera_pose_in_main is a constant identity-rotation placeholder 22 cm ahead of the lens, not a calibration
+# (the view is a third-person camera looking at the gripper), so that view cannot be drawn and is left out.
+MVUMI = MV(calib={'main': GOPRO}, views=['right_main_camera_rgb'])
+# AgiBot G2: the registry anchors the gripper at its hand-eye-calibrated `camera_optical` link, which only the URDF copy in
+# camx/data_processing/agibot/assets has (the tracked grippers/agibot_g2 tree is the 0906 rebuild without that link)
+AGIBOT_G2_ASSETS = os.path.join(VIZ, '..', 'data_processing', 'agibot', 'assets')
+AGIBOT_G2 = MV(config='agibot_g2.json', extra=[a for side in ('left', 'right')
+                                                for a in ('--gripper-urdf', f'{side}={AGIBOT_G2_ASSETS}/agibot_g2_gripper_{side}.urdf')],
+               overlay='AgiBot G2 90 mm gripper URDF (GenieSimAssets) anchored at its hand-eye-calibrated wrist-camera optical frame; '
+                       'per-episode intrinsics of the release')
+REPLACE_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
+    ('agibot/agibot_world_2026', AGIBOT_G2, [('il_3400', 9), ('ri_4560', 4), ('rl_7093', 3)]),
+    # ABC: no gripper model string in the export; the YAM jaw type differs per task (i2rt flexible vs crank 4310), eef per episode
+    ('aloha/abc', MV(config='abc_realsense.json', profile='registry:flexible'), [('assemble_a_carrot_with_lego_realsense', 11)]),
+    ('aloha/abc', MV(config='abc_realsense.json', profile='registry:crank'), [('place_the_shirt_on_the_hanger_realsense', 6),
+                                                                              ('zip_up_the_jacket_realsense', 11)]),
+    ('aloha/biplay', MV(config='biplay.json'), [('dough_cut', 10), ('pick_place', 3), ('sushi_cut_full', 8)]),
+    ('aloha/cosmos_policy', MV(config='aloha_cosmos_policy.json'), [('fold_shirt', 6), ('put_candies_in_bowl', 6), ('put_purple_eggplant_on_plate', 6)]),
+    ('aloha/galaxea', MV(config='galaxea.json'), [('adjust_the_air_conditioner_temperature', 11), ('organize_trays', 2),
+                                                  ('wipe_the_sewage_stains_with_a_ground_cloth', 11)]),
+    ('aloha/molmoact_yam', MV(config='molmoact2_yam.json'), [('clean_dirty_plates_on_tray_and_stack_at_the_side', 2), ('rotate_4_blocks', 1),
+                                                             ('untangle_cables', 5)]),
+    ('aloha/rdt', MV(config='rdt.json'), [('airpods_on_second_layer', 8), ('pull_wet_wipe', 4), ('zip_the_bag', 2)]),
+    ('aloha/robocoin', ROBOCOIN_GX, [('arrange_baai_then_brain_galaxea_r1_stereo', 4)]),
+    ('aloha/robocoin', ROBOCOIN_CM, [('classify_objects_eight_cobot_magic', 11), ('water_bottle_storage_cobot_magic', 6)]),
+    # RoboMIND: the export carries no gripper model string, so the registry key is given (Cobot Magic v2 = ARX5 jaws), eef per episode
+    ('aloha/robomind', MV(config='robomind.json', profile='registry:cobot magic v2'), [('arrange_blocks_and_place_orange_in_center_with_arms', 3),
+                                                    ('pour_seasoning_into_cup_on_scale_with_both_arms', 7), ('write_number_9_on_whiteboard', 3)]),
+    ('aloha/xvla_softfold', MV(config='xvla_softfold.json'), [('fold_the_cloth', 1)]),
+    ('iphumi/behavior_prompting', IPHUMI, [('fold_up', 6), ('left_arm_across_error_correction', 2), ('right_arm_across_error_correction', 4)]),
+    ('iphumi/gated_memory_policy', IPHUMI, [('pick_and_place_back_all', 9), ('pick_and_place_back_and_correction', 4),
+                                            ('pick_and_place_back_correction_all', 11)]),
+    ('iphumi/hommi', IPHUMI, [('delivery', 10), ('laundry', 4), ('tablescape', 7)]),
+    ('iphumi/mofpo', MV(config='iphumi_bimanual_and_head.json'), [('pouring', 12), ('pouring', 168), ('pouring', 5), ('serving', 7)]),
+    ('iphumi/umift', UMIFT, [('lightbulb_insertion_clean_release', 10), ('whiteboard_wiping_addition', 9), ('whiteboard_wiping_wrist_overshoot', 0)]),
+    ('openarm/openarm', MV(config='openarm.json'), [('full_folding', 7), ('high_quality_folding', 9)]),
+    ('rby1/modpack', MV(config='rby1_modpack.json'), [('box_placing_together', 0), ('box_placing_together', 101), ('box_placing_together', 50)]),
+    ('robotiq/droid', MV(config='droid.json'), [('AUTOLab_failure', 4), ('PennPAL_success', 1), ('WEIRD_success', 0)]),
+    ('umi/mvumi', MVUMI, [('bottles_rack', 7), ('markers_placement', 6)]),
+] for ds, ep in picks] + [('genrobot/10kh', ds, 0, G10K(ds)) for ds in ('clean_bowl', 'drawer_to_place_items', 'drawer_to_take_items')]
+
+
 def all_picks():
-    return EXPLICIT_PICKS + auto_picks()
+    return EXPLICIT_PICKS + REPLACE_PICKS + auto_picks()
 
 
 def views_for(info, spec):
@@ -215,8 +273,11 @@ def render_cmd(project, dataset, ep, spec, out):
     root = os.path.join(ROOT, project, dataset)
     if spec['tool'] == BIMANUAL:
         cmd = [PY, os.path.join(VIZ, BIMANUAL), '--dataset-root', root, '--episode', str(ep), '--profile', spec['profile'],
-               '--calib', os.path.join(VIZ, 'calib', spec['calib']), '--calib-fit', spec['calib_fit'], '--cross', spec['cross'],
+               '--calib-fit', spec['calib_fit'], '--cross', spec['cross'],
                '--stride', str(STRIDE), '--max-seconds', str(MAX_SEC), '--output', os.path.join(d, 'stitched.mp4')] + spec.get('extra', [])
+        if spec.get('calib'): cmd += ['--calib', os.path.join(VIZ, 'calib', spec['calib'])]
+        for side in ('left', 'right'):   # per-side (per-episode) lens files
+            if spec.get(f'calib_{side}'): cmd += [f'--calib-{side}', os.path.join(VIZ, 'calib', spec[f'calib_{side}'])]
         if spec.get('eef'):
             for s in sides_of(info):
                 cmd += ['--eef-pose-in-main', f'{s}={spec["eef"]}']
@@ -293,7 +354,8 @@ def pack_one(project, dataset, ep, spec, out, **_):
                       'calib_source': c.get('source'), 'overlay': overlay})
     for s in sides:
         kind = kinds.get(s, spec['profile']); prim = kind in PRIMITIVE_KINDS
-        grips[s] = {'model': info.get(f'{s}_gripper_model'), 'profile': kind, 'urdf': None if prim else spec.get('urdf') or kind,
+        grips[s] = {'model': info.get(f'{s}_gripper_model') or kind,   # ABC / RoboMIND exports carry no model string
+                    'profile': kind, 'urdf': None if prim else spec.get('urdf') or kind,
                     'urdf_present': not prim, 'primitive': prim}
     mode = spec.get('mode') or ('primitive' if all(g['primitive'] for g in grips.values()) else 'urdf')
     tasks = flat_tasks(row['tasks'])
