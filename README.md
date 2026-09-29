@@ -25,7 +25,8 @@ This repository is anonymized for review.
 - `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates.
 - `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the
   rows (`projects` maps a family/project to a more specific entry where one source ships under two licenses,
-  e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7). Hand-maintained; author given names are
+  e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7; `datasets` does the same per row for the
+  five lerobot ALOHA repos whose card says Apache-2.0). Hand-maintained; author given names are
   abbreviated to initials. The build checks it (every source has an entry, no forbidden term) and writes
   `data/citations.bib` (CAMX plus every source paper) from it.
 - Download gate — every download action (the slice command's Copy / Save .sh, a record's "Copy sample command")

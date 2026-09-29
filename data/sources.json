@@ -88,10 +88,27 @@
    ]
   },
   "ALOHA": {
-   "homepage": "https://tonyzhaozh.github.io/aloha/",
+   "homepage": "https://huggingface.co/datasets/lerobot/aloha_static_cups_open",
    "license": {
-    "name": "MIT or Apache-2.0 (varies per lerobot repo)",
-    "url": "https://huggingface.co/datasets/lerobot/aloha_static_cups_open"
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit"
+   },
+   "papers": [
+    {
+     "key": "zhao2023aloha",
+     "title": "Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware",
+     "year": 2023,
+     "arxiv": "2304.13705",
+     "url": "https://arxiv.org/abs/2304.13705",
+     "bibtex": "@inproceedings{zhao2023aloha,\n  title     = {Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware},\n  author    = {Zhao, T. Z. and Kumar, V. and Levine, S. and Finn, C.},\n  booktitle = {Robotics: Science and Systems (RSS)},\n  year      = {2023},\n  eprint    = {2304.13705},\n  archivePrefix = {arXiv},\n  primaryClass  = {cs.RO},\n  url       = {https://arxiv.org/abs/2304.13705}\n}"
+    }
+   ]
+  },
+  "ALOHA (Apache-2.0 repos)": {
+   "homepage": "https://huggingface.co/datasets/lerobot/aloha_static_battery",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0"
    },
    "papers": [
     {
@@ -811,5 +828,12 @@
   "fastumi/fastumi_100k_single_arm": "FastUMI-100K",
   "robotiq/rh20t_cfg6": "RH20T (cfg 6-7)",
   "robotiq/rh20t_cfg7": "RH20T (cfg 6-7)"
+ },
+ "datasets": {
+  "aloha/aloha_lerobot/battery": "ALOHA (Apache-2.0 repos)",
+  "aloha/aloha_lerobot/fork_pick_up": "ALOHA (Apache-2.0 repos)",
+  "aloha/aloha_lerobot/tape": "ALOHA (Apache-2.0 repos)",
+  "aloha/aloha_lerobot/thread_velcro": "ALOHA (Apache-2.0 repos)",
+  "aloha/aloha_lerobot/towel": "ALOHA (Apache-2.0 repos)"
  }
 }

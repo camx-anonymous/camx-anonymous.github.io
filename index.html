@@ -320,7 +320,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const human=s=>{s=String(s).replace(/_+/g,' ').replace(/\s+/g,' ').trim();return s.charAt(0).toUpperCase()+s.slice(1)};
 const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + up axis':m;
 const $=id=>document.getElementById(id);
-let D,P={},L=[],sel=new Set(),SRC={},SRCP={};
+let D,P={},L=[],sel=new Set(),SRC={},SRCP={},SRCD={};
 // AG: sources whose license + citation terms were confirmed in this browser session (see gate())
 const AG=new Set();try{JSON.parse(sessionStorage.getItem('camx.agreed')||'[]').forEach(x=>AG.add(x))}catch(e){}
 const S={cat:'all',robot:null,source:null,q:'',shown:PAGE,slice:'full'};
@@ -336,7 +336,7 @@ function order(rows){const own=new Set();Object.values(P).forEach(p=>p.overlays.
   return rows.slice().sort((a,b)=>(own.has(b.id)-own.has(a.id))||(rank[a.id]-rank[b.id])||(P[b.project].hours-P[a.project].hours)||(b.hours-a.hours))}
 function load(){fetch('data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=order(d.datasets);
   try{JSON.parse(localStorage.getItem('camx.sel')||'[]').forEach(x=>sel.add(x))}catch(e){}
-  fetch('data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};downloads();if($('drawer').classList.contains('open')&&S.open)drawer(S.open)}).catch(()=>{});
+  fetch('data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};downloads();if($('drawer').classList.contains('open')&&S.open)drawer(S.open)}).catch(()=>{});
   $('footInfo').textContent=`CAMX Dataset · anonymized for review · ${d.totals.datasets.toLocaleString()} datasets, ${d.totals.projects} projects, ${d.totals.embodiments} platforms`;
   stats();tree();render();downloads();})}
 
@@ -406,8 +406,8 @@ const CAMX_BIB=()=>$('cite').textContent.trim();
 const lastName=a=>{a=a.trim();if(/^\{.*\}$/.test(a))return a.slice(1,-1);return (a.includes(',')?a.split(',')[0]:a.split(/\s+/).pop()).replace(/[{}]/g,'')};
 function shortCite(p,fb){const m=/author\s*=\s*[{"]([^]*?)[}"]\s*,?\s*\n/i.exec(p.bibtex||'');const au=m?m[1].split(/\s+and\s+/i):[];
   return (au.length?lastName(au[0])+(au.length>1?' et al.':''):(fb||''))+(p.year?' '+p.year:'')}
-// the source label of a row: its inventory source, unless sources.json maps the project to a more specific entry (a second license)
-const srcName=r=>SRCP[r.project]||r.source;
+// the source label of a row: its inventory source, unless sources.json maps the dataset or its project to a more specific entry (a second license)
+const srcName=r=>SRCD[r.id]||SRCP[r.project]||r.source;
 function srcOf(rows){const c={};sampled(rows).forEach(r=>{const k=srcName(r);c[k]=(c[k]||0)+1});
   return Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(n=>({name:n,n:c[n],info:SRC[n]||{}}))}
 const agreed=ss=>ss.every(s=>AG.has(s.name));

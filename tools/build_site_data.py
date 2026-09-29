@@ -200,7 +200,9 @@ DOWNLOAD = {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<proje
 
 # --- sources: license + papers of every source dataset (hand-maintained data/sources.json) ---------------------------
 # {"sources": {"<source label>": {"homepage", "license": {"name", "url"} | null, "papers": [{"key", "title", "year",
-#  "arxiv", "url", "bibtex"}]}}}, keyed by the inventory "source" label that every row carries (SOURCE_OF). The site
+#  "arxiv", "url", "bibtex"}]}}, "projects": {"family/project": "<label>"}, "datasets": {"<row id>": "<label>"}}, keyed by
+# the inventory "source" label that every row carries (SOURCE_OF); "projects" / "datasets" point rows at a more
+# specific entry where one source ships under two licenses (FastUMI-100K, RH20T cfg 6-7, the Apache-2.0 ALOHA repos). The site
 # shows them in the dataset record and in the download gate (cite + license confirmation); this script checks that
 # every source has an entry and no forbidden term, and writes data/citations.bib (CAMX + every source paper).
 SOURCES = os.path.join(REPO, 'data', 'sources.json')
@@ -220,8 +222,8 @@ def sources_pass(out):
     text = open(SOURCES).read()
     hits = sorted({m.group(0).lower() for m in FORBIDDEN.finditer(text)})
     if hits: sys.exit(f'anonymisation failed in {SOURCES}, still present: {hits}')
-    j = json.loads(text); src = j['sources']; proj = j.get('projects', {})
-    used = collections.Counter(proj.get(r['project'], r['source']) for r in out['datasets'])
+    j = json.loads(text); src = j['sources']; proj = j.get('projects', {}); ds = j.get('datasets', {})
+    used = collections.Counter(ds.get(r['id'], proj.get(r['project'], r['source'])) for r in out['datasets'])
     missing = sorted(k for k in used if k not in src)
     if missing: print(f'warning: {len(missing)} sources without an entry in data/sources.json: {missing}', file=sys.stderr)
     unused = sorted(k for k in src if k not in used)
