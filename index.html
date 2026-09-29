@@ -135,46 +135,31 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .code .bar .cp{color:var(--code-fg);border:1px solid rgba(255,255,255,.18);margin-left:6px}
 .code pre{border-radius:0;padding:16px 20px 18px;max-height:420px}
 .code .hint{font:400 12px/1.55 var(--mono);color:var(--code-cm);padding:12px 20px 14px;margin:0;border-top:1px solid rgba(255,255,255,.08)}
-/* locked command: shown until the sources of the slice have been acknowledged in the gate dialog */
-.code .lock{padding:36px 24px 34px;text-align:center;color:var(--code-fg)}
-.code .lock .t{font:500 18px/1.25 var(--sans);letter-spacing:-.02em;margin:0 0 8px}
-.code .lock p{font:400 13.5px/1.55 var(--sans);color:var(--code-cm);max-width:520px;margin:0 auto 18px;text-wrap:pretty}
-.code .lock p b{color:var(--code-fg);font-weight:500}
-.code .lock button{background:var(--code-fg);color:var(--code-bg);border-color:var(--code-fg)}
-.code .lock button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
-.code .lock .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:0 0 22px}
-.code .lock .tags span{font:500 11.5px/1 var(--mono);padding:5px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:var(--code-fg);opacity:.85}
 
-/* ---------- source gate: cite + license confirmation before any download ---------- */
-.gate{width:min(680px,calc(100vw - 32px));max-height:min(88vh,900px);padding:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow-md);overflow:hidden}
+/* ---------- source gate: cite + license confirmation before every copy / save ---------- */
+.gate{width:min(560px,calc(100vw - 32px));max-height:min(88vh,800px);padding:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow-md);overflow:hidden}
 .gate::backdrop{background:rgba(20,15,5,.35)}
-.gate form{display:flex;flex-direction:column;max-height:min(88vh,900px);margin:0}
-.gate .head{padding:26px 28px 0}
-.gate .kicker{font:400 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.02em;color:var(--accent);margin:0 0 10px}
-.gate h3{margin:0 0 6px;font:500 22px/1.2 var(--sans);letter-spacing:-.02em;padding-right:40px}
-.gate .lede{margin:0 0 18px;color:var(--ink2);font-size:14px;line-height:1.55;text-wrap:pretty}
-.gate .srcs{overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px 28px;flex:1 1 auto;min-height:0}
-.gate .src{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(96px,max-content) 2fr;gap:6px 18px;align-items:start;padding:12px 0;border-top:1px solid var(--line2);font-size:13.5px}
+.gate form{display:flex;flex-direction:column;max-height:min(88vh,800px);margin:0}
+.gate .head{padding:22px 24px 0}
+.gate .kicker{font:400 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.02em;color:var(--accent);margin:0 0 8px}
+.gate h3{margin:0 0 4px;font:500 19px/1.2 var(--sans);letter-spacing:-.02em;padding-right:40px}
+.gate .lede{margin:0 0 14px;color:var(--ink2);font-size:13.5px;line-height:1.5;text-wrap:pretty}
+.gate .srcs{overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:2px 24px;flex:1 1 auto;min-height:0}
+.gate .src{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line2);font-size:13px;line-height:1.4}
 .gate .src:first-child{border-top:0}
-.gate .src .sn b{font-weight:500}
-.gate .src .sn small{display:block;font:400 11.5px/1.5 var(--mono);color:var(--ink3)}
-.gate .src .sl .chip{text-decoration:none;white-space:normal;line-height:1.3;border-radius:10px;max-width:190px}
-.gate .src .sl .chip.none{background:transparent;border-color:var(--line-hi);color:var(--ink3)}
-.gate .src .sp{color:var(--ink2);line-height:1.45}
-.gate .src .sp .paper{display:block;margin:0 0 3px}
-.gate .src .sp a{text-decoration:underline;text-decoration-color:var(--line-hi);text-underline-offset:3px}
-.gate .src .sp a:hover{text-decoration-color:var(--accent)}
-.gate .src .sp .au{font:400 11.5px/1 var(--mono);color:var(--ink3);margin-right:6px;white-space:nowrap}
-.gate .src .sp .none{color:var(--ink3)}
-.gate .foot{padding:16px 28px 22px;display:flex;flex-direction:column;gap:14px}
-.gate .bibrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:400 12.5px/1.4 var(--mono);color:var(--ink3)}
-.gate .bibrow span{margin-right:auto}
-.gate .agree{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;cursor:pointer;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel2)}
-.gate .agree input{flex:none;margin:4px 0 0;width:16px;height:16px;accent-color:var(--accent)}
-.gate .acts{display:flex;gap:8px;justify-content:flex-end}
-.gate .acts button[disabled]{opacity:.45;cursor:not-allowed}
-.gate .close{position:absolute;top:14px;right:14px;width:32px;height:32px;padding:0;justify-content:center;border-radius:999px}
-@media (max-width:640px){.gate .src{grid-template-columns:1fr;gap:4px}.gate .head,.gate .srcs,.gate .foot{padding-left:18px;padding-right:18px}}
+.gate .src b{font-weight:500;margin-right:auto}
+.gate .src .chip{text-decoration:none;padding:3px 8px;font-size:11.5px}
+.gate .src .chip.none{background:transparent;border-color:var(--line-hi);color:var(--ink3)}
+.gate .src .au{font:400 12px/1 var(--mono);color:var(--ink3)}
+.gate .src .au a{color:var(--ink2);text-decoration:underline;text-decoration-color:var(--line-hi);text-underline-offset:3px}
+.gate .src .au a:hover{text-decoration-color:var(--accent);color:var(--ink)}
+.gate .foot{padding:14px 24px 18px;display:flex;flex-direction:column;gap:12px}
+.gate .terms{margin:0;font-size:13px;line-height:1.5;color:var(--ink2);text-wrap:pretty}
+.gate .acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.gate .acts .bib{display:flex;gap:6px;margin-right:auto}
+.gate .acts .bib button{font:500 12.5px/1 var(--mono);padding:8px 10px;color:var(--ink2)}
+.gate .close{position:absolute;top:12px;right:12px;width:32px;height:32px;padding:0;justify-content:center;border-radius:999px}
+@media (max-width:640px){.gate .head,.gate .srcs,.gate .foot{padding-left:16px;padding-right:16px}.gate .acts .bib{width:100%;margin:0 0 4px}}
 @media (max-width:640px){.code .bar .st{order:3;flex-basis:100%;max-width:none;margin:4px 0 0}}
 @media (max-width:480px){.slices{grid-template-columns:1fr 1fr;gap:8px}.slice{padding:14px}.slice .sz{font-size:22px}}
 
@@ -297,9 +282,8 @@ footer{margin:0}
     <div class="head"><div class="kicker">Before you download</div><h3 id="gateTitle"></h3><p class="lede" id="gateLede"></p></div>
     <div class="srcs" id="gateList"></div>
     <div class="foot">
-      <div class="bibrow"><span id="gateBibInfo"></span><button type="button" id="gateCopyBib">Copy BibTeX</button><button type="button" id="gateSaveBib">Save .bib</button></div>
-      <label class="agree"><input type="checkbox" id="gateOk"><span id="gateAgree"></span></label>
-      <div class="acts"><button type="button" class="ghost" id="gateCancel">Cancel</button><button type="button" class="primary" id="gateGo" disabled>Confirm and show the command</button></div>
+      <p class="terms" id="gateTerms"></p>
+      <div class="acts"><span class="bib"><button type="button" id="gateCopyBib">Copy BibTeX</button><button type="button" id="gateSaveBib">Save .bib</button></span><button type="button" class="ghost" id="gateCancel">Cancel</button><button type="button" class="primary" id="gateGo"></button></div>
     </div>
   </form>
 </dialog>
@@ -321,13 +305,11 @@ const human=s=>{s=String(s).replace(/_+/g,' ').replace(/\s+/g,' ').trim();return
 const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + up axis':m;
 const $=id=>document.getElementById(id);
 let D,P={},L=[],sel=new Set(),SRC={},SRCP={},SRCD={};
-// AG: sources whose license + citation terms were confirmed in this browser session (see gate())
-const AG=new Set();try{JSON.parse(sessionStorage.getItem('camx.agreed')||'[]').forEach(x=>AG.add(x))}catch(e){}
 const S={cat:'all',robot:null,source:null,q:'',shown:PAGE,slice:'full'};
 // r.sample = {url, bytes, frames, seconds}: the episode-0 archive of the dataset on this repository's GitHub releases (null while unpublished)
 const sampled=rows=>rows.filter(r=>r.sample);
 const fmtDur=s=>!s?'–':s>=3600?(s/3600).toFixed(1)+' h':s>=60?Math.round(s/60)+' min':Math.round(s)+' s';
-const oneCmd=r=>r.sample?`# one-episode sample (episode 0) of ${r.id}, ${fmtDur(r.sample.seconds)}, ${fmtB(r.sample.bytes)}; unpacks to camx_samples/${r.id}/{meta,data,videos}\nmkdir -p camx_samples && cd camx_samples && curl -fL --retry 3 "${r.sample.url}" | tar -xz`:`# ${r.id}: no published sample yet`;
+const oneCmd=r=>r.sample?`# CAMX sample · ${r.id} · episode 0 · ${fmtDur(r.sample.seconds)} · ${fmtB(r.sample.bytes)}\nmkdir -p camx_samples && cd camx_samples && curl -fL --retry 3 "${r.sample.url}" | tar -xz`:`# ${r.id}: no published sample yet`;
 
 /* card order: datasets with their own validation clip first, then the top dataset of every project before any second one,
    so the first page shows the breadth of the corpus instead of one project's slices */
@@ -410,28 +392,29 @@ function shortCite(p,fb){const m=/author\s*=\s*[{"]([^]*?)[}"]\s*,?\s*\n/i.exec(
 const srcName=r=>SRCD[r.id]||SRCP[r.project]||r.source;
 function srcOf(rows){const c={};sampled(rows).forEach(r=>{const k=srcName(r);c[k]=(c[k]||0)+1});
   return Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(n=>({name:n,n:c[n],info:SRC[n]||{}}))}
-const agreed=ss=>ss.every(s=>AG.has(s.name));
 const licName=i=>i&&i.license&&i.license.name||null;
 function licChip(i){const l=i&&i.license;return l?`<a class="chip" href="${esc(l.url||'#')}" target="_blank" rel="noopener">${esc(l.name)}</a>`:'<span class="chip none">license not stated</span>'}
+// compact form for the gate: "Chi et al. 2024" linking to the paper
+function paperShort(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="au">no paper listed yet</span>';
+  return '<span class="au">'+ps.map(p=>`<a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(shortCite(p,fb))}</a>`).join(', ')+'</span>'}
 function paperLinks(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="paper none">no paper listed yet</span>';
   return ps.map(p=>`<span class="paper"><span class="au">${esc(shortCite(p,fb))}</span><a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(p.title)}</a></span>`).join('')}
 function bibOf(ss,label){const seen=new Set(),out=[`% CAMX one-episode samples · ${label}`,`% ${ss.length} source dataset${ss.length===1?'':'s'}: ${ss.map(s=>s.name).join(', ')}`,'% Cite CAMX and every source below; each source keeps its own license (see the record of each dataset on the site).','',CAMX_BIB()];
   ss.forEach(s=>{(s.info.papers||[]).forEach(p=>{if(seen.has(p.key))return;seen.add(p.key);out.push('',`% ${s.name}${licName(s.info)?' · '+licName(s.info):''}`,p.bibtex.trim())})});
   return out.join('\n')+'\n'}
-/* gate(rows,label,then): confirm license + citation for every source of `rows`, then run `then`. Confirmed sources are remembered for the session. */
-function gate(rows,label,then){const ss=srcOf(rows);if(!ss.length||agreed(ss)){then();return}
+/* gate(rows,label,then,verb): confirm license + citation for every source of `rows`, then run `then`. Asked before every copy / save. */
+function gate(rows,label,then,verb){const ss=srcOf(rows);if(!ss.length){then();return}
   const nd=sampled(rows).length,lics=new Set(ss.map(s=>licName(s.info)||'?')),np=new Set();ss.forEach(s=>(s.info.papers||[]).forEach(p=>np.add(p.key)));
   $('gateTitle').textContent=label;
-  $('gateLede').textContent=`The ${nd.toLocaleString()} sample${nd===1?'':'s'} here come${nd===1?'s':''} from ${ss.length} source dataset${ss.length===1?'':'s'}. Each one stays under its own license and must be cited, alongside CAMX, in any work that uses it.`;
-  $('gateList').innerHTML=ss.map(s=>`<div class="src"><div class="sn"><b>${esc(s.name)}</b><small>${s.n.toLocaleString()} dataset${s.n===1?'':'s'}</small></div><div class="sl">${licChip(s.info)}</div><div class="sp">${paperLinks(s.info,s.name)}</div></div>`).join('');
-  $('gateBibInfo').textContent=`${np.size+1} BibTeX entr${np.size?'ies':'y'}: CAMX + the sources`;
-  $('gateAgree').textContent=`I will cite ${np.size===1?'this paper':'these '+np.size+' papers'} together with CAMX, and follow the ${lics.size===1?'license':lics.size+' licenses'} listed above, in any use of this data.`;
+  $('gateLede').textContent=`${nd.toLocaleString()} sample${nd===1?'':'s'} from ${ss.length} source dataset${ss.length===1?'':'s'}. Each keeps its own license and must be cited alongside CAMX.`;
+  $('gateList').innerHTML=ss.map(s=>`<div class="src"><b>${esc(s.name)}</b>${licChip(s.info)}${paperShort(s.info,s.name)}</div>`).join('');
+  $('gateTerms').textContent=`Continuing means you will cite ${np.size===1?'this paper':'these '+np.size+' papers'} together with CAMX and follow the ${lics.size===1?'license':lics.size+' licenses'} above in any use of this data.`;
+  $('gateGo').textContent='Agree and '+(verb||'continue');
   const bib=()=>bibOf(ss,label);
   $('gateCopyBib').onclick=()=>navigator.clipboard.writeText(bib()).then(()=>{$('gateCopyBib').textContent='Copied';setTimeout(()=>$('gateCopyBib').textContent='Copy BibTeX',1200)});
   $('gateSaveBib').onclick=()=>dl('camx_citations.bib',bib(),'application/x-bibtex');
-  const ok=$('gateOk');ok.checked=false;$('gateGo').disabled=true;ok.onchange=()=>{$('gateGo').disabled=!ok.checked};
   const g=$('gate');const close=()=>{g.close()};$('gateCancel').onclick=close;$('gateClose').onclick=close;
-  $('gateGo').onclick=()=>{if(!ok.checked)return;ss.forEach(s=>AG.add(s.name));try{sessionStorage.setItem('camx.agreed',JSON.stringify([...AG]))}catch(e){};g.close();then()};
+  $('gateGo').onclick=()=>{g.close();then()};
   g.showModal();$('gateList').scrollTop=0}
 
 /* ---------- download: slices + command block ---------- */
@@ -455,11 +438,9 @@ function downloads(){const ss=slices();if(!ss.some(s=>s.id===S.slice))S.slice='f
 function cmdText(s){const sm=sampled(s.rows).sort((a,b)=>a.id.localeCompare(b.id));const z=sizeOf(s.rows);
   if(!sm.length)return `# none of the ${s.rows.length.toLocaleString()} datasets in this slice has a published sample yet`;
   return `#!/bin/bash
-# CAMX one-episode samples · ${s.name}: ${sm.length.toLocaleString()} datasets, episode 0 of each, ${fmtDur(z.s)} of video, ${fmtB(z.b)}
-# each archive unpacks to <family>/<project>/<dataset>/{meta,data,videos} (LeRobot v3); datasets already on disk are skipped
-#
-# Every source dataset keeps its own license and must be cited together with CAMX (all BibTeX entries: ${D.download.citations||'https://camx-anonymous.github.io/data/citations.bib'}):
-${srcOf(s.rows).map(x=>`#   ${x.name} · ${x.n} dataset${x.n===1?'':'s'} · ${licName(x.info)||'license not stated'}${(x.info.papers||[]).map(p=>' · '+shortCite(p,x.name)+(p.arxiv?', arXiv:'+p.arxiv:'')).join('')}`).join('\n')}
+# CAMX samples · ${s.name} · ${sm.length.toLocaleString()} datasets, episode 0 of each · ${fmtDur(z.s)} · ${fmtB(z.b)}
+# each unpacks to camx_samples/<family>/<project>/<dataset>/ (LeRobot v3); datasets already on disk are skipped
+# cite CAMX and every source dataset, and follow each source license: ${D.download.citations||'https://camx-anonymous.github.io/data/citations.bib'}
 set -e
 mkdir -p camx_samples && cd camx_samples
 while read -r id url; do
@@ -468,17 +449,14 @@ while read -r id url; do
 done <<'EOF'
 ${sm.map(r=>r.id+' '+r.sample.url).join('\n')}
 EOF`}
-function code(s){const z=sizeOf(s.rows),ss=srcOf(s.rows),open=!z.n||agreed(ss);
+function code(s){const z=sizeOf(s.rows);
   const body=cmdText(s).split('\n').map(l=>l.startsWith('#')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n');
-  const hint='Run it in a terminal; it skips datasets already on disk, so re-run it to fill gaps.'+(z.miss?` ${z.miss.toLocaleString()} dataset${z.miss===1?' has':'s have'} no published sample yet and ${z.miss===1?'is':'are'} left out.`:'');
-  const lics=new Set(ss.map(x=>licName(x.info)||'?'));
-  const lock=`<div class="lock"><div class="t">${ss.length} source dataset${ss.length===1?'':'s'}, ${lics.size} license${lics.size===1?'':'s'}</div><p>The samples in <b>${esc(s.name)}</b> come from the datasets below. Each keeps its own license and must be cited together with CAMX. Confirm that to get the command and the BibTeX for exactly this set.</p><div class="tags">${ss.map(x=>`<span>${esc(x.name)}</span>`).join('')}</div><button type="button" class="primary" id="unlock">Review sources and confirm</button></div>`;
-  $('code').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bash · GitHub releases</button><span class="st"><b>${esc(s.name)}</b> · ${z.n.toLocaleString()} sample${z.n===1?'':'s'} · ${fmtB(z.b)} · ${fmtDur(z.s)}</span><button type="button" class="cp" id="save">Save .sh</button><button type="button" class="cp" id="copy">Copy</button></div>${open?`<pre id="cmd">${body}</pre>`:lock}<p class="hint">${esc(hint)}</p>`;
+  const hint='Skips datasets already on disk; re-run it to fill gaps.'+(z.miss?` ${z.miss.toLocaleString()} dataset${z.miss===1?' has':'s have'} no published sample yet and ${z.miss===1?'is':'are'} left out.`:'');
+  $('code').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bash · GitHub releases</button><span class="st"><b>${esc(s.name)}</b> · ${z.n.toLocaleString()} sample${z.n===1?'':'s'} · ${fmtB(z.b)} · ${fmtDur(z.s)}</span><button type="button" class="cp" id="save">Save .sh</button><button type="button" class="cp" id="copy">Copy</button></div><pre id="cmd">${body}</pre><p class="hint">${esc(hint)}</p>`;
   const save=()=>dl('camx_samples.sh',cmdText(s),'text/x-shellscript');
   const copy=()=>navigator.clipboard.writeText(cmdText(s)).then(()=>{$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy',1200)});
-  $('save').onclick=()=>gate(s.rows,s.name,()=>{if(!open)code(s);save()});
-  $('copy').onclick=()=>gate(s.rows,s.name,()=>{if(!open)code(s);copy()});
-  const u=$('unlock');if(u)u.onclick=()=>gate(s.rows,s.name,()=>code(s))}
+  $('save').onclick=()=>gate(s.rows,s.name,save,'save');
+  $('copy').onclick=()=>gate(s.rows,s.name,copy,'copy')}
 function persist(){try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))}catch(e){}}
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 
@@ -496,7 +474,7 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
     <p class="path">${esc(r.id)}</p>
     ${r.sample?'<div class="acts"><button type="button" id="copyOne">Copy sample command</button></div>':''}
     <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
-  const cp=$('copyOne');if(cp)cp.onclick=()=>gate([r],human(r.name),()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)}));
+  const cp=$('copyOne');if(cp)cp.onclick=()=>gate([r],human(r.name),()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)}),'copy');
   const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:srcName(r),n:1,info:si}],human(r.name))).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
   $('drawer').classList.add('open');$('scrim').classList.add('show')}
 function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}

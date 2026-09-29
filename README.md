@@ -30,12 +30,12 @@ This repository is anonymized for review.
   abbreviated to initials. The build checks it (every source has an entry, no forbidden term) and writes
   `data/citations.bib` (CAMX plus every source paper) from it.
 - Download gate — every download action (the slice command's Copy / Save .sh, a record's "Copy sample command")
-  first opens a dialog listing the sources of exactly those samples with their license and papers, offers the
-  BibTeX of that set (Copy / Save .bib), and asks the user to confirm they will cite them and follow the
-  licenses; the command block stays locked until then. The shortcuts (Full release, one morphology) are
-  handled the same way, since the set is derived from the rows of the slice: confirming the full release
-  unlocks every slice for the session. Each record also shows its License and Cite rows. The generated
-  script repeats the list as a comment header and links `data/citations.bib`.
+  first opens a compact dialog listing the sources of exactly those samples (name, license chip, short paper
+  cite), offers the BibTeX of that set (Copy / Save .bib), and asks the user to agree to cite them and follow
+  the licenses. It is asked every time, nothing is remembered; the command block itself is always visible.
+  The shortcuts (Full release, one morphology) are handled the same way, since the set is derived from the rows
+  of the slice. Each record also shows its License and Cite rows. The generated script carries a three-line
+  header that links `data/citations.bib`.
 
 ## Rebuilding the data
 
