@@ -1,6 +1,6 @@
 {
  "updated": "2026-09-28",
- "_about": "License and papers of every source dataset, keyed by the source label of data/datasets.json rows; \"projects\" maps a family/project key to a different entry where one source has more than one license. Author given names are abbreviated to initials. Checked and turned into data/citations.bib by tools/build_site_data.py.",
+ "_about": "License and papers of every source dataset, keyed by the source label of data/datasets.json rows; \"projects\" maps a family/project key to a different entry where one source has more than one license. Author given names are abbreviated to initials. Checked and turned into data/citations.bib by tools/build_site_data.py. Licenses of the UMI-family entries follow the UMI Data Initiative table (https://umi-data.github.io/).",
  "sources": {
   "ABC": {
    "homepage": "https://abc.bot",
@@ -191,7 +191,10 @@
   },
   "Dobb-E Homes of New York": {
    "homepage": "https://dobb-e.com/",
-   "license": null,
+   "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit"
+   },
    "papers": [
     {
      "key": "shafiullah2023bringing",
@@ -233,7 +236,7 @@
      "year": 2025,
      "arxiv": "2509.14688",
      "url": "https://arxiv.org/abs/2509.14688",
-     "bibtex": "@inproceedings{xu2025exumi,\n  title={{exUMI}: Extensible Robot Teaching System with Action-aware Task-agnostic Tactile Representation},\n  author={Xu, Y. and Wei, L. and An, P. and Zhang, Q. and Li, Y.-L.},\n  booktitle={Conference on Robot Learning (CoRL)},\n  year={2025},\n  eprint={2509.14688},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/2509.14688}\n}"
+     "bibtex": "@inproceedings{xu2025exumi,\n  title={{exUMI}: Extensible Robot Teaching System with Action-aware Task-agnostic Tactile Representation},\n  author={Xu, Y. and Wei, L. and An, P. and Zhang, Q. and Li, Y.-L.},\n  booktitle={Conference on Robot Learning (CoRL)},\n  pages={2536--2554},\n  organization={PMLR},\n  year={2025},\n  eprint={2509.14688},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/2509.14688}\n}"
     }
    ]
   },
