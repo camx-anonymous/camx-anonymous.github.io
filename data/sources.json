@@ -378,7 +378,10 @@
   },
   "HoMMI": {
    "homepage": "https://hommi-robot.github.io/",
-   "license": null,
+   "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit"
+   },
    "papers": [
     {
      "key": "xu2026hommi",
@@ -426,7 +429,10 @@
   },
   "ModPack": {
    "homepage": "https://modpack-robotics.github.io/",
-   "license": null,
+   "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit"
+   },
    "papers": [
     {
      "key": "citron2026modpack",
@@ -440,7 +446,10 @@
   },
   "MoFPO": {
    "homepage": "https://mofpo.github.io/",
-   "license": null,
+   "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit"
+   },
    "papers": [
     {
      "key": "wang2026mixture",
@@ -760,7 +769,10 @@
   },
   "UMIFT": {
    "homepage": "https://umi-ft.github.io/",
-   "license": null,
+   "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit"
+   },
    "papers": [
     {
      "key": "choi2026umift",
