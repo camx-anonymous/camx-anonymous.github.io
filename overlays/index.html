@@ -58,7 +58,7 @@ footer p{margin:0 0 6px}
     <p class="pnote">Projects in the training tree without an example overlay in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
     <table><thead><tr><th>Project</th><th>Embodiment</th><th class="num">Datasets</th><th class="num">Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
   </section>
-  <footer><p>Clips are 10 fps, ~45 s, re-encoded to 360p for the web (source renders are 480p).</p><p>Acceptance chips follow the curation protocol: <b>pass</b> = wrist-view median error ≤ 10 px, p90 ≤ 20 px at 480 rows; <b>unmeasured</b> = no automatic finger detector for the rig yet (visual check only).</p></footer>
+  <footer><p>Clips are 10 fps, ~45 s, re-encoded to 360p for the web (source renders are 480p).</p><p>Wrist tiles draw their own gripper directly from the end-effector pose in that camera; head, third and attached-camera tiles place every gripper through the dataset's world-frame camera trajectories. In the multi-view clips the left gripper's URDF is tinted green and the right one blue; at most four camera streams are shown per clip.</p><p>Acceptance chips follow the curation protocol: <b>pass</b> = wrist-view median error ≤ 10 px, p90 ≤ 20 px at 480 rows; <b>unmeasured</b> = no automatic finger detector for the rig yet (visual check only).</p></footer>
 </main>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -82,6 +82,7 @@ function render(){const projs=D.projects.filter(p=>p.overlays.length);const chip
         <div><span class="k">rendered from</span>export ${esc(o.export_id||'pre-protocol')} · release ${esc((o.rendered_from||'').slice(0,10))} · <a href="${src}">mp4</a></div></div></div>`}).join('')+'</div></section>';});
   document.getElementById('content').innerHTML=h;
   document.querySelectorAll('.vid').forEach(v=>v.onclick=()=>{if(v.querySelector('video'))return;v.innerHTML=`<video controls autoplay loop muted playsinline src="${v.dataset.src}"></video>`});
+  document.getElementById('pending').style.display=D.projects.some(p=>!p.overlays.length)?'':'none';
   document.getElementById('pendingBody').innerHTML=D.projects.filter(p=>!p.overlays.length).map(p=>{const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const n=p.notes||'';let why='no clip in this release';
     if(/conversion tree|not in the camx_480p training tree/i.test(n))why='converted after the last render pass';else if(/rolled into the UMI|handheld/i.test(n)&&/single/.test(Object.keys(p.forms).join()))why='single fisheye / GoPro camera: needs the rig\'s lens fit before drawing';
     return `<tr><td><a href="../#browser">${esc(p.key)}</a></td><td>${esc(emb)}</td><td class="num">${p.datasets}</td><td class="num">${fmtH(p.hours)}</td><td class="why">${why}</td></tr>`}).join('');}

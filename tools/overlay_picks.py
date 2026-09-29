@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-"""Example overlay clips that the shared render tree does not carry (rigs without a URDF, re-renders).
+"""Example overlay clips rendered here (every project of the training tree that the shared render tree does not carry).
 
-The clips are rendered by ``render_bimanual_urdf_overlay_video.py`` of the camera-cross-embodiment checkout and packed
-in the layout that ``tools/build_site_data.py`` reads (``<project_key>/<slug>/{stitched.mp4, poster.jpg, meta.json}``;
-point ``CAMX_OVERLAYS_EXTRA`` at ``--out`` when building ``data/datasets.json``). Rigs without a URDF use the renderer's
-primitive profile: two fingers hinged behind the tool-centre point that open and close with the recorded jaw width, a
-bar between the fingertips, and the tool-centre frame drawn as RGB = xyz axes (the same stand-in as the HiFi-UMI
-converter check). Rigs with a URDF get the URDF anchored at the camera link.
+Two renderers of the camera-cross-embodiment checkout are driven:
+  * ``bimanual``  = render_bimanual_urdf_overlay_video.py  (right main | left main, fisheye tools; the DataClaw / GenRobot picks)
+  * ``multiview`` = render_multiview_overlay_video.py      (every camera stream of the dataset through the world trajectories:
+                    wrist, head, third and attached cameras; URDF from the gripper registry or the primitive stand-in)
+Rigs without a URDF use the primitive profile: two fingers (or a bar) spanning the recorded jaw width behind the
+tool-centre point, the tool-centre frame as RGB = xyz axes, camera markers. Rigs with a URDF get the URDF anchored at
+their camera link or at the dataset's eef pose.
+
+The output tree has the layout ``tools/build_site_data.py`` reads (point ``CAMX_OVERLAYS_EXTRA`` at ``--out``):
+``<project_key>/<slug>/{stitched.mp4, stitched.png, stitched.json, poster.jpg, meta.json, DONE.json, _render.log}``.
 
 Usage:
-  python3 tools/overlay_picks.py render --out <clips dir> [--only <project_key>] [--jobs 3]
-  python3 tools/overlay_picks.py pack   --out <clips dir>          # meta.json + poster.jpg from the renders
-  python3 tools/overlay_picks.py encode --out <clips dir>          # 360p mp4 for the release (_build/videos) + site posters
+  python3 tools/overlay_picks.py list   [--only KEY]
+  python3 tools/overlay_picks.py render --out <clips dir> [--only KEY] [--jobs 4] [--quick]   # --quick: 1 pick, 90 frames
+  python3 tools/overlay_picks.py pack   --out <clips dir> [--only KEY]                          # meta.json + poster.jpg
+  python3 tools/overlay_picks.py encode --out <clips dir> [--only KEY]                          # 360p mp4 (_build/videos) + site poster
 Env:
   CAMX_ROOT  camx_480p tree                                   (default /data/camx_480p)
   CAMX_VIZ   camera-cross-embodiment/camx/visualization       (default ~/projects/camera-cross-embodiment/camx/visualization)
-  CAMX_PY    python for the renderer: cv2 4.x (5.0 mis-spaces the frame label), pyarrow >= 20, trimesh, yourdfpy,
+  CAMX_PY    python for the renderers: cv2 4.x (5.0 mis-spaces the frame label), pyarrow >= 20, trimesh, yourdfpy,
              scipy, rerun-sdk                                  (default: this interpreter)
 """
 import argparse, datetime, json, os, subprocess, sys
@@ -26,14 +31,18 @@ REPO = os.path.dirname(HERE)
 ROOT = os.environ.get('CAMX_ROOT', '/data/camx_480p')
 VIZ = os.path.expanduser(os.environ.get('CAMX_VIZ', '~/projects/camera-cross-embodiment/camx/visualization'))
 PY = os.environ.get('CAMX_PY', sys.executable)
-RENDERER = 'render_bimanual_urdf_overlay_video.py'
-STRIDE, MAX_SEC = 3, 45            # same clip budget as the shared tree: 10 fps, 45 s
+BIMANUAL, MULTIVIEW = 'render_bimanual_urdf_overlay_video.py', 'render_multiview_overlay_video.py'
+STRIDE, MAX_SEC, MAX_VIEWS = 3, 45, 4      # same clip budget as the shared tree: 10 fps, 45 s; at most 4 tiles per clip
+PRIMITIVE_KINDS = {'primitive', 'openneo', 'hifi_umi', 'dataclaw', 'umi_benchmark', 'freetacman', 'dataclaw_primitives',
+                   'hifi_umi_primitives', 'openneo_primitives', 'umi_benchmark_primitives', 'generic_primitives'}
+GOPRO = 'gopro_hero9_maxlens_2_7k_umi.json:crop'   # UMI GoPro Hero 9/10 + Max Lens Mod, 2.7k 4:3 basis, centre-cropped to the square video
 
+# ── the DataClaw / GenRobot picks (bimanual tool, kept from the first pass) ────────────────────────────────────────────
 # DataClaw: no CAD / URDF in the release and no camera-to-TCP calibration, so the tool-centre pose in the main camera is
 # the candidate from the converter notes (pad centre 0.12 m from the lens, 12.5 deg below the optical axis; checked on
 # two openings of device R000153). Fingers hinge L = 0.100 / (2 sin 0.51) = 102 mm behind the pads (the encoder is the
 # hinge angle). Lens: the device's own 1080p intrinsics as a Kannala-Brandt model without distortion terms.
-DATACLAW = dict(profile='dataclaw', mode='primitive', calib_fit='stretch', cross='off',
+DATACLAW = dict(tool=BIMANUAL, profile='dataclaw', mode='primitive', calib_fit='stretch', cross='off',
                 extra=['--theta-max-deg', '73'], eef='0,0.0260,0.1172,0.5,0.5,-0.5,0.5',
                 overlay='primitive stand-in (no URDF in the release): fingers hinged 102 mm behind the fingertip centre '
                         'spanning the recorded jaw width, bar between the tips, tool-centre axes (x red / y green / z blue); '
@@ -41,14 +50,13 @@ DATACLAW = dict(profile='dataclaw', mode='primitive', calib_fit='stretch', cross
 # GenRobot Gripper V4 collections: the DAS Gripper V4 URDF anchored at its camera link (the same profile as the 10Kh
 # clips). The raw MCAP camera_info of these episodes is not at hand, so the lens is the rig-level mean of the 2026
 # single-arm DAS unit (fx 247.5 in the 640 basis); the 10Kh lens (fx 299.5) does not fit these videos.
-GENROBOT_V4 = dict(profile='genrobot', mode='urdf', calib='genrobot_das_camera0_sewing_mean.json', calib_fit='stretch',
+GENROBOT_V4 = dict(tool=BIMANUAL, profile='genrobot', mode='urdf', calib='genrobot_das_camera0_sewing_mean.json', calib_fit='stretch',
                    urdf='DAS_Gripper_V4/urdf/DAS_Gripper_V4.urdf', gripper_profile='genrobot_das_v4',
                    extra=['--own-exclude-visuals', 'base_link,link_imu,link_ca1,link_ca2,link_ca3', '--alpha', '0.45'],
                    overlay='DAS Gripper V4 URDF anchored at its camera link (own gripper; the other gripper through the two '
                            'world trajectories), Kannala-Brandt projection with the rig-level intrinsics of the 2026 '
                            'single-arm DAS unit')
-
-PICKS = [  # (project, dataset, episode, spec)
+EXPLICIT_PICKS = [  # (project, dataset, episode, spec)
     ('daimon/dataclaw', 'dag911262r000153_0325_185837', 0, dict(DATACLAW, calib='daimon_dataclaw_dag911262r000153.json')),
     ('daimon/dataclaw', 'dag911262r00207e_0324_214037', 0, dict(DATACLAW, calib='daimon_dataclaw_fleet_fallback.json')),
     ('daimon/dataclaw', 'dag911262r00207e_0324_214037', 400, dict(DATACLAW, calib='daimon_dataclaw_fleet_fallback.json')),
@@ -56,6 +64,81 @@ PICKS = [  # (project, dataset, episode, spec)
     ('genrobot/gripper_v4', 'sewing_kit_assembly', 2, dict(GENROBOT_V4, cross='off')),
     ('genrobot/gripper_v4', 'jacket_folding', 3, dict(GENROBOT_V4, cross='on')),
 ]
+
+# ── every other project without a clip: multi-view tool, 3 auto picks (3 datasets spread over the project, episode 0) ──
+# spec keys: config (viz config in <VIZ>/config), calib {view-or-'main'-or-'all': 'file[:crop|stretch]'}, profile,
+# hfov {view: deg}, eef {side: 'x,y,z,qw,qx,qy,qz'}, extra [args], views [names] (default: wrists first, then the rest, MAX_VIEWS)
+def MV(**kw):
+    return {'tool': MULTIVIEW, 'profile': 'auto', **kw}
+
+RH20T = MV(config='rh20t.json')                       # per-episode intrinsics + per-episode eef in meta/episodes
+OPENNEO = 'primitive stand-in (OpenNeoData publishes no gripper CAD): jaw bar + pads at the recorded width, tool-centre axes'
+# OpenNeoData: the datasets' eef frames follow each arm's own convention (approach / camera-side axes differ per arm, ur and
+# aloha eef = the flange), so the renderer's TCP frame (x approach, y jaw, z camera side) is passed explicitly: the values are
+# inv(inv(T_eef_renderTCP) @ camera_in_eef) from camx/data_processing/openneo/scripts/render_wrist_overlay.py (checked on the
+# wrist posters 2026-09-28: pads on the fingertips; arx5 needs no remap). Wrist lens = that script's assumed D405 / fx-306 models.
+NEO_D405 = {'main': 'openneo_wrist_d405_640x480_assumed.json:stretch'}
+def NEO(config, eef, calib=NEO_D405):
+    return MV(config=config, profile='openneo', overlay=OPENNEO, calib=calib, eef=eef, extra=['--parallel-jaw'])
+NEO_ALOHA_EEF = '0.008353,0.037243,0.106504,0.401352,0.604170,-0.592538,0.350419'
+NEO_UMI_EEF = '0,0.010179,0.092753,0.346392,0.616452,-0.616452,0.346392'
+SPECS = {
+    'agibot/agibot_world_beta': MV(config='agibot_g1_beta.json'),                     # agibot g1 URDF, per-episode K + eef
+    'aloha/aist_bimanip': MV(config='aist_bimanip.json'),                            # aloha1 URDF, config FOVs
+    'aloha/aloha_lerobot': MV(config='aloha.json'),
+    'aloha/openneo_aloha': NEO('openneo_aloha.json', {'left': NEO_ALOHA_EEF, 'right': NEO_ALOHA_EEF},
+                               calib={'main': 'openneo_wrist_aloha_fx306_assumed.json:stretch'}),
+    'aloha/openneo_arx5': NEO('openneo.json', None),
+    'aloha/openneo_arx5_single': NEO('openneo_single.json', None),
+    'aloha/robodojo': MV(config='robodojo.json'),                                    # piper x / arx x5 per dataset
+    'dahuan/rh20t_cfg1': dict(RH20T, profile='primitive'),                           # Dahuan AG-95: no URDF
+    'dahuan/rh20t_cfg2': dict(RH20T, profile='primitive'),
+    'fastumi/fastumi': MV(calib={'main': GOPRO}, profile='umi'),                      # UMI gripper on an xArm, GoPro
+    'fastumi/fastumi_100k_single_arm': MV(calib={'main': GOPRO}, profile='umi'),
+    'flexiv/openneo_flexiv': NEO('openneo_flexiv.json', {'right': '0.018440,0.001512,0.142193,0.303385,0.736864,-0.519322,0.308696'}),
+    'franka_hand/fmb': MV(config='fmb.json'),                                        # franka hand URDF, anamorphic 256x256
+    'franka_hand/rh20t_cfg5': RH20T,
+    'hifi_umi/hifi_umi': MV(calib={'all': 'hifi_umi_hand_fisheye.json:stretch'}, profile='hifi_umi',
+                            overlay='primitive stand-in (no CAD): hinged fingers spanning the recorded tip gap, tool-centre axes, '
+                                    'camera markers; Kannala-Brandt hand-camera calibration'),
+    'realman/realsource': MV(config='realsource.json'),                              # ctag2f90d URDF, per-episode K
+    'robotiq/droid_lowres': MV(config='droid.json', hfov={'right_stereo_camera_left_rgb': 82.4, 'right_stereo_camera_right_rgb': 82.4,
+                                                          'third_0_stereo_camera_left_rgb': 101.4, 'third_1_stereo_camera_left_rgb': 100.6}),
+    'robotiq/rh20t_cfg4': RH20T, 'robotiq/rh20t_cfg6': RH20T, 'robotiq/rh20t_cfg7': RH20T,
+    'robotiq/robomind_ur5': MV(config='robomind_ur5.json'),
+    'robotiq/roboset_kinesthetic': MV(config='roboset_kinesthetic.json'),
+    'robotiq/roboset_teleop': MV(config='roboset_teleop.json'),
+    'stretch/dobbe': MV(config='dobbe.json'),                                        # dobbe stick URDF, calibrated iPhone FOV
+    # AetheRock: no gripper CAD, no published lens and no camera-to-TCP lever arm (the release pose is the camera itself).
+    # Lens = the fitted image circle read as a 190 deg equidistant fisheye; the tool centre is a CANDIDATE picked on the
+    # wrist video (pads land on the orange fingertip rings at 45 mm ahead / 55 mm below the lens, 2026-09-28), not a fit.
+    'umi/aetherock': MV(profile='primitive', calib={'main': 'aetherock_wrist_fisheye_assumed.json:stretch'},
+                        eef={'right': '0,0.055,0.045,0.5,0.5,-0.5,0.5'},
+                        overlay='primitive stand-in (no CAD): jaw bar + pads at the recorded width, tool-centre axes; assumed 190 deg '
+                                'equidistant lens from the image circle, tool-centre pose = a candidate picked on the video'),
+    'umi/data_scaling_laws': MV(calib={'main': GOPRO}),
+    'umi/exumi': MV(calib={'main': GOPRO}),
+    'umi/humi': MV(calib={'main': GOPRO}),
+    'umi/maniwav': MV(calib={'main': GOPRO}),
+    'umi/openneo_umi': NEO('openneo_umi.json', {'left': NEO_UMI_EEF, 'right': NEO_UMI_EEF}),
+    'umi/openneo_umi_single': NEO('openneo_umi_single.json', {'right': '0,0.006180,0.093105,0.333054,0.623759,-0.623759,0.333054'}),
+    'umi/touch_in_the_wild': MV(calib={'main': GOPRO}),
+    'umi/umi': MV(calib={'main': GOPRO}),
+    # UMI-3D: its own URDF at the fisheye lens; the release's KB4 model (f 395.6 @1280x1024) scaled to the 224 crop; the
+    # body meshes sit on the lens and would blanket the own view, so only the finger holders / soft fingers are drawn there
+    'umi/umi3d': MV(calib={'main': 'umi3d_fisheye_kb4_scaled.json:stretch'}, profile='registry:umi3d',
+                    extra=['--own-exclude-visuals', 'top_cover,fisheye_lens,bottom_plate,handle,battery,grip,gear_left,gear_right,linkage_left,linkage_right']),
+    'umi/umi_benchmark': MV(calib={'main': 'umi_benchmark_fastumi_pro_seucm.json:crop'}, profile='umi_benchmark',
+                            overlay='primitive stand-in (swing gripper, no CAD): bar spanning the recorded tip gap at the jaw midpoint, '
+                                    'tool-centre axes; EUCM fisheye calibration'),
+    'umi/umi_on_legs': MV(calib={'main': GOPRO}),
+    'umi/vitamin': MV(calib={'main': GOPRO}, profile='umi'),
+    # ViTaMIn-B: GoPro (webcam mode) masked to a circle; the 2.7k Max-Lens calibration centre-cropped to the square frame gives
+    # f 88 px at 224 (the same focal the 1080p->224 resize implies), UMI paper-figure URDF hung from the GoPro lens
+    'umi/vitamin_b': MV(calib={'main': GOPRO}, profile='umi'),
+    'ur/openneo_ur': NEO('openneo_single.json', {'right': '0.007589,0.003560,0.092932,0.350080,0.640050,-0.615630,0.297960'}),
+    'wsg50/rh20t_cfg3': dict(RH20T, profile='primitive'),                            # WSG-50: no URDF
+}
 
 
 def key_of(project): return project.replace('/', '_')
@@ -71,27 +154,95 @@ def sides_of(info):  # renderer order: right main | left main
     return [s for s in ('right', 'left') if f'observation.image.{s}_main_camera_rgb' in info['features']]
 
 
+MIN_SEC = 2.0   # auto picks skip episodes shorter than this (umi/vitamin_b cube_storage ep0 is 18 frames)
+
+
+def episode_lengths(project, dataset):
+    import glob
+    import pyarrow.parquet as pq
+    out = {}
+    for f in sorted(glob.glob(os.path.join(ROOT, project, dataset, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
+        for r in pq.read_table(f, columns=['episode_index', 'length']).to_pylist():
+            out[int(r['episode_index'])] = int(r['length'])
+    return out
+
+
+def long_episodes(project, dataset, min_sec=MIN_SEC):
+    """Episode indices (ascending) at least min_sec long."""
+    fps = float(info_of(project, dataset)['fps'])
+    return [e for e, n in sorted(episode_lengths(project, dataset).items()) if n / fps >= min_sec]
+
+
+def auto_picks(n=3):
+    """Three (dataset, episode) picks per SPECS project: datasets spread over the project's sorted list, the first episode of
+    each that is at least MIN_SEC long; projects with fewer datasets take further episodes of the first one."""
+    site = json.load(open(os.path.join(REPO, 'data', 'datasets.json')))
+    by_proj = {}
+    for r in site['datasets']:
+        by_proj.setdefault(r['project'], []).append(r)
+    out = []
+    for proj, spec in SPECS.items():
+        rows = sorted((r for r in by_proj.get(proj, []) if os.path.isfile(os.path.join(ROOT, r['id'], 'meta', 'info.json'))), key=lambda r: r['id'])
+        if not rows:
+            print(f'[picks] {proj}: no dataset on disk', file=sys.stderr); continue
+        idx = sorted({0, len(rows) // 2, len(rows) - 1})[:n]
+        picks = []
+        for i in idx:
+            ds = rows[i]['id'].split('/', 2)[2]; eps = long_episodes(proj, ds)
+            if eps: picks.append((ds, eps[0]))
+        ds0 = rows[0]['id'].split('/', 2)[2]
+        for e in long_episodes(proj, ds0)[1:]:
+            if len(picks) >= n: break
+            picks.append((ds0, e))
+        out += [(proj, ds, e, spec) for ds, e in picks]
+    return out
+
+
+def all_picks():
+    return EXPLICIT_PICKS + auto_picks()
+
+
+def views_for(info, spec):
+    if spec.get('views'): return spec['views']
+    cams = [k.split('observation.image.', 1)[1] for k, f in info['features'].items() if f.get('dtype') == 'video']
+    pri = lambda n: (0 if n.startswith('right_main') else 1 if n.startswith('left_main') else 2 if 'main_camera' in n else 3)  # noqa: E731
+    return sorted(cams, key=lambda n: (pri(n), cams.index(n)))[:MAX_VIEWS]
+
+
 def render_cmd(project, dataset, ep, spec, out):
     info = info_of(project, dataset)
     d = clip_dir(out, project, dataset, ep)
-    cmd = [PY, os.path.join(VIZ, RENDERER), '--dataset-root', os.path.join(ROOT, project, dataset), '--episode', str(ep),
-           '--profile', spec['profile'], '--calib', os.path.join(VIZ, 'calib', spec['calib']), '--calib-fit', spec['calib_fit'],
-           '--cross', spec['cross'], '--stride', str(STRIDE), '--max-seconds', str(MAX_SEC),
-           '--output', os.path.join(d, 'stitched.mp4')] + spec.get('extra', [])
-    if spec.get('eef'):
-        for s in sides_of(info):
-            cmd += ['--eef-pose-in-main', f'{s}={spec["eef"]}']
-    return cmd
+    root = os.path.join(ROOT, project, dataset)
+    if spec['tool'] == BIMANUAL:
+        cmd = [PY, os.path.join(VIZ, BIMANUAL), '--dataset-root', root, '--episode', str(ep), '--profile', spec['profile'],
+               '--calib', os.path.join(VIZ, 'calib', spec['calib']), '--calib-fit', spec['calib_fit'], '--cross', spec['cross'],
+               '--stride', str(STRIDE), '--max-seconds', str(MAX_SEC), '--output', os.path.join(d, 'stitched.mp4')] + spec.get('extra', [])
+        if spec.get('eef'):
+            for s in sides_of(info):
+                cmd += ['--eef-pose-in-main', f'{s}={spec["eef"]}']
+        return cmd
+    cmd = [PY, os.path.join(VIZ, MULTIVIEW), '--dataset-root', root, '--episode', str(ep), '--profile', spec['profile'],
+           '--views', ','.join(views_for(info, spec)), '--stride', str(STRIDE), '--max-seconds', str(MAX_SEC),
+           '--output', os.path.join(d, 'stitched.mp4')]
+    if spec.get('config'): cmd += ['--viz-config', os.path.join(VIZ, 'config', spec['config'])]
+    for name, c in (spec.get('calib') or {}).items():
+        path, _, fit = c.partition(':')
+        cmd += ['--calib', f'{name}={os.path.join(VIZ, "calib", path)}' + (f':{fit}' if fit else '')]
+    for name, deg in (spec.get('hfov') or {}).items(): cmd += ['--hfov', f'{name}={deg}']
+    for side, pose in (spec.get('eef') or {}).items(): cmd += ['--eef-pose-in-main', f'{side}={pose}']
+    return cmd + spec.get('extra', [])
 
 
-def render_one(project, dataset, ep, spec, out):
+def render_one(project, dataset, ep, spec, out, quick=False):
     d = clip_dir(out, project, dataset, ep); os.makedirs(d, exist_ok=True)
     cmd = render_cmd(project, dataset, ep, spec, out)
+    if quick: cmd += ['--max-frames', '90']
     with open(os.path.join(d, '_render.log'), 'w') as log:
         log.write(' '.join(cmd) + '\n'); log.flush()
         rc = subprocess.run(cmd, cwd=VIZ, stdout=log, stderr=subprocess.STDOUT).returncode
-    tail = open(os.path.join(d, '_render.log')).read().strip().splitlines()[-1]
-    print(f'{key_of(project)}/{slug_of(dataset, ep)}: rc={rc} {tail[:120]}', flush=True)
+    lines = open(os.path.join(d, '_render.log')).read().strip().splitlines()
+    tail = next((l for l in reversed(lines) if l.startswith('[done]') or 'Error' in l or 'SystemExit' in l), lines[-1] if lines else '')
+    print(f'{key_of(project)}/{slug_of(dataset, ep)}: rc={rc} {tail[:140]}', flush=True)
     return rc
 
 
@@ -121,38 +272,51 @@ def flat_tasks(v):
     return out
 
 
-def pack_one(project, dataset, ep, spec, out):
+def pack_one(project, dataset, ep, spec, out, **_):
     d = clip_dir(out, project, dataset, ep); mp4 = os.path.join(d, 'stitched.mp4')
     if not os.path.isfile(mp4): print(f'{d}: no stitched.mp4 (render first)'); return
     info = info_of(project, dataset); row = episode_row(project, dataset, ep); fps = float(info['fps'])
     sides = sides_of(info); n = n_frames_of(mp4)
+    summary = json.load(open(os.path.join(d, 'stitched.json'))) if os.path.isfile(os.path.join(d, 'stitched.json')) else {}
+    view_names = summary.get('views') or [f'{s}_main_camera_rgb' for s in sides]
+    kinds = summary.get('sides') or {s: spec.get('gripper_profile') or spec['profile'] for s in sides}
+    sides = list(kinds)   # the renderer's sides (DROID's views are stereo eyes, not *_main_camera_rgb)
+    prim_all = all(k in PRIMITIVE_KINDS for k in kinds.values())
+    overlay = spec.get('overlay') or ('primitive stand-in (no URDF): jaw bar + pads at the recorded width, tool-centre axes, camera markers'
+                                      if prim_all else ', '.join(sorted(set(kinds.values()))) + ' URDF anchored at its mount link or at the eef pose')
+    calibs = summary.get('calib') or {}
     views = []; grips = {}
+    for vn in view_names:
+        key = f'observation.image.{vn}'; shape = info['features'][key]['shape']; c = calibs.get(vn, {})
+        views.append({'name': vn, 'video_key': key, 'entity': None, 'w': int(shape[1]), 'h': int(shape[0]),
+                      'focal_px': c.get('fx'), 'pinhole': c.get('model', 'kb4') == 'pinhole', 'fisheye': c.get('model', 'kb4') != 'pinhole',
+                      'calib_source': c.get('source'), 'overlay': overlay})
     for s in sides:
-        key = f'observation.image.{s}_main_camera_rgb'; shape = info['features'][key]['shape']
-        views.append({'name': f'{s}_main_camera_rgb', 'video_key': key, 'entity': None, 'w': int(shape[1]), 'h': int(shape[0]),
-                      'focal_px': None, 'pinhole': False, 'fisheye': True, 'overlay': spec['overlay']})
-        grips[s] = {'model': info.get(f'{s}_gripper_model'), 'profile': spec.get('gripper_profile', spec['profile'] + '_primitives'),
-                    'urdf': spec.get('urdf'), 'urdf_present': bool(spec.get('urdf')), 'primitive': spec['mode'] == 'primitive'}
+        kind = kinds.get(s, spec['profile']); prim = kind in PRIMITIVE_KINDS
+        grips[s] = {'model': info.get(f'{s}_gripper_model'), 'profile': kind, 'urdf': None if prim else spec.get('urdf') or kind,
+                    'urdf_present': not prim, 'primitive': prim}
+    mode = spec.get('mode') or ('primitive' if all(g['primitive'] for g in grips.values()) else 'urdf')
     tasks = flat_tasks(row['tasks'])
     cmd = render_cmd(project, dataset, ep, spec, out)
-    meta = {'dataset': f'{project}/{dataset}', 'robot_type': info.get('robot_type'), 'fps': fps, 'config': RENDERER,
+    meta = {'dataset': f'{project}/{dataset}', 'robot_type': info.get('robot_type'), 'fps': fps, 'config': spec['tool'],
             'episode_index': ep, 'length': int(row['length']), 'n_frames': n, 'step': STRIDE, 'out_fps': round(fps / STRIDE, 3),
             'tasks': json.dumps(tasks), 'views': views, 'grippers': grips, 'slug': slug_of(dataset, ep), 'project': project,
-            'fisheye': {'calib': {s: spec['calib'] for s in sides}}, 'overlay_mode': spec['mode'], 'tool': RENDERER,
+            'fisheye': any(v['fisheye'] for v in views), 'overlay_mode': mode, 'tool': spec['tool'],
             'args': [os.path.relpath(a, VIZ) if a.startswith(VIZ) else a for a in cmd[2:]],
             'source_export_id': None, 'source_success_mtime': None,
             'built': datetime.datetime.now().astimezone().strftime('%Y-%m-%dT%H:%M:%S%z')}
     json.dump(meta, open(os.path.join(d, 'meta.json'), 'w'), indent=1)
-    json.dump({'views': [v['name'] for v in views], 'n_frames': n, 'out_fps': meta['out_fps'], 'fisheye': True, 'tool': RENDERER,
-               'overlay_mode': spec['mode']}, open(os.path.join(d, 'DONE.json'), 'w'))
+    json.dump({'views': view_names, 'n_frames': n, 'out_fps': meta['out_fps'], 'fisheye': meta['fisheye'], 'tool': spec['tool'],
+               'overlay_mode': mode}, open(os.path.join(d, 'DONE.json'), 'w'))
     png = os.path.join(d, 'stitched.png')  # the renderer's mid-clip poster (gripper in view); else frame 0
     src = ['-i', png] if os.path.isfile(png) else ['-ss', '0', '-i', mp4]
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + src + ['-frames:v', '1', '-q:v', '4', os.path.join(d, 'poster.jpg')], check=True)
-    print(f'{key_of(project)}/{slug_of(dataset, ep)}: {n} frames, {len(views)} view(s), mode {spec["mode"]}')
+    print(f'{key_of(project)}/{slug_of(dataset, ep)}: {n} frames, {len(views)} view(s), mode {mode}, sides {kinds}')
 
 
-def encode_one(project, dataset, ep, spec, out):
+def encode_one(project, dataset, ep, spec, out, **_):
     d = clip_dir(out, project, dataset, ep); name = f'{key_of(project)}__{slug_of(dataset, ep)}'
+    if not os.path.isfile(os.path.join(d, 'poster.jpg')): print(f'{name}: not packed, skipped'); return
     vid_dir = os.path.join(REPO, '_build', 'videos'); os.makedirs(vid_dir, exist_ok=True)
     mp4 = os.path.join(vid_dir, name + '.mp4'); poster = os.path.join(REPO, 'overlays', 'posters', name + '.jpg')
     base = ['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', os.path.join(d, 'stitched.mp4'), '-vf', 'scale=-2:360']
@@ -170,20 +334,37 @@ def main():
     ap.add_argument('cmd', choices=['render', 'pack', 'encode', 'list'])
     ap.add_argument('--out', default=os.environ.get('CAMX_OVERLAYS_EXTRA', '').split(':')[0] or None,
                     help='clip tree (default: the first CAMX_OVERLAYS_EXTRA dir)')
-    ap.add_argument('--only', default=None, help='project key or slug substring')
-    ap.add_argument('--jobs', type=int, default=3)
+    ap.add_argument('--only', default=None, help='project key or slug substring (comma-separated alternatives)')
+    ap.add_argument('--skip', default=None, help='project key or slug substrings to leave out (comma-separated)')
+    ap.add_argument('--jobs', type=int, default=4)
+    ap.add_argument('--quick', action='store_true', help='render: first pick per project only, 90 frames')
+    ap.add_argument('--force', action='store_true', help='render: redo picks that already have a [done] log')
     a = ap.parse_args()
-    picks = [p for p in PICKS if not a.only or a.only in key_of(p[0]) or a.only in slug_of(p[1], p[2])]
+    picks = all_picks()
+    if a.only:
+        alts = [x.strip() for x in a.only.split(',') if x.strip()]
+        picks = [p for p in picks if any(x in key_of(p[0]) or x in slug_of(p[1], p[2]) for x in alts)]
+    if a.skip:
+        skips = [x.strip() for x in a.skip.split(',') if x.strip()]
+        picks = [p for p in picks if not any(x in key_of(p[0]) or x in slug_of(p[1], p[2]) for x in skips)]
+    if a.quick:
+        seen = set(); picks = [p for p in picks if not (p[0] in seen or seen.add(p[0]))]
     if a.cmd == 'list':
-        for p in picks: print(key_of(p[0]), slug_of(p[1], p[2]), p[3]['mode'], p[3]['calib'])
-        return
+        for p in picks: print(f'{key_of(p[0]):32s} {slug_of(p[1], p[2]):70s} {p[3]["tool"][:6]} {p[3]["profile"]}')
+        print(len(picks), 'picks,', len({p[0] for p in picks}), 'projects'); return
     if not a.out: sys.exit('--out (or CAMX_OVERLAYS_EXTRA) is required')
-    fn = {'render': render_one, 'pack': pack_one, 'encode': encode_one}[a.cmd]
-    if a.cmd == 'render' and a.jobs > 1:
+    if a.cmd == 'render':
+        if not a.force:
+            def done(p):
+                log = os.path.join(clip_dir(a.out, p[0], p[1], p[2]), '_render.log')
+                return os.path.isfile(log) and '[done]' in open(log).read()[-3000:]
+            skipped = [p for p in picks if done(p)]; picks = [p for p in picks if not done(p)]
+            if skipped: print(f'{len(skipped)} picks already rendered (use --force to redo)')
         with ThreadPoolExecutor(a.jobs) as ex:
-            list(ex.map(lambda p: fn(*p, a.out), picks))
-    else:
-        for p in picks: fn(*p, a.out)
+            list(ex.map(lambda p: render_one(*p, a.out, quick=a.quick), picks))
+        return
+    fn = {'pack': pack_one, 'encode': encode_one}[a.cmd]
+    for p in picks: fn(*p, a.out)
 
 
 if __name__ == '__main__':

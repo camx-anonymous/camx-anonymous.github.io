@@ -42,10 +42,12 @@ This repository is anonymized for review.
 python3 tools/build_site_data.py            # scans camx_480p, joins the inventory + stats, writes data/datasets.json
 ```
 
-Clips that the shared render tree does not carry (rigs without a URDF, re-renders) come from
-`tools/overlay_picks.py`: `render` runs the renderer of the camera-cross-embodiment checkout for a fixed pick
-table, `pack` writes `<project_key>/<slug>/{stitched.mp4,poster.jpg,meta.json}` in the tree's layout, `encode`
-makes the 360p release mp4 and the site poster. Point `CAMX_OVERLAYS_EXTRA` at that directory when building.
+Clips that the shared render tree does not carry (every other project of the training tree, rigs without a
+URDF, re-renders) come from `tools/overlay_picks.py`: `render` runs the renderers of the camera-cross-embodiment
+checkout (`render_multiview_overlay_video.py` for every camera stream of a dataset, the fisheye bimanual tool for
+the DataClaw / GenRobot picks) for a pick table of three episodes per project, `pack` writes
+`<project_key>/<slug>/{stitched.mp4,poster.jpg,meta.json}` in the tree's layout, `encode` makes the 360p release
+mp4 and the site poster. Point `CAMX_OVERLAYS_EXTRA` at that directory when building.
 
 One-episode samples (the tree root, the output dir and the scrub list are the `--root`, `--out` and
 `$CAMX_SCRUB` defaults; re-running either script only does what is still missing):
