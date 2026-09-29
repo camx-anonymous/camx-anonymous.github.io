@@ -26,7 +26,6 @@
 .crumbs button:hover{color:var(--accent)}
 .crumbs button.cur{color:var(--ink)}
 .crumbs .sep{color:var(--line-hi)}
-.crumbs .n{font:400 12px/1 var(--mono);color:var(--ink4);margin-left:6px}
 .bright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 1 auto;min-width:min(340px,100%);max-width:100%}
 .search{display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--line-hi);border-radius:6px;background:var(--panel);height:42px;width:100%}
 .selbar{display:flex;justify-content:flex-end;align-items:baseline;gap:8px;white-space:nowrap;font:400 12.5px/1.5 var(--mono);color:var(--ink4)}
@@ -360,9 +359,8 @@ function crumbs(rows){const parts=[{l:'All',f:()=>{S.cat='all';S.robot=null;S.so
   if(S.cat!=='all')parts.push({l:ML[S.cat],f:()=>{S.robot=null;S.source=null}});
   if(S.robot)parts.push({l:S.robot,f:()=>{S.source=null}});
   if(S.source)parts.push({l:S.source,f:()=>{}});
-  const a=agg(rows),st=state(rows);
+  const st=state(rows);
   $('crumbs').innerHTML=parts.map((p,i)=>`${i?'<span class="sep">/</span>':''}<button type="button" class="${i===parts.length-1?'cur':''}" data-i="${i}">${esc(p.l)}</button>`).join('')
-    +`<span class="n">${rows.length.toLocaleString()} datasets · ${fmt(a.ep)} episodes · ${fmtH(a.h)} h</span>`
     +(rows.length?`<button type="button" class="lk" id="selAll">${st==='true'?'Deselect all':'Select all '+rows.length.toLocaleString()}</button>`:'');
   $('crumbs').querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>{parts[+b.dataset.i].f();S.shown=PAGE;tree();render()});
   const sa=$('selAll');if(sa)sa.onclick=()=>setSel(rows,st!=='true');
