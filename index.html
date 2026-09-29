@@ -28,13 +28,15 @@
 .crumbs button.cur{color:var(--ink)}
 .crumbs .sep{color:var(--line-hi)}
 .crumbs .n{font:400 12px/1 var(--mono);color:var(--ink4);margin-left:6px}
-.bright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 1 340px;min-width:260px}
+.bright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 1 auto;min-width:min(340px,100%);max-width:100%}
 .search{display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--line-hi);border-radius:6px;background:var(--panel);height:42px;width:100%}
-.selbar{font:400 12.5px/1.5 var(--mono);color:var(--ink4);text-align:right}
+.selbar{display:flex;justify-content:flex-end;align-items:baseline;gap:8px;white-space:nowrap;font:400 12.5px/1.5 var(--mono);color:var(--ink4)}
+.selbar.hint{display:block;white-space:normal;max-width:340px;text-align:right}
 .selbar b{font-weight:500;color:var(--ink)}
 .selbar a{color:var(--accent)}
+.selbar .sep{color:var(--line-hi)}
 .crumbs .lk{margin-left:8px}
-@media (max-width:640px){.bright{align-items:flex-start;flex-basis:100%}.selbar{text-align:left}}
+@media (max-width:640px){.bright{align-items:flex-start;flex-basis:100%}.selbar{justify-content:flex-start}.selbar.hint{text-align:left;max-width:none}}
 .search:focus-within{border-color:var(--ink)}
 .search svg{width:12px;height:12px;stroke:var(--ink4);fill:none;stroke-width:1.8;flex:none}
 .search input{border:0;background:transparent;font:inherit;font-size:14px;color:var(--ink);outline:0;width:100%;min-width:0;padding:0}
@@ -350,7 +352,7 @@ function state(rows){let n=0;rows.forEach(r=>{if(sel.has(r.id))n++});return n===
 function setSel(rows,on){rows.forEach(r=>on?sel.add(r.id):sel.delete(r.id));persist();if(on&&sel.size)S.slice='sel';refresh()}
 function refresh(){tree();crumbs(filtered());syncCards();downloads()}
 function syncCards(){$('cards').querySelectorAll('.dcard').forEach(c=>{const on=sel.has(c.dataset.id);c.classList.toggle('on',on);const k=c.querySelector('.ck');if(k)k.setAttribute('aria-checked',on)})}
-function selbar(){const n=sel.size;$('selbar').innerHTML=n?`<b>${n.toLocaleString()} dataset${n===1?'':'s'} selected</b> · <a href="#download">go to download</a> · <button type="button" class="lk" id="selClear">clear</button>`:'Tick a platform, source or dataset to add it to your download.';
+function selbar(){const n=sel.size,el=$('selbar');el.classList.toggle('hint',!n);el.innerHTML=n?`<b>${n.toLocaleString()} dataset${n===1?'':'s'} selected</b><span class="sep">·</span><a href="#download">go to download</a><span class="sep">·</span><button type="button" class="lk" id="selClear">clear</button>`:'Tick a platform, source or dataset to add it to your download.';
   const c=$('selClear');if(c)c.onclick=()=>setSel(L,false)}
 
 function filtered(){const q=S.q.toLowerCase();return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source)&&(!q||hay(r).includes(q)))}
