@@ -67,7 +67,9 @@ EXPLICIT_PICKS = [  # (project, dataset, episode, spec)
 
 # ── every other project without a clip: multi-view tool, 3 auto picks (3 datasets spread over the project, episode 0) ──
 # spec keys: config (viz config in <VIZ>/config), calib {view-or-'main'-or-'all': 'file[:crop|stretch]'}, profile,
-# hfov {view: deg}, eef {side: 'x,y,z,qw,qx,qy,qz'}, extra [args], views [names] (default: wrists first, then the rest, MAX_VIEWS)
+# hfov {view: deg}, eef {side: 'x,y,z,qw,qx,qy,qz'} (constant tool-centre pose in the main camera), eef_tcp {side: pose7 of the
+# renderer TCP in the dataset eef frame: composed per episode with the dataset's <side>_eef_pose_in_main}, extra [args],
+# views [names] (default: wrists first, then the rest, MAX_VIEWS)
 def MV(**kw):
     return {'tool': MULTIVIEW, 'profile': 'auto', **kw}
 
@@ -77,9 +79,15 @@ OPENNEO = 'primitive stand-in (OpenNeoData publishes no gripper CAD): jaw bar + 
 # aloha eef = the flange), so the renderer's TCP frame (x approach, y jaw, z camera side) is passed explicitly: the values are
 # inv(inv(T_eef_renderTCP) @ camera_in_eef) from camx/data_processing/openneo/scripts/render_wrist_overlay.py (checked on the
 # wrist posters 2026-09-28: pads on the fingertips; arx5 needs no remap). Wrist lens = that script's assumed D405 / fx-306 models.
+# flexiv / ur pass `eef_tcp` = T_eef_renderTCP (that script's FRAMES) instead of a constant: the tool-centre pose is then
+# composed PER EPISODE from the dataset's own <side>_eef_pose_in_main (meta/episodes row or info.json). Flexiv needs that
+# since 2026-09-28 (export openneo_4e8e8ac7): the wrist camera was re-mounted between recording sessions, so the eef pose
+# is a per-episode column now; ur keeps a static info.json value (third_0 dropped the same day, wrist stream only).
 NEO_D405 = {'main': 'openneo_wrist_d405_640x480_assumed.json:stretch'}
-def NEO(config, eef, calib=NEO_D405):
-    return MV(config=config, profile='openneo', overlay=OPENNEO, calib=calib, eef=eef, extra=['--parallel-jaw'])
+def NEO(config, eef, calib=NEO_D405, eef_tcp=None):
+    return MV(config=config, profile='openneo', overlay=OPENNEO, calib=calib, eef=eef, eef_tcp=eef_tcp, extra=['--parallel-jaw'])
+NEO_FLEXIV_TCP = {'right': '0,0,0,-0.707107,0,0.707107,0'}   # approach = eef z, camera side = -eef x, flange = TCP
+NEO_UR_TCP = {'right': '0,0,0.105,0.5,0.5,-0.5,0.5'}         # approach = eef z, camera side = -eef y, TCP 105 mm past the flange
 NEO_ALOHA_EEF = '0.008353,0.037243,0.106504,0.401352,0.604170,-0.592538,0.350419'
 NEO_UMI_EEF = '0,0.010179,0.092753,0.346392,0.616452,-0.616452,0.346392'
 SPECS = {
@@ -95,7 +103,7 @@ SPECS = {
     'dahuan/rh20t_cfg2': dict(RH20T, profile='primitive'),
     'fastumi/fastumi': MV(calib={'main': GOPRO}, profile='umi'),                      # UMI gripper on an xArm, GoPro
     'fastumi/fastumi_100k_single_arm': MV(calib={'main': GOPRO}, profile='umi'),
-    'flexiv/openneo_flexiv': NEO('openneo_flexiv.json', {'right': '0.018440,0.001512,0.142193,0.303385,0.736864,-0.519322,0.308696'}),
+    'flexiv/openneo_flexiv': NEO('openneo_flexiv.json', None, eef_tcp=NEO_FLEXIV_TCP),   # per-episode eef (re-mounted wrist camera)
     'franka_hand/fmb': MV(config='fmb.json'),                                        # franka hand URDF, anamorphic 256x256
     'franka_hand/rh20t_cfg5': RH20T,
     'hifi_umi/hifi_umi': MV(calib={'all': 'hifi_umi_hand_fisheye.json:stretch'}, profile='hifi_umi',
@@ -136,7 +144,7 @@ SPECS = {
     # ViTaMIn-B: GoPro (webcam mode) masked to a circle; the 2.7k Max-Lens calibration centre-cropped to the square frame gives
     # f 88 px at 224 (the same focal the 1080p->224 resize implies), UMI paper-figure URDF hung from the GoPro lens
     'umi/vitamin_b': MV(calib={'main': GOPRO}, profile='umi'),
-    'ur/openneo_ur': NEO('openneo_single.json', {'right': '0.007589,0.003560,0.092932,0.350080,0.640050,-0.615630,0.297960'}),
+    'ur/openneo_ur': NEO('openneo_ur.json', None, eef_tcp=NEO_UR_TCP),                  # wrist stream only (third_0 dropped)
     'wsg50/rh20t_cfg3': dict(RH20T, profile='primitive'),                            # WSG-50: no URDF
 }
 
@@ -291,6 +299,9 @@ def render_cmd(project, dataset, ep, spec, out):
         cmd += ['--calib', f'{name}={os.path.join(VIZ, "calib", path)}' + (f':{fit}' if fit else '')]
     for name, deg in (spec.get('hfov') or {}).items(): cmd += ['--hfov', f'{name}={deg}']
     for side, pose in (spec.get('eef') or {}).items(): cmd += ['--eef-pose-in-main', f'{side}={pose}']
+    for side, tcp in (spec.get('eef_tcp') or {}).items():   # dataset eef pose (per episode) remapped to the renderer's TCP frame
+        pose = compose_pose7(episode_eef(project, dataset, ep, side), [float(v) for v in tcp.split(',')])
+        cmd += ['--eef-pose-in-main', f'{side}=' + ','.join(f'{v:.6f}' for v in pose)]
     return cmd + spec.get('extra', [])
 
 
@@ -320,6 +331,34 @@ def episode_row(project, dataset, ep):
         for r in pq.read_table(f, columns=['episode_index', 'length', 'tasks']).to_pylist():
             if int(r['episode_index']) == ep: return r
     raise SystemExit(f'episode {ep} not in meta/episodes of {project}/{dataset}')
+
+
+def episode_eef(project, dataset, ep, side):
+    """<side>_eef_pose_in_main_xyz_wxyz of one episode: info.json (static rigs) or the meta/episodes row (per-episode rigs)."""
+    import glob
+    import pyarrow.parquet as pq
+    col = f'{side}_eef_pose_in_main_xyz_wxyz'
+    info = info_of(project, dataset)
+    if info.get(col): return [float(v) for v in info[col]]
+    for f in sorted(glob.glob(os.path.join(ROOT, project, dataset, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
+        t = pq.read_table(f)
+        if col not in t.column_names: continue
+        for r in t.select(['episode_index', col]).to_pylist():
+            if int(r['episode_index']) == ep and r[col] is not None: return [float(v) for v in r[col]]
+    raise SystemExit(f'{project}/{dataset} ep {ep}: no {col} in info.json or meta/episodes')
+
+
+def compose_pose7(a, b):
+    """pose7 (x,y,z,qw,qx,qy,qz) of T_a @ T_b (b expressed in a's frame)."""
+    (ax, ay, az, aw, ai, aj, ak), (bx, by, bz, bw, bi, bj, bk) = a, b
+    # rotate b's translation by a's quaternion: v' = v + 2 q_vec x (q_vec x v + w v)
+    tx, ty, tz = aj * bz - ak * by + aw * bx, ak * bx - ai * bz + aw * by, ai * by - aj * bx + aw * bz
+    rx, ry, rz = bx + 2 * (aj * tz - ak * ty), by + 2 * (ak * tx - ai * tz), bz + 2 * (ai * ty - aj * tx)
+    qw = aw * bw - ai * bi - aj * bj - ak * bk
+    qi = aw * bi + ai * bw + aj * bk - ak * bj
+    qj = aw * bj - ai * bk + aj * bw + ak * bi
+    qk = aw * bk + ai * bj - aj * bi + ak * bw
+    return [ax + rx, ay + ry, az + rz, qw, qi, qj, qk]
 
 
 def flat_tasks(v):
