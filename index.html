@@ -6,6 +6,7 @@
 <title>CAMX — Cross-Embodiment Robot Manipulation Dataset</title>
 <meta name="description" content="CAMX: real-world robot manipulation across handheld, single-arm, bimanual and mobile-manipulator embodiments, re-exported into one camera-aware LeRobot-v3 layout. Browse every dataset and fetch one-episode samples from GitHub with a single command (anonymous submission).">
 <link rel="stylesheet" href="site.css">
+<script src="clip.js" defer></script>
 <style>
 /* ---------- hero ---------- */
 .hero{padding-top:96px;padding-bottom:64px}
@@ -82,7 +83,6 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .dcard.on .thumb{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .dcard .thumb{position:relative;aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--chipbg) 0 8px,var(--panel2) 8px 16px);border:1px solid var(--line)}
 .dcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.dcard .thumb video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
 .dcard .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .dcard .play i{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:background .12s}
 .dcard .play i::after{content:"";width:0;height:0;border-left:11px solid #22211E;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
@@ -370,7 +370,7 @@ function thumb(r){const p=P[r.project];const own=p.overlays.find(o=>o.dataset===
   return {o,own:!!own,poster:`overlays/posters/${f}.jpg`,src:D.overlay_base+f+'.mp4'}}
 
 function card(r){const t=thumb(r),on=sel.has(r.id);
-  const th=t?`<div class="thumb has" data-src="${t.src}" title="Play the validation clip"><img src="${t.poster}" alt="" loading="lazy"><span class="tl">${t.own?`validation clip · ep ${t.o.episode}`:'project clip'}</span><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
+  const th=t?`<div class="thumb has clip" data-src="${t.src}" title="Play the validation clip"><img src="${t.poster}" alt="" loading="lazy"><span class="tl">${t.own?`validation clip · ep ${t.o.episode}`:'project clip'}</span><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
     :`<div class="thumb"><span class="tl">no example clip</span><span class="dur">${fmtH(r.hours)} h</span></div>`;
   return `<article class="dcard${on?' on':''}" data-id="${esc(r.id)}">${th}${ck(on,'','Select '+human(r.name)+' for download')}<div class="body"><div class="ttl">${esc(human(r.name))}</div>
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded',()=>{load();
   $('cards').addEventListener('click',e=>{const k=e.target.closest('.ck');
     if(k){const id=k.closest('.dcard').dataset.id;setSel(L.filter(r=>r.id===id),!sel.has(id));return}
     const t=e.target.closest('.thumb[data-src]');
-    if(t){if(!t.querySelector('video'))t.innerHTML=`<video controls autoplay loop muted playsinline src="${t.dataset.src}"></video>`;return}
+    if(t){openClip(t);return}
     const c=e.target.closest('.dcard');if(c)drawer(c.dataset.id)});
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});

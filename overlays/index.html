@@ -6,6 +6,7 @@
 <title>CAMX Gripper Projection</title>
 <meta name="description" content="The gripper projected through each dataset's own camera poses and intrinsics, for validating the CAMX camera and end-effector calibration.">
 <link rel="stylesheet" href="../site.css">
+<script src="../clip.js" defer></script>
 <style>
 main>header{padding-top:64px;padding-bottom:8px}
 header h1{max-width:900px}
@@ -71,13 +72,13 @@ function render(){const projs=D.projects.filter(p=>p.overlays.length);
   projs.forEach(p=>{const ovs=p.overlays;const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];
     h+=`<section class="proj" id="${esc(p.key.replace('/','_'))}"><h2>${esc(p.key)}<small>${esc(emb)} · ${p.datasets} datasets · ${fmtH(p.hours)} h · ${p.overlays.length} clip${p.overlays.length>1?'s':''}</small></h2>`;
     h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`;const src=D.overlay_base+file+'.mp4';
-      return `<div class="card"><div class="vid" data-src="${src}"><img src="posters/${file}.jpg" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
+      return `<div class="card"><div class="vid clip" data-src="${src}"><img src="posters/${file}.jpg" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
         <div class="title">${esc(o.dataset)} · ep ${o.episode}</div>
         <div class="meta">${o.fisheye?'<div class="row"><span class="chip">fisheye</span></div>':''}
         ${o.task?`<div><span class="k">task</span>${esc(taskList(o.task).slice(0,3).join(' · '))}${taskList(o.task).length>3?' …':''}</div>`:''}
         <div><span class="k">views</span>${o.views.map(esc).join(' · ')}</div></div></div>`}).join('')+'</div></section>';});
   document.getElementById('content').innerHTML=h;
-  document.querySelectorAll('.vid').forEach(v=>v.onclick=()=>{if(v.querySelector('video'))return;v.innerHTML=`<video controls autoplay loop muted playsinline src="${v.dataset.src}"></video>`});
+  document.querySelectorAll('.vid').forEach(v=>v.onclick=()=>openClip(v));
   document.getElementById('pending').style.display=D.projects.some(p=>!p.overlays.length)?'':'none';
   document.getElementById('pendingBody').innerHTML=D.projects.filter(p=>!p.overlays.length).map(p=>{const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const n=p.notes||'';let why='no clip in this release';
     if(/conversion tree|not in the camx_480p training tree/i.test(n))why='converted after the last render pass';else if(/rolled into the UMI|handheld/i.test(n)&&/single/.test(Object.keys(p.forms).join()))why='single fisheye / GoPro camera: needs the rig\'s lens fit before drawing';
