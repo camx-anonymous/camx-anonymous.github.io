@@ -16,7 +16,7 @@ Usage:
   python3 tools/overlay_picks.py list   [--only KEY]
   python3 tools/overlay_picks.py render --out <clips dir> [--only KEY] [--jobs 4] [--quick]   # --quick: 1 pick, 90 frames
   python3 tools/overlay_picks.py pack   --out <clips dir> [--only KEY]                          # meta.json + poster.jpg
-  python3 tools/overlay_picks.py encode --out <clips dir> [--only KEY]                          # 360p mp4 (_build/videos) + site poster
+  python3 tools/overlay_picks.py encode --out <clips dir> [--only KEY]                          # 360p mp4 (overlays/videos) + site poster
 Env:
   CAMX_ROOT  camx_480p tree                                   (default /data/camx_480p)
   CAMX_VIZ   camera-cross-embodiment/camx/visualization       (default ~/projects/camera-cross-embodiment/camx/visualization)
@@ -418,7 +418,7 @@ def pack_one(project, dataset, ep, spec, out, **_):
 def encode_one(project, dataset, ep, spec, out, **_):
     d = clip_dir(out, project, dataset, ep); name = f'{key_of(project)}__{slug_of(dataset, ep)}'
     if not os.path.isfile(os.path.join(d, 'poster.jpg')): print(f'{name}: not packed, skipped'); return
-    vid_dir = os.path.join(REPO, '_build', 'videos'); os.makedirs(vid_dir, exist_ok=True)
+    vid_dir = os.path.join(REPO, 'overlays', 'videos'); os.makedirs(vid_dir, exist_ok=True)  # tracked: Pages serves them as video/mp4
     mp4 = os.path.join(vid_dir, name + '.mp4'); poster = os.path.join(REPO, 'overlays', 'posters', name + '.jpg')
     base = ['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', os.path.join(d, 'stitched.mp4'), '-vf', 'scale=-2:360']
     tail = ['-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', mp4]

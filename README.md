@@ -20,7 +20,8 @@ This repository is anonymized for review.
 - `overlays/` — camera-projection validation clips, a few example episodes per project: the gripper URDF
   (or, where no URDF is released, a primitive stand-in: hinged fingers that follow the recorded jaw width plus
   the tool-centre frame as RGB = xyz axes) projected through each dataset's own poses and intrinsics. Clips are
-  served from the `overlays-v1` GitHub release; posters live in `overlays/posters/`. The site is fully static
+  served from `overlays/videos/` (tracked, so Pages sends them as `video/mp4`; iOS Safari will not play the
+  `application/octet-stream` that GitHub release assets come back as); posters live in `overlays/posters/`. The site is fully static
   (GitHub Pages); there is no rendering backend.
 - `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates.
 - `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the

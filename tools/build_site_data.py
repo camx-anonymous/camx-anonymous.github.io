@@ -388,7 +388,9 @@ def main():
     total_h = sum(r['hours'] for r in rows)
     out = {'built': datetime.datetime.now().astimezone().strftime('%Y-%m-%d %H:%M %Z'), 'root': a.root,
            'inventory_updated': inv.get('updated'), 'stats_as_of': stats.get('as_of'),
-           'overlay_base': RELEASES + '/download/overlays-v1/',
+           # clips are served from the site itself (overlays/videos/, root-relative): GitHub release assets come back as
+           # application/octet-stream through an extension-less signed redirect, which iOS Safari refuses to play
+           'overlay_base': '/overlays/videos/',
            'totals': {'datasets': len(rows), 'projects': len(projects), 'episodes': sum(r['episodes'] for r in rows),
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
