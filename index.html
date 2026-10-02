@@ -100,6 +100,17 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .cards .empty{grid-column:1/-1}
 .loadmore{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:48px;flex-wrap:wrap}
 .loadmore .n{font:400 12px/1 var(--mono);color:var(--ink4)}
+/* sources of the paper's tables with no converted data on the site yet: muted tree rows without a tick box, cards under the results */
+.tree .row.listed button{color:var(--ink4)}
+.tree .row.listed button .c{font-style:italic}
+.pendlist{margin-top:56px;padding-top:28px;border-top:1px solid var(--line)}
+.pendlist.solo{margin-top:0;padding-top:0;border-top:0}
+.pendlist h3{margin:0 0 6px;font:500 17px/1.3 var(--sans);letter-spacing:-.01em}
+.pendlist .p{margin:0 0 24px;font-size:14px;line-height:1.5;color:var(--ink3);max-width:640px;text-wrap:pretty}
+.pcard .thumb{background:repeating-linear-gradient(135deg,var(--panel2) 0 8px,var(--panel) 8px 16px)}
+.pcard .thumb .tag{position:absolute;left:10px;bottom:10px;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:4px;background:var(--chipbg);color:var(--ink2)}
+.pcard .note{font-size:12.5px;line-height:1.45;color:var(--ink3)}
+.pcard .note b{font:500 11px/1 var(--mono);color:var(--accent);margin-right:4px}
 
 /* ---------- download ---------- */
 #download{background:var(--panel2);border-top:1px solid var(--line);scroll-margin-top:60px}
@@ -237,6 +248,7 @@ footer{margin:0}
       <div class="results">
         <div class="cards" id="cards"></div>
         <div class="loadmore" id="loadmore"></div>
+        <div class="pendlist" id="pend" hidden></div>
       </div>
     </div>
   </section>
@@ -303,7 +315,8 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const human=s=>{s=String(s).replace(/_+/g,' ').replace(/\s+/g,' ').trim();return s.charAt(0).toUpperCase()+s.slice(1)};
 const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + up axis':m;
 const $=id=>document.getElementById(id);
-let D,P={},L=[],sel=new Set(),SRC={},SRCP={},SRCD={};
+let D,P={},L=[],PEND=[],sel=new Set(),SRC={},SRCP={},SRCD={};
+// D.pending: the sources of the paper's appendix tables with no converted data here yet (data/pending.json), listed with the paper's counts
 const S={cat:'all',robot:null,source:null,q:'',shown:PAGE,slice:'full'};
 // r.sample = {url, bytes, frames, seconds}: the episode-0 archive of the dataset on this repository's GitHub releases (null while unpublished)
 const sampled=rows=>rows.filter(r=>r.sample);
@@ -315,32 +328,38 @@ const oneCmd=r=>r.sample?`# CAMX sample · ${r.id} · episode 0 · ${fmtDur(r.sa
 function order(rows){const own=new Set();Object.values(P).forEach(p=>p.overlays.forEach(o=>own.add(o.dataset)));const rank={},seen={};
   rows.slice().sort((a,b)=>b.hours-a.hours).forEach(r=>{rank[r.id]=seen[r.project]=(seen[r.project]||0)+1});
   return rows.slice().sort((a,b)=>(own.has(b.id)-own.has(a.id))||(rank[a.id]-rank[b.id])||(P[b.project].hours-P[a.project].hours)||(b.hours-a.hours))}
-function load(){fetch('data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=order(d.datasets);
+function load(){fetch('data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=order(d.datasets);PEND=d.pending||[];
   try{JSON.parse(localStorage.getItem('camx.sel')||'[]').forEach(x=>sel.add(x))}catch(e){}
-  fetch('data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};downloads();if($('drawer').classList.contains('open')&&S.open)drawer(S.open)}).catch(()=>{});
-  $('footInfo').textContent=`CAMX Dataset · anonymized for review · ${d.totals.datasets.toLocaleString()} datasets, ${d.totals.projects} projects, ${d.totals.embodiments} platforms`;
+  fetch('data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};downloads();if($('drawer').classList.contains('open')){if(S.open)drawer(S.open);else if(S.openPend!=null)drawerPend(S.openPend)}}).catch(()=>{});
+  $('footInfo').textContent=`CAMX Dataset · anonymized for review · ${d.totals.datasets.toLocaleString()} datasets, ${d.totals.projects} projects, ${d.totals.embodiments_listed||d.totals.embodiments} platforms`;
   stats();tree();render();downloads();})}
 
 function agg(rows){return rows.reduce((a,r)=>{a.n++;a.ep+=r.episodes||0;a.h+=r.hours||0;a.b+=r.bytes_est||0;return a},{n:0,ep:0,h:0,b:0})}
 
-function stats(){const t=D.totals;$('stats').innerHTML=[[fmt(t.episodes),'episodes'],[fmtH(t.hours)+' h','of video'],[t.datasets.toLocaleString(),'datasets'],[t.embodiments,'robot platforms'],[MORPHS.length,'morphologies']]
+function stats(){const t=D.totals;$('stats').innerHTML=[[fmt(t.episodes),'episodes'],[fmtH(t.hours)+' h','of video'],[t.datasets.toLocaleString(),'datasets'],[t.sources||'–','sources'],[t.embodiments_listed||t.embodiments,'robot platforms'],[MORPHS.length,'morphologies']]
   .map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')}
 
 /* ---------- browse: tree, crumbs, cards ---------- */
 /* every tree row is a filter button plus a tick box that selects the whole group for download;
    sources appear as a third level under the platform being browsed */
-function tree(){const all=agg(L);
-  let h=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>',fmtH(all.h)+' h',L,'all datasets')+'<div class="lvl1">';
-  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const a=agg(rows);const embs={};rows.forEach(r=>{const e=embs[r.embodiment]||(embs[r.embodiment]={n:0,h:0,rows:[]});e.n++;e.h+=r.hours||0;e.rows.push(r)});
-    h+='<div>'+row(S.cat===m.id&&!S.robot,{cat:m.id},'<span class="tick"></span><span>'+m.label+'</span>',fmtH(a.h)+' h',rows,m.label)+'<div class="lvl2">'
+function tree(){const all=agg(L),ph=list=>list.reduce((a,p)=>a+(p.hours||0),0);
+  let h=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>',fmtH(all.h+ph(PEND))+' h',L,'all datasets')+'<div class="lvl1">';
+  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id),pend=PEND.filter(p=>p.morph===m.id);const a=agg(rows);const embs={};
+    const emb=e=>embs[e]||(embs[e]={n:0,h:0,rows:[],pend:[]});
+    rows.forEach(r=>{const e=emb(r.embodiment);e.n++;e.h+=r.hours||0;e.rows.push(r)});
+    pend.forEach(p=>{const e=emb(p.embodiment);e.h+=p.hours||0;e.pend.push(p)});
+    h+='<div>'+row(S.cat===m.id&&!S.robot,{cat:m.id},'<span class="tick"></span><span>'+m.label+'</span>',fmtH(a.h+ph(pend))+' h',rows,m.label)+'<div class="lvl2">'
       +Object.entries(embs).sort((x,y)=>y[1].h-x[1].h).map(([e,v])=>{const act=S.cat===m.id&&S.robot===e;
-        let o=row(act&&!S.source,{cat:m.id,robot:e},'<span class="tick"></span><span>'+esc(e)+'</span>',fmtH(v.h)+' h',v.rows,e,`${esc(e)} · ${v.n} datasets`);
-        if(act){const srcs={};v.rows.forEach(r=>{const x=srcs[r.source]||(srcs[r.source]={n:0,h:0,rows:[]});x.n++;x.h+=r.hours||0;x.rows.push(r)});
-          o+='<div class="lvl3">'+Object.entries(srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',fmtH(x.h)+' h',x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`)).join('')+'</div>'}
+        let o=row(act&&!S.source,{cat:m.id,robot:e},'<span class="tick"></span><span>'+esc(e)+'</span>',fmtH(v.h)+' h',v.rows,e,`${esc(e)} · ${v.n} dataset${v.n===1?'':'s'}`+(v.pend.length?` · ${v.pend.length} source${v.pend.length===1?'':'s'} not converted yet`:''),!v.rows.length);
+        if(act){const srcs={};const src=n=>srcs[n]||(srcs[n]={n:0,h:0,rows:[],pend:[]});
+          v.rows.forEach(r=>{const x=src(r.source);x.n++;x.h+=r.hours||0;x.rows.push(r)});
+          v.pend.forEach(p=>{const x=src(p.source);x.h+=p.hours||0;x.pend.push(p)});
+          o+='<div class="lvl3">'+Object.entries(srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',fmtH(x.h)+' h',x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`+(x.pend.length?(x.n?' · more datasets not converted yet':' · not converted yet'):''),!x.rows.length)).join('')+'</div>'}
         return o}).join('')+'</div></div>'});
   $('tree').innerHTML=h+'</div>'}
-function row(on,f,lab,c,rows,name,title){const d=Object.entries(f).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ');
-  return `<div class="row"><button type="button" class="${on?'on':''}" ${d}${title?` title="${title}"`:''}><span class="lab">${lab}</span><span class="c">${c}</span></button>${ck(state(rows),d,'Select '+name+' for download')}</div>`}
+/* pend: the row has no converted dataset (only sources listed from the paper), so no tick box */
+function row(on,f,lab,c,rows,name,title,pend){const d=Object.entries(f).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ');
+  return `<div class="row${pend?' listed':''}"><button type="button" class="${on?'on':''}" ${d}${title?` title="${title}"`:''}><span class="lab">${lab}</span><span class="c">${c}</span></button>${pend?'':ck(state(rows),d,'Select '+name+' for download')}</div>`}
 function groupRows(d){return L.filter(r=>(d.cat==='all'||r.morph===d.cat)&&(!d.robot||r.embodiment===d.robot)&&(!d.source||r.source===d.source))}
 
 /* ---------- selection: dataset ids picked while browsing, fed to the "Your selection" download slice ---------- */
@@ -353,6 +372,8 @@ function selbar(){const n=sel.size,el=$('selbar');el.classList.toggle('hint',!n)
   const c=$('selClear');if(c)c.onclick=()=>setSel(L,false)}
 
 function filtered(){const q=S.q.toLowerCase();return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source)&&(!q||hay(r).includes(q)))}
+function pendFiltered(){const q=S.q.toLowerCase();return PEND.filter(p=>(S.cat==='all'||p.morph===S.cat)&&(!S.robot||p.embodiment===S.robot)&&(!S.source||p.source===S.source)&&(!q||(p.source+' '+p.embodiment+' '+p.morph+' '+(p.remark||'')+' '+noteText(p)).toLowerCase().includes(q)))}
+const noteText=p=>p.note&&D.pending_notes?D.pending_notes[p.note]||'':'';
 function hay(r){return (r.id+' '+human(r.name)+' '+r.robot_type+' '+r.embodiment+' '+r.source+' '+r.morph+' '+r.form+' '+r.cams.map(c=>c.model).join(' ')+' '+(P[r.project].notes||'')).toLowerCase()}
 
 function crumbs(rows){const parts=[{l:'All',f:()=>{S.cat='all';S.robot=null;S.source=null}}];
@@ -376,10 +397,17 @@ function card(r){const t=thumb(r),on=sel.has(r.id);
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
     <div class="sub">${esc(r.project)} · ${fmt(r.episodes)} ep · ${r.n_views} view${r.n_views===1?'':'s'} · ${Math.round(r.fps)} fps</div></div></article>`}
 
-function render(){const rows=filtered();crumbs(rows);const show=rows.slice(0,S.shown);
-  $('cards').innerHTML=show.length?show.map(card).join(''):'<div class="empty">No datasets match. Try another search or pick a different platform.</div>';
+function render(){const rows=filtered(),pend=pendFiltered();crumbs(rows);const show=rows.slice(0,S.shown);
+  $('cards').innerHTML=show.length?show.map(card).join(''):pend.length?'':'<div class="empty">No datasets match. Try another search or pick a different platform.</div>';
   $('loadmore').innerHTML=rows.length>S.shown?`<button type="button" id="more">Load more datasets</button><span class="n">showing ${show.length} of ${rows.length.toLocaleString()}</span>`:(rows.length>PAGE?`<span class="n">all ${rows.length.toLocaleString()} shown</span>`:'');
-  const m=$('more');if(m)m.onclick=()=>{S.shown+=PAGE;render()}}
+  const m=$('more');if(m)m.onclick=()=>{S.shown+=PAGE;render()};
+  const pe=$('pend');pe.hidden=!pend.length;pe.classList.toggle('solo',!show.length);
+  pe.innerHTML=pend.length?`<h3>Listed in the paper, not converted yet</h3><p class="p">${pend.length} source${pend.length===1?'':'s'} of the appendix source tables ${pend.length===1?'has':'have'} no LeRobot-v3 export on this site yet, so no sample archive and no validation clip. Counts are the paper's; the bracketed letter is its note.</p><div class="cards">${pend.map(pcard).join('')}</div>`:''}
+function pcard(p){const i=PEND.indexOf(p);
+  return `<article class="dcard pcard" data-pid="${i}"><div class="thumb"><span class="tl">no sample yet</span>${p.note?`<span class="tag">[${esc(p.note)}]</span>`:''}<span class="dur">${fmtH(p.hours)} h</span></div><div class="body"><div class="ttl">${esc(p.source)}</div>
+    <div class="meta"><span class="cat">${esc(ML[p.morph]||p.morph)}</span><span>›</span><span>${esc(p.embodiment)}</span></div>
+    <div class="sub">${p.datasets.toLocaleString()} dataset${p.datasets===1?'':'s'} · ${fmt(p.episodes)} ep · ${esc(p.views)} view${p.views==='1'?'':'s'} · ${esc(p.fps)} fps</div>
+    <div class="note">${p.note?`<b>[${esc(p.note)}]</b>${esc(noteText(p))}`:esc(p.remark||'conversion pending')}</div></div></article>`}
 
 /* ---------- sources: license + papers per source dataset (data/sources.json), and the gate before any download ---------- */
 const CAMX_BIB=()=>$('cite').textContent.trim();
@@ -459,7 +487,7 @@ function persist(){try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 
 /* ---------- dataset drawer ---------- */
-function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const ov=p.overlays.filter(o=>o.dataset===r.id);const si=SRC[srcName(r)]||{};S.open=id;
+function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const ov=p.overlays.filter(o=>o.dataset===r.id);const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
   const kv=[hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
@@ -475,6 +503,18 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
   const cp=$('copyOne');if(cp)cp.onclick=()=>gate([r],human(r.name),()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)}),'copy');
   const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:srcName(r),n:1,info:si}],human(r.name))).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
   $('drawer').classList.add('open');$('scrim').classList.add('show')}
+/* record of a source listed from the paper without converted data: the paper's counts, its note, license and paper */
+function drawerPend(i){const p=PEND[i];if(!p)return;const si=SRC[p.entry||p.source]||{};S.open=null;S.openPend=i;
+  const kv=[['Datasets',p.datasets.toLocaleString()],['Episodes',esc(fmt(p.episodes))],['Duration',esc(fmtH(p.hours))+' h'],['Views',esc(p.views)],['FPS',esc(p.fps)],
+    ['Status','<span class="dim">not converted yet: no sample archive, no validation clip</span>'+(p.note?`<br><b>[${esc(p.note)}]</b> ${esc(noteText(p))}`:'')+(p.remark?`<br>${esc(p.remark)}`:'')],
+    ['License',licChip(si)+(si.homepage?` <a class="dim" href="${esc(si.homepage)}" target="_blank" rel="noopener">source page</a>`:'')],
+    ['Cite',paperLinks(si,p.source)+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]];
+  $('drawerBody').innerHTML=`<div class="kicker">Source listed in the paper</div><h3>${esc(p.source)}</h3>
+    <div class="meta"><span class="cat">${esc(ML[p.morph]||p.morph)}</span><span>›</span><span>${esc(p.embodiment)}</span></div>
+    <p class="path">counts from the source release, as in the appendix table</p>
+    <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
+  const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:p.entry||p.source,n:1,info:si}],p.source)).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
+  $('drawer').classList.add('open');$('scrim').classList.add('show')}
 function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
 
 document.addEventListener('DOMContentLoaded',()=>{load();
@@ -488,6 +528,7 @@ document.addEventListener('DOMContentLoaded',()=>{load();
     const t=e.target.closest('.thumb[data-src]');
     if(t){openClip(t);return}
     const c=e.target.closest('.dcard');if(c)drawer(c.dataset.id)});
+  $('pend').addEventListener('click',e=>{const c=e.target.closest('.pcard');if(c)drawerPend(+c.dataset.pid)});
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
   $('citeBtn').onclick=()=>$('cite').classList.toggle('show');

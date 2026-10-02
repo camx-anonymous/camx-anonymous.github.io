@@ -23,7 +23,15 @@ This repository is anonymized for review.
   served from `overlays/videos/` (tracked, so Pages sends them as `video/mp4`; iOS Safari will not play the
   `application/octet-stream` that GitHub release assets come back as); posters live in `overlays/posters/`. The site is fully static
   (GitHub Pages); there is no rendering backend.
-- `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates.
+- `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates. The browse tree follows
+  the source tables of the paper's appendix: the build relabels rows into the paper's embodiment groups (iPhUMI,
+  TacUMI, Other research projects; Galaxea, UR5, ARX5 and OpenArm each inside one morphology band) and copies
+  `data/pending.json` in as `pending`.
+- `data/pending.json` — hand-maintained: every source of the appendix tables that has no converted LeRobot-v3 data
+  on the site yet (no sample archive, no validation clip), with the paper's counts (datasets, episodes, frames, hours,
+  views, fps) and the table's note letter ([A]–[D]). The tree lists them under their embodiment group without a tick
+  box; the cards sit in a block under the results and open a record with license and citation. Remove an entry
+  once its data is converted and the build picks the rows up.
 - `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the
   rows (`projects` maps a family/project to a more specific entry where one source ships under two licenses,
   e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7; `datasets` does the same per row for the

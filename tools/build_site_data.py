@@ -6,6 +6,7 @@ Sources (desktop001 only):
   * camera-cross-embodiment/camx/figures/dataset_inventory.json  (embodiment / source / form factor / notes / 480p bytes)
   * camx_480p_browser/stats/stats.json                            (skills, episode-duration histogram, #instructions)
   * camx_480p_browser/mv_urdf/videos/<project>/<slug>/meta.json   (projection overlay clips)
+  * data/pending.json (hand-maintained, in the repo): the sources of the paper's appendix tables with no converted data yet
 
 Usage: python3 tools/build_site_data.py [--root /data/camx_480p]
        python3 tools/build_site_data.py --scrub-only   # re-run the anonymisation pass over data/datasets.json
@@ -113,6 +114,63 @@ def merge_projects(out):
         b['overlays'] += a['overlays']
     out['projects'] = sorted(by_key.values(), key=lambda p: p['key'])
     out['totals']['projects'] = len(out['projects'])
+    return out
+
+
+# --- paper alignment -------------------------------------------------------------------------------------------
+# The browse tree follows the source tables of the paper's appendix (tab:camx_sources, tab:camx_sources_held; user,
+# 2026-10-02): the inventory files every hand-held rig under UMI and bands each leaf by its own form factor, the paper
+# groups the hand-held rigs by hardware (UMI, iPhUMI, TacUMI, Other research projects, Dexterous hands) and keeps every
+# embodiment inside one band. Rows keep their own `form`; only `embodiment` and `morph` change.
+PAPER_EMBODIMENT = {  # (inventory embodiment, source) -> embodiment group of the paper
+    ('UMI', 'Behavior Prompting'): 'iPhUMI', ('UMI', 'Gated Memory Policy'): 'iPhUMI', ('UMI', 'HoMMI'): 'iPhUMI',
+    ('UMI', 'MoFPO'): 'iPhUMI', ('UMI', 'UMIFT'): 'iPhUMI',
+    ('UMI', 'OpenNeoData'): 'TacUMI',
+    ('UMI', 'Dobb-E Homes of New York'): 'Other research projects', ('UMI', 'AetheRock'): 'Other research projects',
+}
+PAPER_MORPH = {  # embodiment -> the band the paper lists it under (Galaxea RoboCOIN, RoboMIND 2.0 UR, single-arm ARX5 leaves)
+    'Galaxea R1-Lite': 'Mobile manipulator', 'UR5': 'Single-arm robot', 'ARX5': 'Bimanual robot', 'OpenArm': 'Bimanual robot',
+}
+PENDING = os.path.join(REPO, 'data', 'pending.json')
+
+
+def align_paper(out):
+    for r in out['datasets']:
+        r['embodiment'] = PAPER_EMBODIMENT.get((r['embodiment'], r['source']), r['embodiment'])
+        r['morph'] = PAPER_MORPH.get(r['embodiment'], r['morph'])
+    embs = collections.defaultdict(collections.Counter)
+    for r in out['datasets']: embs[r['project']][r['embodiment']] += 1
+    for p in out['projects']:
+        if p['key'] in embs: p['embodiments'] = dict(embs[p['key']])
+    out['totals']['embodiments'] = len({r['embodiment'] for r in out['datasets']})
+    return out
+
+
+def pending_pass(out):
+    """data/pending.json: every source of the paper's tables that has no converted data on the site (no sample archive, no
+    clip), with the paper's counts. Copied into out['pending'] so the browse tree lists it under its embodiment group."""
+    out['pending'] = []; out['pending_notes'] = {}
+    if not os.path.isfile(PENDING):
+        print(f'warning: {PENDING} not found, the unconverted sources of the paper are not listed', file=sys.stderr); return out
+    text = open(PENDING).read()
+    hits = sorted({m.group(0).lower() for m in FORBIDDEN.finditer(text)})
+    if hits: sys.exit(f'anonymisation failed in {PENDING}, still present: {hits}')
+    j = json.loads(text)
+    morphs = {m for _, m in MORPH_OF_FORM}
+    for e in j['entries']:
+        assert e['morph'] in morphs, e
+        for k in ('embodiment', 'source', 'datasets', 'episodes', 'frames', 'hours', 'views', 'fps'): assert k in e, (k, e)
+        assert e.get('note') in (None, *j['notes']), e
+    out['pending'] = j['entries']; out['pending_notes'] = j['notes']
+    conv = {(r['embodiment'], r['source']) for r in out['datasets']}
+    pend = {(e['embodiment'], e['source']) for e in out['pending']}
+    t = out['totals']
+    t['embodiments_listed'] = len({r['embodiment'] for r in out['datasets']} | {e['embodiment'] for e in out['pending']})
+    t['sources'] = len(conv | pend)  # table rows of the paper: one per embodiment and source
+    t['pending'] = {'sources': len(out['pending']), 'datasets': sum(e['datasets'] for e in out['pending']),
+                    'episodes': sum(e['episodes'] for e in out['pending']), 'hours': round(sum(e['hours'] for e in out['pending']), 1)}
+    print(f"{len(out['pending'])} unconverted sources listed from {os.path.relpath(PENDING, REPO)}; "
+          f"{t['sources']} sources / {t['embodiments_listed']} embodiment groups in all", file=sys.stderr)
     return out
 
 
@@ -224,6 +282,7 @@ def sources_pass(out):
     if hits: sys.exit(f'anonymisation failed in {SOURCES}, still present: {hits}')
     j = json.loads(text); src = j['sources']; proj = j.get('projects', {}); ds = j.get('datasets', {})
     used = collections.Counter(ds.get(r['id'], proj.get(r['project'], r['source'])) for r in out['datasets'])
+    for e in out.get('pending', []): used[e.get('entry') or e['source']] += 1
     missing = sorted(k for k in used if k not in src)
     if missing: print(f'warning: {len(missing)} sources without an entry in data/sources.json: {missing}', file=sys.stderr)
     unused = sorted(k for k in src if k not in used)
@@ -279,7 +338,7 @@ def main():
     if a.scrub_only or a.attach_samples_only:
         out = json.load(open(a.out))
         if a.attach_samples_only: out = attach_samples(out, SAMPLES)
-        out = sources_pass(anonymise(merge_projects(out)))
+        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     inv = json.load(open(INVENTORY))
@@ -395,7 +454,7 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = sources_pass(anonymise(merge_projects(attach_samples(out, SAMPLES))))
+    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(out, SAMPLES))))))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)
