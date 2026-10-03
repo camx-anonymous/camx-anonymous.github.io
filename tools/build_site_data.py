@@ -46,7 +46,8 @@ FORBIDDEN = re.compile(_sc.get('forbidden') or r'(?!x)x', re.I)
 
 # Label fixes applied to every string (before the anonymisation pass): upstream metadata (inventory, info.json
 # robot_type, stats platforms) still carries these spellings, so a rebuild must not bring them back.
-LABEL_FIXES = [(r'RB-Y1m', 'RB-Y1'), (r'GenRobot DAS handheld gripper \(bimanual\)', 'GenRobot (bimanual)')]
+LABEL_FIXES = [(r'RB-Y1m', 'RB-Y1'), (r'GenRobot DAS handheld gripper \(bimanual\)', 'GenRobot (bimanual)'),
+               (r'real\.stanford\.edu/dexumi, ', '')]   # a lab domain in DexUMI's source_dataset: no institution names on the site
 
 
 def scrub_text(s):
@@ -585,6 +586,10 @@ def leaf_row(root, p, inv_rows):
     # samples-first conversion (2026-10-03): the converter kept one episode per dataset and stamped the rest as pending;
     # the row carries that episode's counts and `partial`, the record says so, the paper's counts stay in data/pending.json
     partial = d.get('camx_partial_export')
+    # ... with `source_totals: {episodes, frames}` (read from the raw release, no transcode) the row shows the dataset's
+    # true size, the site being a browser of samples: episode 0 is what it serves either way (user, 2026-10-03)
+    tot = (partial or {}).get('source_totals') or {}
+    if tot.get('episodes') and tot.get('frames'): eps, frames = int(tot['episodes']), int(tot['frames'])
     return {**({'partial': partial} if partial else {}),
         'id': rel, 'family': family, 'project': pk, 'name': '/'.join(rel.split('/')[2:]),
         'embodiment': emb, 'source': src, 'robot_type': rt, 'setup': setup, 'form': ff, 'morph': morph_of(ff),

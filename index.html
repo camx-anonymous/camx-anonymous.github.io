@@ -10,17 +10,18 @@
 /* ---------- hero ---------- */
 .hero{padding-top:64px;padding-bottom:20px}
 .hero h1{font-size:clamp(30px,4.2vw,52px);line-height:1.05;letter-spacing:-.03em;font-weight:500;margin:0;text-wrap:balance}
-.stats{display:grid;grid-template-columns:repeat(6,auto);justify-content:space-between;gap:10px 20px;margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(7,auto);align-items:baseline;justify-content:space-between;gap:10px 20px;margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}
 .stats>div{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
 .stats .v{font-size:24px;font-weight:500;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
 .stats .k{font-size:15px;color:var(--ink3)}
-@media (max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stats .rl{font-size:15px;font-weight:500;color:var(--ink2,var(--ink3))}
+@media (max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.stats .rl{grid-column:1/-1}.stats .rl~.rl{margin-top:8px}}
 /* the rollouts link stays in the upper right corner while the page scrolls (this page has no top bar), its right
    edge on the right edge of the .wrap content column; it sits under the drawer and its scrim. On a phone it is
    smaller and the hero starts below it. */
 .button.pin{position:fixed;top:16px;right:max(var(--pad-x),calc((100% - var(--w-wide))/2 + var(--pad-x)));z-index:20;box-shadow:var(--shadow-md);font-size:18px;padding:16px 26px;gap:10px;border-radius:8px}
 .button.pin svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k{font-size:13px}.button.pin{top:10px;font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
+@media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k,.stats .rl{font-size:13px}.button.pin{top:10px;font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
 
 /* ---------- browse ---------- */
 #browse{padding-top:20px;padding-bottom:96px}
@@ -226,7 +227,6 @@ footer{margin:0}
 .cmp .hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0 0 10px}
 .cmp .hd b{font:500 14px/1.4 var(--sans)}
 .cmp .hd span{font:400 12px/1.5 var(--mono);color:var(--ink3);overflow-wrap:anywhere}
-.cmp .views{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
 .cmp .panes{display:grid;gap:12px}
 .cmp .panes.side{grid-template-columns:1fr 1fr;align-items:end}
 .cmp figure{margin:0;min-width:0}
@@ -234,7 +234,8 @@ footer{margin:0}
 .cmp figcaption .note{font:400 12px/1.5 var(--sans);text-transform:none;letter-spacing:0}
 /* one window per clip; the video is wider than its window when a single camera view is picked (the strip is cropped to that tile) */
 .cmp .win{position:relative;overflow:hidden;border-radius:8px;background:#000;cursor:pointer;margin:0 auto}
-.cmp .win video{position:absolute;top:0;height:100%;max-width:none;display:block}
+.cmp .win video{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
+.cmp .win .vtag{position:absolute;top:0;margin:8px;padding:1px 7px;border-radius:5px;background:rgba(0,0,0,.55);color:#fff;font:500 11px/1.7 var(--mono);pointer-events:none}
 .cmp .win .err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
 .cmp .ctl{display:flex;align-items:center;gap:12px;margin-top:12px}
 .cmp .ctl button{width:36px;height:32px;padding:0;justify-content:center;flex:none}
@@ -244,14 +245,14 @@ footer{margin:0}
 .cmp .cap .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 0 4px}
 .cmp .cap .row .k{font:500 11px/1.7 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-right:auto}
 .cmp .cap p{margin:0;font:400 14px/1.5 var(--sans);color:var(--ink);text-wrap:pretty;overflow-wrap:anywhere}
-/* the original / augmented switch of a caption with alternate wordings (capBox; the clip viewer and the Caption row of
-   the dataset record): two chips and, on the augmented side, a stepper through the alternates */
-.capalt{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
-.capalt .stp{display:inline-flex;align-items:center;gap:2px;font:400 12px/1 var(--mono);color:var(--ink3);font-variant-numeric:tabular-nums}
+/* the wordings of a caption with augmented alternates (capBox; the clip viewer and the Caption row of the dataset
+   record): the "augmented" label and a stepper through all the wordings */
+.capalt{display:inline-flex;align-items:center;gap:6px;font:400 12px/1 var(--mono);color:var(--ink3);font-variant-numeric:tabular-nums}
+.capalt .stp{display:inline-flex;align-items:center;gap:2px}
 .capalt .stp button{width:24px;height:22px;padding:0 0 2px;justify-content:center;font-size:16px;line-height:1;border-color:transparent;color:var(--ink2)}
 .capalt .stp button:hover{background:var(--chipbg);color:var(--ink)}
-.capalt[hidden],.capalt .stp[hidden]{display:none!important}
-/* the Caption row of the record: the dataset's instruction, the switch under it, then the count of its other instructions */
+.capalt[hidden]{display:none!important}
+/* the Caption row of the record: the dataset's instruction, the augmented stepper under it, then the count of its other instructions */
 .drawer dd.capr p{margin:0;color:var(--ink)}
 .drawer dd.capr .capalt{display:flex;margin-top:6px}
 .drawer dd.capr .more{display:block;margin-top:4px}
@@ -375,8 +376,11 @@ function agg(rows){return rows.reduce((a,r)=>{a.n++;a.ep+=r.episodes||0;a.h+=r.h
 // the header and the footer quote the paper: the totals of its two appendix source tables (totals.paper, kept in data/pending.json).
 // The site's own sums can differ from them, so they are only the fallback: converted datasets plus the listed sources (totals.pending)
 const tot=k=>{const t=D.totals;return (t.paper||{})[k]??(k==='sources'?t.sources:k==='embodiments'?t.embodiments_listed||t.embodiments:t[k]+((t.pending||{})[k]||0))};
-function stats(){$('stats').innerHTML=[[fmt(tot('episodes')),'episodes'],[fmtH(tot('hours'))+' h','of video'],[tot('datasets').toLocaleString(),'datasets'],[tot('sources')||'–','sources'],[tot('embodiments'),'robot platforms'],[MORPHS.length,'morphologies']]
-  .map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')}
+// two rows: the full dataset (the paper's totals, tot) and the one-episode samples published on this site (summed over the rows with a sample)
+function stats(){const sm=sampled(L),uniq=k=>new Set(sm.map(r=>r[k])).size;
+  const rows=[['Full dataset',[[fmt(tot('episodes')),'episodes'],[fmtH(tot('hours'))+' h','of video'],[tot('datasets').toLocaleString(),'datasets'],[tot('sources')||'–','sources'],[tot('embodiments'),'robot platforms'],[MORPHS.length,'morphologies']]],
+    ['Sample dataset',[[fmt(sm.length),'episodes'],[fmtH(sm.reduce((a,r)=>a+r.sample.seconds,0)/3600)+' h','of video'],[sm.length.toLocaleString(),'datasets'],[uniq('source'),'sources'],[uniq('embodiment'),'robot platforms'],[uniq('morph'),'morphologies']]]];
+  $('stats').innerHTML=rows.map(([l,c])=>`<div class="rl">${l}</div>`+c.map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')).join('')}
 
 /* ---------- browse: tree, cards ---------- */
 /* every tree row is a filter button plus a tick box that selects the whole group for download;
@@ -562,25 +566,27 @@ function dl(name,text,type){const a=document.createElement('a');a.href=URL.creat
 
 /* ---------- dataset drawer ---------- */
 /* example clip viewer: the raw video next to the gripper overlay, frame for frame. Both clips are strips of the same
-   camera views (equal heights, left to right in o.views). "all views" shows the strips one above the other; picking a
-   view crops both to that tile and shows them side by side. */
+   camera views (equal heights, left to right in o.views), shown whole: one above the other, or side by side when the
+   strip is narrow, each tile tagged with the short name of its view. */
 let CMP=null;
 const wide=matchMedia('(min-width:1100px)');
 function tilesOf(o){const row=L.find(x=>x.id===o.dataset);const ar=o.views.map(v=>{const c=row&&row.cams.find(c=>c.name===v);return c?c.w/c.h:4/3});
-  const A=ar.reduce((a,b)=>a+b,0);let x=0;return {A,T:ar.map(a=>{const t={x:x/A,w:a/A,ar:a};x+=a;return t})}}
+  const A=ar.reduce((a,b)=>a+b,0);let x=0;return {A,X:ar.map(a=>{const l=x/A;x+=a;return l})}}
+// the short name of a camera view, drawn on its tile: right_main_camera_rgb -> right, third_0_main_camera_rgb -> third 0
+const viewTag=v=>v.replace(/_rgb$/,'').replace(/_main_camera|_camera/,'').replace(/_/g,' ');
 function closeCmp(){if(!CMP)return;CMP.querySelectorAll('video').forEach(v=>{v.pause();v.removeAttribute('src');v.load()});CMP.remove();CMP=null;$('stage').classList.remove('show')}
 function placeCmp(){if(!CMP)return;const st=$('stage'),dl=$('drawerBody').querySelector('dl');
   if(wide.matches){st.appendChild(CMP);st.classList.add('show')}else{st.classList.remove('show');if(dl)dl.before(CMP)}}
 wide.addEventListener('change',placeCmp);
-function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,T}=tilesOf(o),f=clipName(o);
+function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesOf(o),f=clipName(o);
   const el=CMP=document.createElement('div');el.className='cmp';
-  const pane=(cap,src)=>`<figure><figcaption>${cap}</figcaption><div class="win"><video src="${esc(src)}" muted loop playsinline preload="auto"></video></div></figure>`;
+  const tags=o.views.map((v,i)=>`<span class="vtag" style="left:${(100*X[i]).toFixed(3)}%">${esc(viewTag(v))}</span>`).join('');
+  const pane=(cap,src)=>`<figure><figcaption>${cap}</figcaption><div class="win"><video src="${esc(src)}" muted loop playsinline preload="auto"></video>${tags}</div></figure>`;
   // the clip's captions over time, [[start second, caption], ...]: a track for an episode annotated per sub-task whose
   // caption changes while the clip plays (o.captions, tools/build_site_data.py), else the one caption of the clip
   const caps=o.captions||(o.task?[[0,o.task]]:[]);
   el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}</span></div>
-    ${o.views.length>1?`<div class="views" role="group" aria-label="Camera view">${['all views',...o.views.map(v=>v.replace(/_rgb$/,''))].map((v,i)=>`<button type="button" class="chip btn" data-v="${i-1}">${esc(v)}</button>`).join('')}</div>`:''}
-    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane(o.mode==='primitive'?'Gripper stand-in overlay <span class="note">(No gripper CAD available. Only showing gripper tip.)</span>':'Gripper CAD overlay',D.overlay_base+f+'.mp4')}</div>
+    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane(o.mode==='primitive'?'Gripper stand-in overlay <span class="note">(No gripper CAD available. Only showing gripper tip.)</span>':o.standin?`Gripper CAD overlay <span class="note">(No gripper CAD published for this rig: the stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper stands in.)</span>`:'Gripper CAD overlay',D.overlay_base+f+'.mp4')}</div>
     ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
     <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
   const [a,b]=el.querySelectorAll('video'),pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
@@ -600,30 +606,24 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,T}=tilesO
   el.querySelectorAll('.win').forEach(w=>{w.onclick=toggle;
     w.firstChild.addEventListener('error',()=>w.insertAdjacentHTML('beforeend','<div class="err">Clip failed to load.</div>'))});
   // the window takes the aspect of what is shown; its height is capped so both windows, the caption and the controls fit the stage
-  const show=i=>{const t=i<0?{x:0,w:1,ar:A}:T[i],side=t.ar<1.9;el.querySelector('.panes').classList.toggle('side',side);
-    el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=t.ar;w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(t.ar/(side?1:2)).toFixed(4)}))`;
-      w.firstChild.style.width=100/t.w+'%';w.firstChild.style.left=-100*t.x/t.w+'%'});
-    el.querySelectorAll('.views button').forEach(k=>{const on=+k.dataset.v===i;k.classList.toggle('on',on);k.setAttribute('aria-pressed',on)})};
-  el.querySelectorAll('.views button').forEach(k=>k.onclick=()=>show(+k.dataset.v));
-  show(-1);placeCmp();
+  const side=A<1.9;el.querySelector('.panes').classList.toggle('side',side);
+  el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=A;w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(A/(side?1:2)).toFixed(4)}))`});
+  placeCmp();
   // start both together once each has a frame; if one fails to load, the other still plays
   let n=0;const go=()=>{if(++n===2&&CMP===el)toggle()};
   [a,b].forEach(v=>{if(v.readyState>=2)go();else{v.addEventListener('loadeddata',go,{once:true});v.addEventListener('error',go,{once:true})}})}
 
-/* a caption and its alternate wordings (the datasets' '||'-joined language annotations): the text and, when there is
-   more than one wording, an original / augmented switch whose augmented side steps through the alternates. The host
-   holds one <p> and one .capalt (CAPALT); set(text) shows a caption. Used by the clip viewer and the dataset record. */
-const CAPALT='<span class="capalt" role="group" aria-label="Caption wording" hidden><button type="button" class="chip btn" data-aug="0">original</button><button type="button" class="chip btn" data-aug="1">augmented</button><span class="stp"><button type="button" aria-label="Previous wording">‹</button><span></span><button type="button" aria-label="Next wording">›</button></span></span>';
-function capBox(host){const alt=host.querySelector('.capalt'),p=host.querySelector('p'),st=alt.querySelector('.stp');let w=[],aug=0,ai=0;
-  const draw=()=>{const alts=w.slice(1),on=aug&&alts.length>0;alt.hidden=!alts.length;p.textContent=on?alts[ai]:w[0]||'';
-    alt.querySelectorAll('[data-aug]').forEach(k=>{const s=+k.dataset.aug===(on?1:0);k.classList.toggle('on',s);k.setAttribute('aria-pressed',s)});
-    st.hidden=!on;if(on)st.children[1].textContent=`${ai+1} / ${alts.length}`};
-  alt.querySelectorAll('[data-aug]').forEach(k=>k.onclick=()=>{aug=+k.dataset.aug;ai=0;draw()});
-  const step=d=>{const n=w.length-1;ai=(ai+n+d)%n;draw()};st.children[0].onclick=()=>step(-1);st.children[2].onclick=()=>step(1);
-  return {set(text){w=String(text??'').split('||').map(s=>s.trim()).filter((s,k,a)=>s&&a.indexOf(s)===k);ai=0;draw()}}}
+/* a caption and its wordings (the datasets' '||'-joined language annotations, the augmented captions): the text and,
+   when there is more than one wording, an "augmented ‹ 1 / n ›" stepper through all of them. The host holds one <p>
+   and one .capalt (CAPALT); set(text) shows a caption. Used by the clip viewer and the dataset record. */
+const CAPALT='<span class="capalt" role="group" aria-label="Caption wordings" hidden><span>augmented</span><span class="stp"><button type="button" aria-label="Previous wording">‹</button><span></span><button type="button" aria-label="Next wording">›</button></span></span>';
+function capBox(host){const alt=host.querySelector('.capalt'),p=host.querySelector('p'),st=alt.querySelector('.stp');let w=[],i=0;
+  const draw=()=>{alt.hidden=w.length<2;p.textContent=w[i]||'';st.children[1].textContent=`${i+1} / ${w.length}`};
+  const step=d=>{i=(i+w.length+d)%w.length;draw()};st.children[0].onclick=()=>step(-1);st.children[2].onclick=()=>step(1);
+  return {set(text){w=String(text??'').split('||').map(s=>s.trim()).filter((s,k,a)=>s&&a.indexOf(s)===k);i=0;draw()}}}
 /* data/captions.json (tools/build_site_data.py): the language annotations of every dataset, {n: instructions in the
    dataset, tasks: [the first few, wordings '||'-joined], name?: the task group heading its sub-task labels (AgiBot)};
-   fetched when the first record opens. The Caption row shows the first instruction (or the group) with its switch,
+   fetched when the first record opens. The Caption row shows the first instruction (or the group) with its augmented stepper,
    then the count of the others with the next few as examples. */
 let CAPS=null,capsLoad=null;
 const loadCaps=()=>capsLoad||(capsLoad=fetch('data/captions.json').then(r=>r.ok?r.json():{}).catch(()=>({})).then(j=>CAPS=j));
@@ -646,7 +646,7 @@ function mixRow(m){const st=m.kind==='steps',tot=m.skills.reduce((s,[,n])=>s+n,0
 
 function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
-  const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))+(r.partial?' <span class="dim">sample conversion; the full dataset is still being converted</span>':'')],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
+  const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))+(r.partial?' <span class="dim">'+(r.partial.source_totals?'in the source release; episode 0 is converted here as the sample':'sample conversion; the full dataset is still being converted')+'</span>':'')],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
     p.overlays.length?['Example clips',`<a href="overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`]:null,

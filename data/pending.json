@@ -18,18 +18,6 @@
  "entries": [
   {
    "morph": "Handheld, robot-free",
-   "embodiment": "iPhUMI",
-   "source": "MuSe",
-   "datasets": 3,
-   "episodes": 159,
-   "frames": 76508,
-   "hours": 0.4,
-   "views": "2",
-   "fps": "60",
-   "note": "A"
-  },
-  {
-   "morph": "Handheld, robot-free",
    "embodiment": "Other research projects",
    "source": "LEGATO",
    "datasets": 3,
@@ -54,18 +42,6 @@
   },
   {
    "morph": "Handheld, robot-free",
-   "embodiment": "Other research projects",
-   "source": "TAMEn",
-   "datasets": 4,
-   "episodes": 652,
-   "frames": 192340,
-   "hours": 1.8,
-   "views": "2",
-   "fps": "30",
-   "note": "A"
-  },
-  {
-   "morph": "Handheld, robot-free",
    "embodiment": "DataClaw",
    "source": "DM-DataClaw",
    "datasets": 580,
@@ -80,18 +56,6 @@
   {
    "morph": "Handheld, robot-free",
    "embodiment": "Dexterous hands",
-   "source": "DexUMI",
-   "datasets": 16,
-   "episodes": 1846,
-   "frames": 490796,
-   "hours": 3.9,
-   "views": "1",
-   "fps": "30 / 45",
-   "note": "D"
-  },
-  {
-   "morph": "Handheld, robot-free",
-   "embodiment": "Dexterous hands",
    "source": "DexWild",
    "datasets": 10,
    "episodes": 9505,
@@ -100,32 +64,6 @@
    "views": "3–5",
    "fps": "30",
    "note": "D"
-  },
-  {
-   "morph": "Single-arm robot",
-   "embodiment": "Franka",
-   "source": "MolmoAct (Franka)",
-   "datasets": 2,
-   "episodes": 7902,
-   "frames": 1110869,
-   "hours": 30.9,
-   "views": "3",
-   "fps": "10",
-   "note": "A",
-   "remark": "one episode of every task is converted and browsable as a sample; the full conversion is in progress"
-  },
-  {
-   "morph": "Single-arm robot",
-   "embodiment": "WidowX 250S",
-   "source": "Bridge V2",
-   "datasets": 1,
-   "episodes": 25965,
-   "frames": 927598,
-   "hours": 51.5,
-   "views": "4",
-   "fps": "5",
-   "note": "A",
-   "remark": "the wrist-carrying half of the release (about 51.5% of its 50,418 episodes)"
   },
   {
    "morph": "Bimanual robot",
@@ -139,18 +77,6 @@
    "fps": "10–50",
    "note": "A",
    "remark": "the remaining 19 of the 27 community uploads; 8 are converted and browsable"
-  },
-  {
-   "morph": "Bimanual robot",
-   "embodiment": "AIRBOT MMK2 + XHAND",
-   "source": "Dexora",
-   "datasets": 142,
-   "episodes": 12200,
-   "frames": 2920000,
-   "hours": 40.5,
-   "views": "4",
-   "fps": "20",
-   "note": "D"
   }
  ]
 }

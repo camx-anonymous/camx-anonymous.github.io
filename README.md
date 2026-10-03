@@ -35,15 +35,20 @@ This repository is anonymized for review.
   it (above it on a phone), a comparison viewer that plays the raw clip next to the overlay clip in step; picking one
   camera view crops both clips to that tile and shows them side by side. Under the clips the viewer shows the caption
   of the frame on screen: each clip's `task` in `data/datasets.json`, or, for an episode annotated per sub-task whose
-  caption changes while the clip plays, its `captions` track (`[[start second, caption], ...]`, read from the
-  dataset's per-frame `task_index` by the build). A caption with alternate wordings (the datasets' `||`-joined
-  language annotations, 2-20 per task) gets an original / augmented switch that steps through the alternates.
+  caption changes while the clip plays, its `captions` track (`[[start second, caption], ...]`). The build reads both
+  from the dataset's current data (the episode's per-frame `task_index` through `meta/tasks.parquet`), the same
+  source as the record's Caption row, so the viewer, the overlays page and the record always agree; the render
+  tree's `meta.json` task string is a snapshot from render time (it goes stale when an annotation bank is
+  re-expanded) and only stands in when the dataset cannot be read. A caption with alternate wordings (the datasets'
+  `||`-joined language annotations, 2-25 per task) gets an "augmented ‹ 1 / n ›" stepper through all its wordings.
 - `data/captions.json` — the language annotations of every dataset for the Caption row of its record, keyed by row
   id: `{n: instructions in meta/tasks.parquet, tasks: [the first 3 by task_index, wordings '||'-joined], name?: the
   task group of info.json task_name (AgiBot), shown as the headline over its sub-task labels}`. The row shows the
-  first instruction (or the group) with the same original / augmented switch, then the count of the others with the
+  first instruction (or the group) with the same augmented stepper, then the count of the others with the
   next ones as examples. Its own file, fetched when the first record opens: the task strings of all datasets run to
-  13 MB (DROID lists every episode's instruction), so only the first three per dataset are kept.
+  13 MB (DROID lists every episode's instruction), so only the first three per dataset are kept. The build merges
+  into the existing file: a row whose dataset is not under `--root` keeps its entry (so an incremental build against
+  a partial tree drops nothing), ids no longer in `datasets.json` go.
 - Task mix — most datasets are one task each, but the DROID lab splits, BiPlay, RoboCOIN and FMB hold several tasks
   (one caption per episode, differing between episodes), and AgiBot World, Galaxea and MolmoAct hold one task annotated
   per sub-task (several captions per episode). The build's `--tasks-only` pass reads every episode's `tasks` list from
@@ -103,7 +108,8 @@ mp4 and the site poster. Point `CAMX_OVERLAYS_EXTRA` at that directory when buil
 camx_480p tree, the curation tree and the camera-cross-embodiment checkout (`plan` prints each clip's route: `reuse`
 a current headless-Rerun export of the curation tree, `rerun` headless Rerun through `lerobot_rerun_viz.py` +
 `mv_site/record_views.py`, `fisheye` the OpenCV renderer through `tools/white_overlay.py`, `keep` untouched: pinhole
-rigs without a gripper CAD, rigs whose lens file or viz config is not in the checkout). `render` writes the clip tree
+rigs without a gripper CAD, rigs whose lens file, viz config or URDF meshes are not in the checkout, and the OpenNeoData
+ARX X5 / UMI rigs, whose stock-CAD stand-in does not land on the fingers, and the 180p DROID twin, where the headless viewer draws nothing; `KEEP` in the script lists them). `render` writes the clip tree
 (`<key>/<slug>/{stitched.mp4,meta.json,DONE.json,poster.jpg}`, 2 Rerun + 3 fisheye clips in parallel, pausing while
 the user slice's memory pressure is high), `encode` the 360p site mp4 + poster, `attach` the clip records
 (views, grippers, mode, seconds, bytes, caption track):

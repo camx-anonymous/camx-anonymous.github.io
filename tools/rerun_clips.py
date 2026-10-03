@@ -50,12 +50,18 @@ EXTRA_CONFIG = {'franka_hand/fmb': 'config/fmb.json', 'franka_hand/rh20t_cfg5': 
                 'aloha/openneo_aloha': os.path.join(HERE, 'configs', 'openneo_aloha_fx306.json'), 'aloha/openneo_arx5': 'config/openneo.json',
                 'aloha/openneo_arx5_single': 'config/openneo_single.json', 'umi/openneo_umi': 'config/openneo_umi.json',
                 'umi/openneo_umi_single': 'config/openneo_umi_single.json'}
+# the dataset names another gripper than the rig carries: drawn with this registry profile instead (AIST: ALOHA 1 arms, ALOHA-2-style fingers)
+MODEL_OVERRIDE = {'aloha/aist_bimanip': 'aloha2'}
 STANDIN = {'aloha/openneo_aloha': 'piper', 'aloha/openneo_arx5': 'arx x5', 'aloha/openneo_arx5_single': 'arx x5',
-           'umi/openneo_umi': 'umi', 'umi/openneo_umi_single': 'umi'}
+           'umi/openneo_umi': 'umi', 'umi/openneo_umi_single': 'umi'}   # the ARX X5 / UMI ones are in KEEP, see there
 # fisheye route: arguments of render_bimanual_urdf_overlay_video.py (tiles: right main | left main)
 GOPRO = dict(profile='umi', calib='gopro_hero9_maxlens_2_7k_umi.json', fit='crop')   # GoPro Hero 9/10 + Max Lens Mod, centre crop
 FISHEYE = {p: GOPRO for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm', 'umi/data_scaling_laws', 'umi/exumi', 'umi/humi',
                                'umi/maniwav', 'umi/mvumi', 'umi/touch_in_the_wild', 'umi/umi', 'umi/umi_on_legs', 'umi/vitamin', 'umi/vitamin_b')}
+FISHEYE['umi/exumi'] = dict(GOPRO, profile='exumi')   # grippers/exumi: the exUMI 9DTact fingertips fitted to the wrist frames (2026-10-03)
+# grippers/vitamin_b: DuoTact fingers fitted to the wrist frames; the release's GoPro lens through the 2028-square crop -> 224 (crop chain assumed);
+# theta-max = the circular image mask, so the other hand is not drawn into the black surround
+FISHEYE['umi/vitamin_b'] = dict(profile='vitamin_b', calib='vitamin_b_gopro_webcam_224.json', fit='crop', extra=['--theta-max-deg', '55'])
 FISHEYE['genrobot/10kh'] = dict(profile='genrobot', fit='stretch', calib_episode='genrobot_episodes/{ds}_ep{ep}_{side}.json',   # per-episode MCAP camera_info
                                 extra=['--cross', 'on', '--own-exclude-visuals', 'base_link,link_imu,link_ca1,link_ca2,link_ca3',
                                        '--anchor-delta-xyz=0.0067,-0.0204,0.0142', '--anchor-delta-rpy=0,0,0.042', '--width-scale', '0.94'])
@@ -64,11 +70,24 @@ FISHEYE['daimon/dataclaw'] = dict(profile='dataclaw', fit='stretch', calib_devic
 FISHEYE['umi/umi_benchmark'] = dict(profile='umi_benchmark', calib='umi_benchmark_fastumi_pro_seucm.json', fit='crop', mode='primitive')
 # left as they are: pinhole rigs without a gripper CAD (the Rerun viewer draws URDFs only), and rigs whose lens file or viz config
 # is not in this checkout (umi3d / aetherock lens files, robomind_ur5 config, the gripper_v4 DAS lens, hifi_umi's attached cameras)
-KEEP = {'dahuan/rh20t_cfg1', 'dahuan/rh20t_cfg2', 'wsg50/rh20t_cfg3', 'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
-        'umi/umi3d', 'umi/aetherock', 'hifi_umi/hifi_umi', 'genrobot/gripper_v4'}
+# multiview route: rigs the headless Rerun viewer cannot do, drawn by render_multiview_overlay_video.py (or, for GenRobot V4, the
+# bimanual fisheye tool) through tools/white_multiview.py / white_overlay.py with the arguments of tools/overlay_picks.py (SPECS and
+# its explicit picks): pinhole rigs without a gripper CAD (primitive stand-in: RH20T cfg1-3, the OpenNeoData Flexiv / UR / ARX X5 /
+# UMI rigs, whose stock-CAD stand-in does not land on the fingers), fisheye rigs with their own lens file (UMI-3D, AetheRock,
+# HiFi-UMI, GenRobot V4), RoboMIND UR5 (no-mimic Robotiq URDF) and the 180p DROID twin (the viewer draws nothing at 320x180).
+# Their renderer, configs and lens files are on camera-cross-embodiment origin/main: CAMX_VIZ_MV names that checkout's visualization dir.
+MULTIVIEW = {'dahuan/rh20t_cfg1', 'dahuan/rh20t_cfg2', 'wsg50/rh20t_cfg3', 'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
+             'umi/umi3d', 'umi/aetherock', 'hifi_umi/hifi_umi', 'genrobot/gripper_v4', 'aloha/openneo_arx5', 'aloha/openneo_arx5_single',
+             'umi/openneo_umi', 'umi/openneo_umi_single', 'robotiq/droid_lowres'}
+VIZ_MV = os.path.expanduser(os.environ.get('CAMX_VIZ_MV', '/data/camx/visualization'))
+KEEP = set()
 
 
 def log(msg): print(f'{datetime.datetime.now():%H:%M:%S} {msg}', flush=True)
+def is_done(d):
+    """finish() ran: DONE.json AND a meta.json with the tool (record_views.py writes a DONE.json of its own after the per-view mp4s)."""
+    try: return os.path.isfile(os.path.join(d, 'DONE.json')) and 'tool' in json.load(open(os.path.join(d, 'meta.json')))
+    except (OSError, ValueError): return False
 def proj_of(o): return '/'.join(o['dataset'].split('/')[:2])
 def feat(name): return name.split('observation.image.', 1)[1] if name.startswith('observation.image.') else name
 def info_of(rel): return json.load(open(os.path.join(ROOT, rel, 'meta', 'info.json')))
@@ -122,6 +141,7 @@ def finish(d, meta, views, mode, tool, t0):
 def route_of(o):
     proj = proj_of(o)
     if proj in FISHEYE: return 'fisheye', None
+    if proj in MULTIVIEW: return 'multiview', None
     if proj in KEEP: return 'keep', None
     cd = os.path.join(CUR, o['key'], o['slug'])
     if os.path.isfile(os.path.join(cd, 'DONE.json')):
@@ -160,6 +180,12 @@ def rerun_one(o, cfg, d, slot, t0):
     proj, rel, ep = proj_of(o), o['dataset'], int(o['episode']); root = Path(ROOT) / rel
     as_py = lambda v: v.as_py() if hasattr(v, 'as_py') else v  # noqa: E731
     row = next(r for r in B.episodes_table(root) if int(as_py(r['episode_index'])) == ep)
+    # the clip's own copy of the viz config, without the camera streams this dataset lacks (rh20t.json lists every camera of
+    # the RH20T rigs as a fallback, droid.json both ZED eyes): the viz exits on a video_key missing from the features
+    cfg_src = cfg; c = json.load(open(cfg)); feats = info_of(rel)['features']
+    c['videos'] = [v for v in c.get('videos', []) if v.get('video_key') in feats]
+    if not c['videos']: raise SystemExit(f'{cfg_src}: none of its camera streams is in {rel}')
+    cfg = os.path.join(d, 'viz_config.json'); json.dump(c, open(cfg, 'w'), indent=1)
     info, vids, grip = B.resolve_videos(root, Path(cfg), ep); fps = float(info['fps'])
     step = max(1, int(round(fps / OUT_FPS))); start = int(as_py(row['dataset_from_index'])); n_cap = min(int(as_py(row['length'])), int(MAX_SEC * fps))
     frames = list(range(start, start + n_cap, step))
@@ -174,6 +200,11 @@ def rerun_one(o, cfg, d, slot, t0):
         for side in grip:
             extra += ['--gripper-profile-override', f'{side}={STANDIN[proj]}']
             grip[side] = dict(grip[side], profile=prof.name, urdf=str(prof.urdf_path(side)), urdf_present=prof.urdf_path(side).is_file(), standin=True)
+    if proj in MODEL_OVERRIDE:
+        prof = gripper_registry.lookup(MODEL_OVERRIDE[proj])
+        for side in grip:
+            extra += ['--gripper-profile-override', f'{side}={MODEL_OVERRIDE[proj]}']
+            grip[side] = dict(grip[side], profile=prof.name, urdf=str(prof.urdf_path(side)), urdf_present=prof.urdf_path(side).is_file())
     for f in Path(d).glob('*.mp4'): f.unlink()   # record_views keeps a view whose mp4 exists
     rrd = Path(d) / 'episode.rrd'
     with open(os.path.join(d, '_render.log'), 'w') as lg:
@@ -188,7 +219,7 @@ def rerun_one(o, cfg, d, slot, t0):
     rrd.unlink(missing_ok=True)
     stitch([(n, os.path.join(d, n + '.mp4')) for n in names], os.path.join(d, 'stitched.mp4'))
     tasks = as_py(row['tasks']); tasks = tasks if isinstance(tasks, list) else [tasks]
-    meta = {'dataset': rel, 'robot_type': info.get('robot_type'), 'fps': fps, 'config': cfg, 'episode_index': ep, 'length': int(as_py(row['length'])), 'step': step,
+    meta = {'dataset': rel, 'robot_type': info.get('robot_type'), 'fps': fps, 'config': cfg_src, 'episode_index': ep, 'length': int(as_py(row['length'])), 'step': step,
             'tasks': json.dumps(tasks), 'grippers': grip, 'slug': o['slug'], 'project': proj, 'fisheye': False, 'args': extra,
             'source_export_id': (info.get('camx_export') or {}).get('export_id'), 'source_success_mtime': stamp(rel), 'source_realpath': str(root.resolve())}
     return finish(d, meta, views, 'urdf', 'rerun', t0)
@@ -228,6 +259,27 @@ def fisheye_one(o, d, t0):
 
 
 # ── commands ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+_OP_LOCK = __import__('threading').Lock()
+def multiview_one(o, d, t0):
+    sys.path.insert(0, HERE); import overlay_picks as OP
+    OP.ROOT, OP.VIZ = ROOT, VIZ_MV
+    proj = proj_of(o); ds = o['dataset'].split('/', 2)[2]; ep = int(o['episode'])
+    spec = next((p[3] for p in OP.EXPLICIT_PICKS + OP.REPLACE_PICKS if p[:3] == (proj, ds, ep)), None) or OP.SPECS[proj]
+    spec = dict(spec, views=list(o['views'])) if spec['tool'] == OP.MULTIVIEW else dict(spec)
+    stride = max(1, round(float(info_of(o['dataset'])['fps']) / OUT_FPS))   # overlay_picks samples every 3rd frame whatever the rate
+    with _OP_LOCK: OP.STRIDE = stride; cmd = OP.render_cmd(proj, ds, ep, spec, OUT)
+    cmd[1] = os.path.join(HERE, 'white_multiview.py' if spec['tool'] == OP.MULTIVIEW else 'white_overlay.py')
+    while '--alpha' in cmd: i = cmd.index('--alpha'); del cmd[i:i + 2]
+    cmd += ['--alpha', '1.0']
+    with open(os.path.join(d, '_render.log'), 'w') as lg:
+        lg.write(' '.join(cmd) + '\n'); lg.flush()
+        subprocess.run(cmd, cwd=VIZ_MV, env=dict(os.environ, CAMX_VIZ=VIZ_MV), stdout=lg, stderr=subprocess.STDOUT, check=True)
+    with _OP_LOCK: OP.STRIDE = stride; OP.pack_one(proj, ds, ep, spec, OUT)
+    m = json.load(open(os.path.join(d, 'meta.json'))); m.update(source_success_mtime=stamp(o['dataset']), render_seconds=round(time.time() - t0))
+    json.dump(m, open(os.path.join(d, 'meta.json'), 'w'), indent=1)
+    return f"{len(m['views'])} view(s), {m['n_frames']} frames, {m['render_seconds']}s"
+
+
 def wait_pressure(limit=20.0):
     while True:
         try: some = float(open(PRESSURE).read().split('avg10=')[1].split()[0])
@@ -238,11 +290,11 @@ def wait_pressure(limit=20.0):
 
 def render(rows, a):
     slots = queue.Queue()
-    for i in range(a.jobs_rerun): slots.put(i)
+    for i in range(a.jobs_rerun): slots.put(i + a.slot_offset)
 
     def run(o, r, x):
         d = os.path.join(OUT, o['key'], o['slug']); name = f"{o['key']}/{o['slug']}"
-        if os.path.isfile(os.path.join(d, 'DONE.json')) and not a.force: return
+        if is_done(d) and not a.force: return
         os.makedirs(d, exist_ok=True)
         try: os.close(os.open(os.path.join(d, '_RENDERING'), os.O_CREAT | os.O_EXCL | os.O_WRONLY))   # another render process has it
         except FileExistsError: return
@@ -250,19 +302,21 @@ def render(rows, a):
         try:
             if r == 'reuse': msg = reuse_one(o, x, d, t0)
             elif r == 'fisheye': msg = fisheye_one(o, d, t0)
+            elif r == 'multiview': msg = multiview_one(o, d, t0)
             else:
                 slot = slots.get()
                 try: msg = rerun_one(o, x, d, slot, t0)
                 finally: slots.put(slot)
             log(f'{r:8s} {name}: {msg}')
-        except Exception as e:  # noqa: BLE001 -- one failed clip must not stop the batch; the log names it
+        except KeyboardInterrupt: raise
+        except BaseException as e:  # noqa: BLE001 -- one failed clip must not stop the batch; the log names it (the viz helpers raise SystemExit)
             log(f'{r:8s} {name}: FAILED {e!r}  (see {d}/_render.log)')
         finally: Path(d, '_RENDERING').unlink(missing_ok=True)
 
     todo = [(o, r, x) for o, r, x in rows if r != 'keep' and r in a.routes.split(',')]
     with ThreadPoolExecutor(a.jobs_rerun) as ex_r, ThreadPoolExecutor(a.jobs_fisheye) as ex_f:
-        for o, r, x in todo: (ex_f if r == 'fisheye' else ex_r).submit(run, o, r, x)
-    done = sum(os.path.isfile(os.path.join(OUT, o['key'], o['slug'], 'DONE.json')) for o, _, _ in todo)
+        for o, r, x in todo: (ex_f if r in ('fisheye', 'multiview') else ex_r).submit(run, o, r, x)
+    done = sum(is_done(os.path.join(OUT, o['key'], o['slug'])) for o, _, _ in todo)
     log(f'{done}/{len(todo)} clips in {OUT}')
 
 
@@ -270,8 +324,9 @@ def encode(rows):
     vdir, pdir = os.path.join(REPO, 'overlays', 'videos'), os.path.join(REPO, 'overlays', 'posters')
     for o, r, _ in rows:
         d = os.path.join(OUT, o['key'], o['slug']); name = f"{o['key']}__{o['slug']}"
-        if r == 'keep' or not os.path.isfile(os.path.join(d, 'DONE.json')): continue
-        mp4 = os.path.join(vdir, name + '.mp4')
+        if r == 'keep' or not is_done(d): continue
+        mp4 = os.path.join(vdir, name + '.mp4'); src = os.path.join(d, 'stitched.mp4')
+        if os.path.isfile(mp4) and os.path.getmtime(mp4) >= os.path.getmtime(src) and os.path.isfile(os.path.join(pdir, name + '.jpg')): continue
         subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', os.path.join(d, 'stitched.mp4'), '-vf', 'scale=-2:360', '-c:v', 'libx264',
                         '-preset', 'slow', '-crf', '28', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', mp4], check=True)
         _, _, rate, n = probe(mp4)
@@ -287,7 +342,7 @@ def attach():
     for p in site['projects']:
         for i, o in enumerate(p['overlays']):
             d = os.path.join(OUT, o['key'], o['slug'])
-            if not os.path.isfile(os.path.join(d, 'DONE.json')): continue
+            if proj_of(o) in KEEP or not is_done(d): continue
             m = json.load(open(os.path.join(d, 'meta.json'))); mp4 = os.path.join(REPO, 'overlays', 'videos', f"{o['key']}__{o['slug']}.mp4")
             grips = {s: {'model': g.get('model'), 'profile': g.get('profile'), 'urdf': bool(g.get('urdf_present'))} for s, g in (m.get('grippers') or {}).items() if g.get('model')}
             try: tasks = json.loads(m.get('tasks') or '[]')
@@ -298,9 +353,12 @@ def attach():
                    'seconds': round((m.get('n_frames') or 0) / (m.get('out_fps') or OUT_FPS), 1),
                    'bytes': os.path.getsize(mp4) if os.path.isfile(mp4) else os.path.getsize(os.path.join(d, 'stitched.mp4'))}
             if any(g.get('standin') for g in (m.get('grippers') or {}).values()): rec['standin'] = sorted({g['profile'] for g in m['grippers'].values() if g.get('standin')})
-            try: track = S.caption_track(ROOT, rec['dataset'], int(rec['episode']), rec['seconds'])
-            except (OSError, KeyError, ImportError) as e: track = o.get('captions'); print(f"warning: {rec['dataset']}: caption track kept ({e!r})", file=sys.stderr)
-            if track: rec['captions'] = track
+            # the captions from the dataset's current data, as build_site_data.captions_pass: meta.json's `tasks` is a snapshot
+            # from render time (stale once an annotation bank is re-expanded) and only stands in when the dataset cannot be read
+            try: track = S.clip_captions(ROOT, rec['dataset'], int(rec['episode']), rec['seconds'])
+            except (OSError, KeyError, ImportError) as e: track = o.get('captions'); print(f"warning: {rec['dataset']}: captions kept from the render tree ({e!r})", file=sys.stderr)
+            else: rec['task'] = track[0][1]
+            if track and len(track) > 1: rec['captions'] = track
             p['overlays'][i] = rec; n += 1
     json.dump(site, open(path, 'w'), separators=(',', ':'))
     log(f'{n} clip records rewritten in {path}')
@@ -313,7 +371,8 @@ def main():
     ap.add_argument('--force', action='store_true', help='render: redo clips that have a DONE.json')
     ap.add_argument('--jobs-rerun', type=int, default=2, help='headless Rerun clips in parallel (each: 1 viewer per view, lavapipe)')
     ap.add_argument('--jobs-fisheye', type=int, default=3, help='OpenCV fisheye renders in parallel')
-    ap.add_argument('--routes', default='reuse,rerun,fisheye', help='render: only clips of these routes')
+    ap.add_argument('--routes', default='reuse,rerun,fisheye,multiview', help='render: only clips of these routes')
+    ap.add_argument('--slot-offset', type=int, default=0, help='render: first Rerun slot (viewer ports 9700 + 40 * slot); a second render process needs its own')
     a = ap.parse_args()
     if a.cmd == 'attach': attach(); return
     site = json.load(open(os.path.join(REPO, 'data', 'datasets.json')))

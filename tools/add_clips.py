@@ -38,7 +38,9 @@ def main():
                 print(f'skip {slug}: {m["dataset"]} is not in {ROOT}', file=sys.stderr); continue
             key = m['project'].replace('/', '_'); d = os.path.join(OUT, key, slug); os.makedirs(d, exist_ok=True)
             rate, n = probe(os.path.join(s, 'stitched.mp4'))
-            m.setdefault('n_frames', n); m.setdefault('out_fps', round(rate, 3)); m.setdefault('overlay_mode', 'urdf'); m['slug'] = slug
+            m.setdefault('n_frames', n); m.setdefault('out_fps', round(rate, 3)); m['slug'] = slug
+            # no gripper CAD in the render (stand-in fingers): the site labels the clip as a stand-in overlay
+            m.setdefault('overlay_mode', 'urdf' if any(g.get('urdf_present') for g in (m.get('grippers') or {}).values()) else 'primitive')
             for k in ('config', 'source_realpath'): m.pop(k, None)          # local paths stay out of the tree the site reads
             for g in (m.get('grippers') or {}).values(): g.pop('urdf', None)
             for f in ('stitched.mp4', 'DONE.json', 'poster.jpg'):
