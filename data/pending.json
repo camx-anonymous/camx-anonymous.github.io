@@ -57,13 +57,14 @@
    "morph": "Handheld, robot-free",
    "embodiment": "Dexterous hands",
    "source": "DexWild",
-   "datasets": 10,
-   "episodes": 9505,
-   "frames": 3500000,
-   "hours": 32.4,
+   "datasets": 8,
+   "episodes": 8773,
+   "frames": 3287396,
+   "hours": 31.3,
    "views": "3–5",
    "fps": "30",
-   "note": "D"
+   "note": "D",
+   "remark": "the remaining 8 task and embodiment sets of the release; the two pour sets are converted as samples and browsable"
   },
   {
    "morph": "Bimanual robot",

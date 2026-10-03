@@ -42,6 +42,8 @@ sys.path[:0] = [VIZ, os.path.join(VIZ, 'mv_site')]
 
 # viz configs of the Rerun route for projects the curation planner (build_mv_site.config_for) does not cover
 EXTRA_CONFIG = {'franka_hand/fmb': 'config/fmb.json', 'franka_hand/rh20t_cfg5': 'config/rh20t.json', 'robotiq/rh20t_cfg4': 'config/rh20t.json',
+                # RH20T cfg1-3: the vendors' AG-95 / WSG-50 URDFs (grippers/dh_ag95, grippers/wsg50 of the checkout), hung behind the tcp
+                'dahuan/rh20t_cfg1': 'config/rh20t.json', 'dahuan/rh20t_cfg2': 'config/rh20t.json', 'wsg50/rh20t_cfg3': 'config/rh20t.json',
                 'robotiq/rh20t_cfg6': 'config/rh20t.json', 'robotiq/rh20t_cfg7': 'config/rh20t.json', 'robotiq/droid_lowres': 'config/droid.json',
                 'robotiq/roboset_kinesthetic': 'config/roboset_kinesthetic.json', 'robotiq/roboset_teleop': 'config/roboset_teleop.json',
                 'stretch/dobbe': 'config/dobbe.json',
@@ -72,11 +74,11 @@ FISHEYE['umi/umi_benchmark'] = dict(profile='umi_benchmark', calib='umi_benchmar
 # is not in this checkout (umi3d / aetherock lens files, robomind_ur5 config, the gripper_v4 DAS lens, hifi_umi's attached cameras)
 # multiview route: rigs the headless Rerun viewer cannot do, drawn by render_multiview_overlay_video.py (or, for GenRobot V4, the
 # bimanual fisheye tool) through tools/white_multiview.py / white_overlay.py with the arguments of tools/overlay_picks.py (SPECS and
-# its explicit picks): pinhole rigs without a gripper CAD (primitive stand-in: RH20T cfg1-3, the OpenNeoData Flexiv / UR / ARX X5 /
+# its explicit picks): pinhole rigs without a gripper CAD (primitive stand-in: the OpenNeoData Flexiv / UR / ARX X5 /
 # UMI rigs, whose stock-CAD stand-in does not land on the fingers), fisheye rigs with their own lens file (UMI-3D, AetheRock,
 # HiFi-UMI, GenRobot V4), RoboMIND UR5 (no-mimic Robotiq URDF) and the 180p DROID twin (the viewer draws nothing at 320x180).
 # Their renderer, configs and lens files are on camera-cross-embodiment origin/main: CAMX_VIZ_MV names that checkout's visualization dir.
-MULTIVIEW = {'dahuan/rh20t_cfg1', 'dahuan/rh20t_cfg2', 'wsg50/rh20t_cfg3', 'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
+MULTIVIEW = {'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
              'umi/umi3d', 'umi/aetherock', 'hifi_umi/hifi_umi', 'genrobot/gripper_v4', 'aloha/openneo_arx5', 'aloha/openneo_arx5_single',
              'umi/openneo_umi', 'umi/openneo_umi_single', 'robotiq/droid_lowres'}
 VIZ_MV = os.path.expanduser(os.environ.get('CAMX_VIZ_MV', '/data/camx/visualization'))
@@ -150,6 +152,7 @@ def route_of(o):
         if m.get('source_success_mtime') == stamp(o['dataset']) and all(v in have for v in o['views']) \
                 and all(os.path.isfile(os.path.join(cd, v['name'] + '.mp4')) for v in m['views']): return 'reuse', cd
     import build_mv_site as B
+    if not os.path.isfile(os.path.join(ROOT, o['dataset'], 'meta', 'info.json')): return 'keep', 'dataset not in this tree'
     info = info_of(o['dataset']); keys = [k for k, f in info['features'].items() if f.get('dtype') == 'video']
     cfg = B.config_for(proj, str(info.get('robot_type')), len(keys), keys, o['dataset'])
     if cfg is None and proj in EXTRA_CONFIG: cfg = EXTRA_CONFIG[proj] if os.path.isabs(EXTRA_CONFIG[proj]) else os.path.join(VIZ, EXTRA_CONFIG[proj])
