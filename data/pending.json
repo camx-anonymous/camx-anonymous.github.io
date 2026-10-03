@@ -1,11 +1,19 @@
 {
- "updated": "2026-10-02",
- "_about": "Sources of the paper's appendix source tables that have no converted LeRobot-v3 data on the site yet (no sample archive, no validation clip). One entry per embodiment and source with the counts the paper lists (datasets, episodes, frames, hours = frames / fps, camera views, fps); `note` is the bracketed letter of the appendix table ([A]-[D], text in `notes`), null for a source of the training mix whose remaining datasets are still unconverted. `entry` names the data/sources.json key when it differs from `source`. Hand-maintained; tools/build_site_data.py copies it into data/datasets.json as `pending` and checks every entry against data/sources.json.",
+ "updated": "2026-10-03",
+ "_about": "Sources of the paper's appendix source tables that have no converted LeRobot-v3 data on the site yet (no sample archive, no example clip). One entry per embodiment and source with the counts the paper lists (datasets, episodes, frames, hours = frames / fps, camera views, fps); `note` is the bracketed letter of the appendix table ([A]-[D], text in `notes`), null for a source of the training mix whose remaining datasets are still unconverted. `entry` names the data/sources.json key when it differs from `source`. Hand-maintained; tools/build_site_data.py copies it into data/datasets.json as `pending` and checks every entry against data/sources.json.",
  "notes": {
   "A": "not included when the training mix was frozen",
   "B": "held out: camera calibration not fully validated",
   "C": "actuator groups do not share one global frame: each hand is tracked in its own frame",
   "D": "dexterous-hand data recorded with a wrist camera; the current model has no dexterous-hand action head, so it is listed for future training"
+ },
+ "paper": {
+  "_about": "Totals of the paper's two appendix source tables, quoted by the header and the footer of the site: the training mix (37 sources, 1,998 datasets, 1,738,358 episodes, 18,632.1 h) plus the sources outside it (33 sources, 2,471 datasets, 712,630 episodes, 7,218.6 h), over 24 embodiment groups. Copy them from the generated table bodies when the paper's tables change; tools/build_site_data.py writes them to `totals.paper` and warns when the site's own sums differ.",
+  "sources": 70,
+  "embodiments": 24,
+  "datasets": 4469,
+  "episodes": 2450988,
+  "hours": 25850.7
  },
  "entries": [
   {

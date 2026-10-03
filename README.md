@@ -6,18 +6,19 @@ This repository is anonymized for review.
 
 ## Pages
 
-- `index.html` — the landing page and dataset browser: hero stats, a morphology → platform tree with search
-  over every dataset (cards open a record drawer with the dataset's sample archive and its one-line fetch
+- `index.html` — the landing page and dataset browser: hero stats, a morphology → platform tree
+  over every dataset (each row shows its project count and hours, "13 projects · 434 h"; a project row shows its
+  task count, "34 tasks · 209 h", one task per dataset; cards open a record drawer with the dataset's sample archive and its one-line fetch
   command), and the download section: one bash command per slice (full release, one morphology, or the
   datasets added from the drawer) that fetches and unpacks the one-episode samples from the GitHub releases,
-  with JSON export/import of the selection.
+  with JSON export of the selection.
 - One-episode samples — episode 0 of every dataset as a valid LeRobot-v3 dataset (`meta/`, `data/`, `videos/`
   holding just that episode), one `.tar.gz` per dataset on the `samples-v1-<family>` GitHub releases of this
   repository. Built with `tools/build_samples.py` (cuts the episode out of the packed files, drops every meta
   file that is not `info.json`, `episodes/`, `tasks.parquet`, `stats.json` or `_SUCCESS`, and runs the
   anonymisation pass), uploaded with `tools/publish_samples.py`, and merged into `data/datasets.json` as each
   row's `sample` (`{url, bytes, frames, seconds}`) by `tools/build_site_data.py --attach-samples-only`.
-- `overlays/` — camera-projection validation clips, a few example episodes per project: the gripper URDF
+- `overlays/` — camera-projection example clips, a few episodes per project: the gripper URDF
   (or, where no URDF is released, a primitive stand-in: hinged fingers that follow the recorded jaw width plus
   the tool-centre frame as RGB = xyz axes) projected through each dataset's own poses and intrinsics. Clips are
   served from `overlays/videos/` (tracked, so Pages sends them as `video/mp4`; iOS Safari will not play the
@@ -28,10 +29,15 @@ This repository is anonymized for review.
   TacUMI, Other research projects; Galaxea, UR5, ARX5 and OpenArm each inside one morphology band) and copies
   `data/pending.json` in as `pending`.
 - `data/pending.json` — hand-maintained: every source of the appendix tables that has no converted LeRobot-v3 data
-  on the site yet (no sample archive, no validation clip), with the paper's counts (datasets, episodes, frames, hours,
-  views, fps) and the table's note letter ([A]–[D]). The tree lists them under their embodiment group without a tick
-  box; their cards (a block under the results, opening a record with license and citation) are switched off for now
-  by `SHOW_PEND` in `index.html`. Remove an entry once its data is converted and the build picks the rows up.
+  on the site yet (no sample archive, no example clip), with the paper's counts (datasets, episodes, frames, hours,
+  views, fps) and the table's note letter ([A]–[D]). The hero stats and the footer quote the paper: the
+  totals of its two appendix tables (episodes, hours, datasets, sources, platforms), kept by hand in the `paper` block
+  of this file and copied to `totals.paper`. The build warns when the site's own sums (converted + these entries)
+  differ from them; the download slices keep counting converted datasets only. The tree leaves them out:
+  it shows only sources with converted data and a stated license (`inTree` in `index.html`), and its project, task
+  and hour counts follow the rows shown. Their cards (a block under the results, opening a record with license and
+  citation) are switched off for now by `SHOW_PEND` in `index.html`. Remove an entry once its data is converted and
+  the build picks the rows up.
 - `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the
   rows (`projects` maps a family/project to a more specific entry where one source ships under two licenses,
   e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7; `datasets` does the same per row for the
@@ -42,9 +48,10 @@ This repository is anonymized for review.
   first opens a compact dialog listing the sources of exactly those samples (name, license chip, short paper
   cite), offers the BibTeX of that set (Copy / Save .bib), and asks the user to agree to cite them and follow
   the licenses. It is asked every time, nothing is remembered; the command block itself is always visible.
-  The shortcuts (Full release, one morphology) are handled the same way, since the set is derived from the rows
-  of the slice. Each record also shows its License and Cite rows. The generated script carries a three-line
-  header that links `data/citations.bib`.
+  The shortcuts (All morphologies, one morphology) are handled the same way, since the set is derived from the rows
+  of the slice. Each record also shows its License and Cite rows, and every source row of the browse tree carries
+  a line with its paper ("(Chi et al. 2024)", linking to arXiv where there is one) and its license chip. The
+  generated script carries a three-line header that links `data/citations.bib`.
 
 ## Rebuilding the data
 

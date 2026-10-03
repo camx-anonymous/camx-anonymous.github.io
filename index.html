@@ -9,46 +9,37 @@
 <script src="clip.js" defer></script>
 <style>
 /* ---------- hero ---------- */
-.hero{padding-top:96px;padding-bottom:64px}
-.hero h1{font-size:clamp(40px,6.2vw,80px);line-height:1;letter-spacing:-.035em;font-weight:500;margin:0;max-width:1000px;text-wrap:balance}
-.hero .lede{font-size:19px;line-height:1.55;color:var(--ink2);max-width:600px;margin:28px 0 0;text-wrap:pretty}
-.ctas{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:24px;margin-top:72px;padding-top:24px;border-top:1px solid var(--line)}
-.stats .v{font-size:36px;font-weight:500;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
-.stats .k{font-size:13px;color:var(--ink3);margin-top:4px}
-@media (max-width:640px){.hero{padding-top:56px;padding-bottom:40px}.stats{margin-top:48px;grid-template-columns:repeat(2,1fr)}.stats .v{font-size:30px}}
+.hero{padding-top:64px;padding-bottom:20px}
+.hero h1{font-size:clamp(30px,4.2vw,52px);line-height:1.05;letter-spacing:-.03em;font-weight:500;margin:0;text-wrap:balance}
+.stats{display:grid;grid-template-columns:repeat(6,auto);justify-content:space-between;gap:10px 20px;margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}
+.stats>div{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.stats .v{font-size:24px;font-weight:500;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.stats .k{font-size:15px;color:var(--ink3)}
+@media (max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}}
+/* the rollouts link stays in the upper right corner while the page scrolls (this page has no top bar), its right
+   edge on the right edge of the .wrap content column; it sits under the drawer and its scrim. On a phone it is
+   smaller and the hero starts below it. */
+.button.pin{position:fixed;top:16px;right:max(var(--pad-x),calc((100% - var(--w-wide))/2 + var(--pad-x)));z-index:20;box-shadow:var(--shadow-md);font-size:18px;padding:16px 26px;gap:10px;border-radius:8px}
+.button.pin svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k{font-size:13px}.button.pin{top:10px;font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
 
 /* ---------- browse ---------- */
-#browse{padding-top:40px;padding-bottom:96px;scroll-margin-top:60px}
-.bhead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--line)}
-.bhead h2{margin:0}
-.crumbs{display:flex;align-items:center;gap:8px;font-size:15px;margin-top:10px;flex-wrap:wrap}
-.crumbs button{all:unset;cursor:pointer;font-weight:500;color:var(--ink3)}
-.crumbs button:hover{color:var(--accent)}
-.crumbs button.cur{color:var(--ink)}
-.crumbs .sep{color:var(--line-hi)}
-.bright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 1 auto;min-width:min(340px,100%);max-width:100%}
-.search{display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--line-hi);border-radius:6px;background:var(--panel);height:42px;width:100%}
-.selbar{display:flex;justify-content:flex-end;align-items:baseline;gap:8px;white-space:nowrap;font:400 12.5px/1.5 var(--mono);color:var(--ink4)}
-.selbar.hint{display:block;white-space:normal;max-width:340px;text-align:right}
-.selbar b{font-weight:500;color:var(--ink)}
-.selbar a{color:var(--accent)}
-.selbar .sep{color:var(--line-hi)}
-.crumbs .lk{margin-left:8px}
-@media (max-width:640px){.bright{align-items:flex-start;flex-basis:100%}.selbar{justify-content:flex-start}.selbar.hint{text-align:left;max-width:none}}
-.search:focus-within{border-color:var(--ink)}
-.search svg{width:12px;height:12px;stroke:var(--ink4);fill:none;stroke-width:1.8;flex:none}
-.search input{border:0;background:transparent;font:inherit;font-size:14px;color:var(--ink);outline:0;width:100%;min-width:0;padding:0}
-.search input::placeholder{color:var(--ink4)}
+#browse{padding-top:20px;padding-bottom:96px}
 .browse{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
-.tree{position:sticky;top:84px;display:flex;flex-direction:column;gap:4px;flex:1 1 240px;max-width:280px}
-@media (max-width:760px){.tree{position:static;max-width:none;flex-basis:100%}}
+/* the tree sticks beside the cards and scrolls on its own when it is taller than the window. A scroll box has no
+   automatic minimum width, so the width is fixed: 380 of content + the padding that keeps the outdented top row
+   inside the box + the scrollbar gutter; the negative margins leave the cards where a 380px column puts them.
+   Below 980px the two columns no longer fit side by side (380 + 40 + 480) and the tree is a plain block on top. */
+.tree{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line-hi) transparent;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:4px;flex:0 0 400px;margin:0 -12px 0 -8px;padding:0 2px 4px 8px}
+.tree>*{flex:none}
+@media (max-width:980px){.tree{position:static;max-height:none;overflow:visible;flex-basis:100%;margin:0;padding:0}}
 .tree button{all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 10px 7px 8px;margin-left:-8px;font-size:15px;font-weight:500;border-radius:4px;color:var(--ink);min-width:0}
 .tree button:hover{color:var(--accent)}
-.tree button .c{font:400 12px/1 var(--mono);color:var(--ink4);flex:none}
+.tree button .c{font:400 12px/1 var(--mono);color:var(--ink4);flex:none;word-spacing:-.2em}
 .tree button.on{color:var(--accent);background:var(--accent-soft);font-weight:600}
 .tree .lab{display:flex;align-items:center;gap:10px;min-width:0}
-.tree .lab span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* a name too long for the room beside its count ("6 projects · 36.7 h") wraps instead of being cut */
+.tree .lab span:last-child{overflow-wrap:anywhere;line-height:1.3;padding:.125em 0}
 .tree .dia{width:9px;height:9px;background:var(--ink);transform:rotate(45deg);flex:none}
 .tree .tick{width:12px;height:1px;background:var(--line-hi);flex:none}
 .tree .lvl1{margin-left:14px;border-left:1px solid var(--line-hi);display:flex;flex-direction:column;gap:2px;padding:4px 0}
@@ -65,6 +56,14 @@
 .tree .lvl3 button{font-size:12.5px;color:var(--ink2);padding:5px 8px 5px 6px}
 .tree .lvl3 button.on{color:var(--accent)}
 .tree .lvl3 .tick{width:8px}
+/* under a source row, aligned with its name: the paper as "(Chi et al. 2024)" linking to arXiv, and the license */
+.tree .smeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:-1px 0 6px 24px;font:400 10.5px/1.4 var(--mono);color:var(--ink4)}
+.tree .smeta a{color:var(--ink3)}
+.tree .smeta a:hover{color:var(--accent)}
+.tree .smeta .au{text-decoration:underline;text-decoration-color:var(--line-hi);text-underline-offset:3px}
+.tree .smeta .au:hover{text-decoration-color:var(--accent)}
+.tree .smeta .chip{font-size:10px;font-weight:400;padding:3px 7px;white-space:normal;line-height:1.3;border-radius:9px}
+.tree .smeta .chip.none{background:transparent;border-color:var(--line-hi)}
 /* tri-state tick boxes: tree rows select a whole group, cards select one dataset */
 button.ck,.tree button.ck{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:14px;height:14px;margin:0;padding:0;border:1px solid var(--line-hi);border-radius:3px;background:var(--panel);display:inline-flex;align-items:center;justify-content:center;transition:border-color .12s,background .12s}
 button.ck:hover,.tree button.ck:hover{border-color:var(--ink)}
@@ -74,9 +73,9 @@ button.ck[aria-checked="true"]::after{content:"";width:3px;height:7px;border:sol
 button.ck[aria-checked="mixed"],.tree button.ck[aria-checked="mixed"]{border-color:var(--accent)}
 button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;background:var(--accent)}
 .results{flex:999 1 480px;min-width:0}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:32px 20px}
-@media (max-width:480px){.cards{grid-template-columns:1fr 1fr;gap:24px 14px}}
-.dcard{position:relative;display:flex;flex-direction:column;gap:12px;cursor:pointer;min-width:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px 14px}
+@media (max-width:480px){.cards{grid-template-columns:1fr 1fr;gap:16px 12px}}
+.dcard{position:relative;display:flex;flex-direction:column;gap:8px;cursor:pointer;min-width:0}
 .dcard .ck{position:absolute;top:8px;right:8px;z-index:2;width:22px;height:22px;background:rgba(255,255,255,.92);border-color:rgba(34,33,30,.3);box-shadow:0 1px 3px rgba(0,0,0,.08);opacity:0;transition:opacity .12s,border-color .12s,background .12s}
 .dcard:hover .ck,.dcard .ck[aria-checked="true"],.dcard .ck:focus-visible{opacity:1}
 @media (hover:none){.dcard .ck{opacity:1}}
@@ -84,25 +83,22 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .dcard .thumb{position:relative;aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--chipbg) 0 8px,var(--panel2) 8px 16px);border:1px solid var(--line)}
 .dcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .dcard .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.dcard .play i{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:background .12s}
-.dcard .play i::after{content:"";width:0;height:0;border-left:11px solid #22211E;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+.dcard .play i{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:background .12s}
+.dcard .play i::after{content:"";width:0;height:0;border-left:9px solid #22211E;border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:2px}
 .dcard .thumb.has:hover .play i{background:var(--accent)}
 .dcard .thumb.has:hover .play i::after{border-left-color:#fff}
 .dcard .tl{position:absolute;left:10px;top:10px;font:400 11px/1 var(--mono);color:var(--ink3)}
-.dcard .thumb.has .tl{background:rgba(34,33,30,.7);color:#FAF9F6;padding:3px 6px;border-radius:4px}
-.dcard .dur{position:absolute;right:10px;bottom:10px;font:400 11px/1 var(--mono);padding:3px 6px;background:rgba(34,33,30,.8);color:#FAF9F6;border-radius:4px}
-.dcard .body{display:flex;flex-direction:column;gap:4px;min-width:0}
-.dcard .ttl{font-size:15px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}
+.dcard .dur{position:absolute;right:8px;bottom:8px;font:400 11px/1 var(--mono);padding:3px 6px;background:rgba(34,33,30,.8);color:#FAF9F6;border-radius:4px}
+.dcard .body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dcard .ttl{font-size:14px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}
 .dcard:hover .ttl{color:var(--accent)}
-.dcard .meta{display:flex;gap:6px;font-size:13px;color:var(--ink3);flex-wrap:wrap}
+.dcard .meta{display:flex;gap:0 5px;font-size:12px;color:var(--ink3);flex-wrap:wrap}
 .dcard .meta .cat{color:var(--accent)}
 .dcard .sub{font:400 11.5px/1.5 var(--mono);color:var(--ink4);overflow-wrap:anywhere}
 .cards .empty{grid-column:1/-1}
 .loadmore{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:48px;flex-wrap:wrap}
 .loadmore .n{font:400 12px/1 var(--mono);color:var(--ink4)}
-/* sources of the paper's tables with no converted data on the site yet: muted tree rows without a tick box, cards under the results */
-.tree .row.listed button{color:var(--ink4)}
-.tree .row.listed button .c{font-style:italic}
+/* sources of the paper's tables with no converted data on the site yet: cards under the results (the tree leaves them out) */
 .pendlist{margin-top:56px;padding-top:28px;border-top:1px solid var(--line)}
 .pendlist.solo{margin-top:0;padding-top:0;border-top:0}
 .pendlist h3{margin:0 0 6px;font:500 17px/1.3 var(--sans);letter-spacing:-.01em}
@@ -113,15 +109,15 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .pcard .note b{font:500 11px/1 var(--mono);color:var(--accent);margin-right:4px}
 
 /* ---------- download ---------- */
-#download{background:var(--panel2);border-top:1px solid var(--line);scroll-margin-top:60px}
+#download{background:var(--panel2);border-top:1px solid var(--line)}
 .dl{padding-top:96px;padding-bottom:96px}
 @media (max-width:640px){.dl{padding-top:56px;padding-bottom:56px}}
-.dlhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px 24px;flex-wrap:wrap;margin-bottom:24px}
+.dlhead{margin-bottom:24px}
 .dlhead h2{margin:0}
-.dlhead .p{font-size:16px;line-height:1.5;color:var(--ink2);margin:10px 0 0;max-width:600px;text-wrap:pretty}
+.dlhead .p{font-size:16px;line-height:1.5;color:var(--ink2);margin:10px 0 0;text-wrap:pretty}
+.dlhead .p b{font-weight:600;color:var(--ink)}
 .lk{all:unset;cursor:pointer;font:400 12.5px/1 var(--mono);color:var(--ink3)}
 .lk:hover{color:var(--accent)}
-.dlhead .lk{padding:8px 0}
 .slices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .slice{position:relative;display:flex;flex-direction:column;gap:12px;min-width:0;padding:18px 18px 16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;transition:border-color .12s,box-shadow .12s}
 .slice:hover{border-color:var(--line-hi);box-shadow:var(--shadow-sm)}
@@ -209,40 +205,15 @@ footer{margin:0}
 </head>
 <body>
 
-<header class="topbar">
-  <div class="wrap">
-    <a class="brand" href="./"><span class="mark"></span><span class="name">CAMX</span></a>
-    <nav aria-label="Sections">
-      <a href="#browse">Browse</a>
-      <a href="#download">Download</a>
-      <a href="overlays/">Validation clips</a>
-    </nav>
-    <a class="button primary cta" href="https://camx-anonymous.github.io/camuva-rollouts/">CAMUVA Rollouts</a>
-  </div>
-</header>
+<a class="button primary pin" href="https://camx-anonymous.github.io/camuva-rollouts/"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.5" r="1.5"/><path d="M12 5v3"/><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M1.5 13v3M22.5 13v3M9 13v2M15 13v2"/></svg>CamUVA Rollouts</a>
 
 <main>
   <section class="hero wrap" id="overview">
-    <h1>CamX Dataset</h1>
-    <p class="lede">Unified camera-centric representation</p>
-    <div class="ctas">
-      <a class="button accent lg" href="#browse">Browse datasets</a>
-      <a class="button lg" href="#download">Download</a>
-    </div>
+    <h1>CamX Dataset (Samples)</h1>
     <div class="stats" id="stats"></div>
   </section>
 
-  <section class="wrap" id="browse">
-    <div class="bhead">
-      <div>
-        <h2>Browse datasets</h2>
-        <div class="crumbs" id="crumbs"></div>
-      </div>
-      <div class="bright">
-        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="q" placeholder='Search tasks or sources, e.g. "fold towel"' aria-label="Search datasets"></label>
-        <div class="selbar" id="selbar"></div>
-      </div>
-    </div>
+  <section class="wrap" id="browse" aria-label="Browse datasets">
     <div class="browse">
       <aside class="tree" id="tree" aria-label="Morphologies and platforms"></aside>
       <div class="results">
@@ -256,12 +227,8 @@ footer{margin:0}
   <section id="download">
     <div class="wrap dl">
       <div class="dlhead">
-        <div>
-          <h2>Download</h2>
-          <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command. Take a whole slice, or tick platforms, sources and datasets while browsing to build your own.</p>
-        </div>
-        <button type="button" class="lk" id="importSel">Import a selection (JSON)</button>
-        <input type="file" id="importFile" accept="application/json" class="hidden">
+        <h2>Download dataset samples</h2>
+        <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command. Take a whole slice, or tick platforms, sources and datasets while browsing to build your own. <b>The full dataset will be available upon official release.</b></p>
       </div>
       <div class="slices" id="dlist"></div>
       <div class="code" id="code"></div>
@@ -273,7 +240,7 @@ footer{margin:0}
       <span id="footInfo">CAMX Dataset · anonymized for review</span>
       <nav>
         <a href="https://github.com/camx-anonymous/camx-anonymous.github.io">GitHub</a>
-        <a href="overlays/">Validation clips</a>
+        <a href="overlays/">Example clips</a>
         <button type="button" id="citeBtn">Cite</button>
       </nav>
     </div>
@@ -315,96 +282,99 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const human=s=>{s=String(s).replace(/_+/g,' ').replace(/\s+/g,' ').trim();return s.charAt(0).toUpperCase()+s.slice(1)};
 const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + up axis':m;
 const $=id=>document.getElementById(id);
-let D,P={},L=[],PEND=[],sel=new Set(),SRC={},SRCP={},SRCD={};
+let D,P={},L=[],PEND=[],sel=new Set(),SRC={},SRCP={},SRCD={},SRCOK=false;
 // D.pending: the sources of the paper's appendix tables with no converted data here yet (data/pending.json), listed with the paper's counts
-// SHOW_PEND: the "Listed in the paper, not converted yet" cards under the dataset cards; off for now, the tree still lists these sources
+// SHOW_PEND: the "Listed in the paper, not converted yet" cards under the dataset cards; off for now, and the tree leaves these sources out
 const SHOW_PEND=false;
-const S={cat:'all',robot:null,source:null,q:'',shown:PAGE,slice:'full'};
+const S={cat:'all',robot:null,source:null,shown:PAGE,slice:'full'};
 // r.sample = {url, bytes, frames, seconds}: the episode-0 archive of the dataset on this repository's GitHub releases (null while unpublished)
 const sampled=rows=>rows.filter(r=>r.sample);
 const fmtDur=s=>!s?'–':s>=3600?(s/3600).toFixed(1)+' h':s>=60?Math.round(s/60)+' min':Math.round(s)+' s';
 const oneCmd=r=>r.sample?`# CAMX sample · ${r.id} · episode 0 · ${fmtDur(r.sample.seconds)} · ${fmtB(r.sample.bytes)}\nmkdir -p camx_samples && cd camx_samples && curl -fL --retry 3 "${r.sample.url}" | tar -xz`:`# ${r.id}: no published sample yet`;
 
-/* card order: datasets with their own validation clip first, then the top dataset of every project before any second one,
+/* card order: the top dataset of every project before any second one,
    so the first page shows the breadth of the corpus instead of one project's slices */
-function order(rows){const own=new Set();Object.values(P).forEach(p=>p.overlays.forEach(o=>own.add(o.dataset)));const rank={},seen={};
+function order(rows){const rank={},seen={};
   rows.slice().sort((a,b)=>b.hours-a.hours).forEach(r=>{rank[r.id]=seen[r.project]=(seen[r.project]||0)+1});
-  return rows.slice().sort((a,b)=>(own.has(b.id)-own.has(a.id))||(rank[a.id]-rank[b.id])||(P[b.project].hours-P[a.project].hours)||(b.hours-a.hours))}
+  return rows.slice().sort((a,b)=>(rank[a.id]-rank[b.id])||(P[b.project].hours-P[a.project].hours)||(b.hours-a.hours))}
 function load(){fetch('data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=order(d.datasets);PEND=d.pending||[];
   try{JSON.parse(localStorage.getItem('camx.sel')||'[]').forEach(x=>sel.add(x))}catch(e){}
-  fetch('data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};downloads();if($('drawer').classList.contains('open')){if(S.open)drawer(S.open);else if(S.openPend!=null)drawerPend(S.openPend)}}).catch(()=>{});
-  $('footInfo').textContent=`CAMX Dataset · anonymized for review · ${d.totals.datasets.toLocaleString()} datasets, ${d.totals.projects} projects, ${d.totals.embodiments_listed||d.totals.embodiments} platforms`;
+  fetch('data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};SRCOK=true;tree();downloads();if($('drawer').classList.contains('open')){if(S.open)drawer(S.open);else if(S.openPend!=null)drawerPend(S.openPend)}}).catch(()=>{});
+  $('footInfo').textContent=`CAMX Dataset · anonymized for review · ${tot('datasets').toLocaleString()} datasets, ${d.totals.projects} projects, ${tot('embodiments')} platforms`;
   stats();tree();render();downloads();})}
 
 function agg(rows){return rows.reduce((a,r)=>{a.n++;a.ep+=r.episodes||0;a.h+=r.hours||0;a.b+=r.bytes_est||0;return a},{n:0,ep:0,h:0,b:0})}
 
-function stats(){const t=D.totals;$('stats').innerHTML=[[fmt(t.episodes),'episodes'],[fmtH(t.hours)+' h','of video'],[t.datasets.toLocaleString(),'datasets'],[t.sources||'–','sources'],[t.embodiments_listed||t.embodiments,'robot platforms'],[MORPHS.length,'morphologies']]
+// the header and the footer quote the paper: the totals of its two appendix source tables (totals.paper, kept in data/pending.json).
+// The site's own sums can differ from them, so they are only the fallback: converted datasets plus the listed sources (totals.pending)
+const tot=k=>{const t=D.totals;return (t.paper||{})[k]??(k==='sources'?t.sources:k==='embodiments'?t.embodiments_listed||t.embodiments:t[k]+((t.pending||{})[k]||0))};
+function stats(){$('stats').innerHTML=[[fmt(tot('episodes')),'episodes'],[fmtH(tot('hours'))+' h','of video'],[tot('datasets').toLocaleString(),'datasets'],[tot('sources')||'–','sources'],[tot('embodiments'),'robot platforms'],[MORPHS.length,'morphologies']]
   .map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')}
 
-/* ---------- browse: tree, crumbs, cards ---------- */
+/* ---------- browse: tree, cards ---------- */
 /* every tree row is a filter button plus a tick box that selects the whole group for download;
-   sources appear as a third level under the platform being browsed */
-function tree(){const all=agg(L),ph=list=>list.reduce((a,p)=>a+(p.hours||0),0);
-  let h=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>',fmtH(all.h+ph(PEND))+' h',L,'all datasets')+'<div class="lvl1">';
-  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id),pend=PEND.filter(p=>p.morph===m.id);const a=agg(rows);const embs={};
-    const emb=e=>embs[e]||(embs[e]={n:0,h:0,rows:[],pend:[]});
-    rows.forEach(r=>{const e=emb(r.embodiment);e.n++;e.h+=r.hours||0;e.rows.push(r)});
-    pend.forEach(p=>{const e=emb(p.embodiment);e.h+=p.hours||0;e.pend.push(p)});
-    h+='<div>'+row(S.cat===m.id&&!S.robot,{cat:m.id},'<span class="tick"></span><span>'+m.label+'</span>',fmtH(a.h+ph(pend))+' h',rows,m.label)+'<div class="lvl2">'
+   sources (projects) appear as a third level under the platform being browsed.
+   The tree shows only what can be fetched here under a stated license: the sources listed from the paper with no converted
+   data (PEND) are left out, and so is any dataset whose sources.json entry states no license (inTree, once sources.json is in).
+   The count on the right follows the rows shown: "7 projects · 749 h" on the rows above a project (one project per platform
+   and source), "34 tasks · 209 h" on a project row (one task per dataset). The hero stats quote the paper instead (tot). */
+const cnt=(n,w,h)=>`${n.toLocaleString()} ${w}${n===1?'':'s'} · ${fmtH(h)} h`;
+const inTree=r=>!SRCOK||!!licName(SRC[srcName(r)]);
+function tree(){const T=L.filter(inTree);let np=0,h='';
+  MORPHS.forEach(m=>{const rows=T.filter(r=>r.morph===m.id);const a=agg(rows);const embs={};
+    const emb=e=>embs[e]||(embs[e]={n:0,h:0,rows:[],srcs:{}});
+    const src=(e,n)=>e.srcs[n]||(e.srcs[n]={n:0,h:0,rows:[]});
+    rows.forEach(r=>{const e=emb(r.embodiment),x=src(e,r.source);e.n++;e.h+=r.hours||0;e.rows.push(r);x.n++;x.h+=r.hours||0;x.rows.push(r)});
+    const mp=Object.values(embs).reduce((s,v)=>s+Object.keys(v.srcs).length,0);np+=mp;
+    h+='<div>'+row(S.cat===m.id&&!S.robot,{cat:m.id},'<span class="tick"></span><span>'+m.label+'</span>',cnt(mp,'project',a.h),rows,m.label)+'<div class="lvl2">'
       +Object.entries(embs).sort((x,y)=>y[1].h-x[1].h).map(([e,v])=>{const act=S.cat===m.id&&S.robot===e;
-        let o=row(act&&!S.source,{cat:m.id,robot:e},'<span class="tick"></span><span>'+esc(e)+'</span>',fmtH(v.h)+' h',v.rows,e,`${esc(e)} · ${v.n} dataset${v.n===1?'':'s'}`+(v.pend.length?` · ${v.pend.length} source${v.pend.length===1?'':'s'} not converted yet`:''),!v.rows.length);
-        if(act){const srcs={};const src=n=>srcs[n]||(srcs[n]={n:0,h:0,rows:[],pend:[]});
-          v.rows.forEach(r=>{const x=src(r.source);x.n++;x.h+=r.hours||0;x.rows.push(r)});
-          v.pend.forEach(p=>{const x=src(p.source);x.h+=p.hours||0;x.pend.push(p)});
-          o+='<div class="lvl3">'+Object.entries(srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',fmtH(x.h)+' h',x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`+(x.pend.length?(x.n?' · more datasets not converted yet':' · not converted yet'):''),!x.rows.length)).join('')+'</div>'}
+        let o=row(act&&!S.source,{cat:m.id,robot:e},'<span class="tick"></span><span>'+esc(e)+'</span>',cnt(Object.keys(v.srcs).length,'project',v.h),v.rows,e,`${esc(e)} · ${v.n} dataset${v.n===1?'':'s'}`);
+        if(act)o+='<div class="lvl3">'+Object.entries(v.srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',cnt(x.n,'task',x.h),x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`)+srcMeta(x)).join('')+'</div>';
         return o}).join('')+'</div></div>'});
-  $('tree').innerHTML=h+'</div>'}
-/* pend: the row has no converted dataset (only sources listed from the paper), so no tick box */
-function row(on,f,lab,c,rows,name,title,pend){const d=Object.entries(f).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ');
-  return `<div class="row${pend?' listed':''}"><button type="button" class="${on?'on':''}" ${d}${title?` title="${title}"`:''}><span class="lab">${lab}</span><span class="c">${c}</span></button>${pend?'':ck(state(rows),d,'Select '+name+' for download')}</div>`}
-function groupRows(d){return L.filter(r=>(d.cat==='all'||r.morph===d.cat)&&(!d.robot||r.embodiment===d.robot)&&(!d.source||r.source===d.source))}
+  $('tree').innerHTML=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>',cnt(np,'project',agg(T).h),T,'all datasets')+'<div class="lvl1">'+h+'</div>'}
+function row(on,f,lab,c,rows,name,title){const d=Object.entries(f).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ');
+  return `<div class="row"><button type="button" class="${on?'on':''}" ${d}${title?` title="${title}"`:''}><span class="lab">${lab}</span><span class="c">${c}</span></button>${ck(state(rows),d,'Select '+name+' for download')}</div>`}
+function groupRows(d){return L.filter(r=>inTree(r)&&(d.cat==='all'||r.morph===d.cat)&&(!d.robot||r.embodiment===d.robot)&&(!d.source||r.source===d.source))}
+/* a click in the tree re-renders the tree and the cards, and both move the tree: a cards column shorter than the tree
+   ends the sticky range and takes the tree off screen, and the sources of the platform left behind collapse above the
+   clicked row. keep(b,fn) runs the re-render fn for the clicked button b, then puts the tree back where it was.
+   Beside the cards: a stuck tree sits at the same place when the page is at the first card, so the page goes there
+   and the tree scrolls its own box until the clicked row is under the pointer again. Stacked above the cards (narrow
+   windows): the page scrolls by however far the row moved. A tick box changes no filter, so the page stays where it
+   is. Scroll amounts are rounded to device pixels: the browser cuts a fraction off, which shows as a one-pixel twitch. */
+function keep(b,fn){const T=$('tree'),box=T.parentNode,d=b.dataset,ck=b.classList.contains('ck'),y0=b.getBoundingClientRect().top,b0=box.getBoundingClientRect().top;
+  fn();
+  const cs=getComputedStyle(T),px=devicePixelRatio||1,snap=y=>Math.round(y*px)/px,by=y=>window.scrollBy({top:snap(y),behavior:'instant'});
+  const nb=[...T.querySelectorAll('button[data-cat]')].find(x=>x.classList.contains('ck')===ck&&x.dataset.cat===d.cat&&x.dataset.robot===d.robot&&x.dataset.source===d.source);
+  const dy=()=>nb?nb.getBoundingClientRect().top-y0:0;
+  if(cs.position!=='sticky'){by(dy());return}
+  if(!ck)by(box.getBoundingClientRect().top-Math.max(b0,parseFloat(cs.top)||0));
+  T.scrollTop+=snap(dy())}
 
 /* ---------- selection: dataset ids picked while browsing, fed to the "Your selection" download slice ---------- */
 const ck=(st,attrs,label)=>`<button type="button" class="ck" role="checkbox" aria-checked="${st}" aria-label="${esc(label)}" ${attrs}></button>`;
 function state(rows){let n=0;rows.forEach(r=>{if(sel.has(r.id))n++});return n===0?'false':n===rows.length?'true':'mixed'}
 function setSel(rows,on){rows.forEach(r=>on?sel.add(r.id):sel.delete(r.id));persist();if(on&&sel.size)S.slice='sel';refresh()}
-function refresh(){tree();crumbs(filtered());syncCards();downloads()}
+function refresh(){tree();syncCards();downloads()}
 function syncCards(){$('cards').querySelectorAll('.dcard').forEach(c=>{const on=sel.has(c.dataset.id);c.classList.toggle('on',on);const k=c.querySelector('.ck');if(k)k.setAttribute('aria-checked',on)})}
-function selbar(){const n=sel.size,el=$('selbar');el.classList.toggle('hint',!n);el.innerHTML=n?`<b>${n.toLocaleString()} dataset${n===1?'':'s'} selected</b><span class="sep">·</span><a href="#download">go to download</a><span class="sep">·</span><button type="button" class="lk" id="selClear">clear</button>`:'Tick a platform, source or dataset to add it to your download.';
-  const c=$('selClear');if(c)c.onclick=()=>setSel(L,false)}
-
-function filtered(){const q=S.q.toLowerCase();return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source)&&(!q||hay(r).includes(q)))}
-function pendFiltered(){const q=S.q.toLowerCase();return PEND.filter(p=>(S.cat==='all'||p.morph===S.cat)&&(!S.robot||p.embodiment===S.robot)&&(!S.source||p.source===S.source)&&(!q||(p.source+' '+p.embodiment+' '+p.morph+' '+(p.remark||'')+' '+noteText(p)).toLowerCase().includes(q)))}
+function filtered(){return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source))}
+function pendFiltered(){return PEND.filter(p=>(S.cat==='all'||p.morph===S.cat)&&(!S.robot||p.embodiment===S.robot)&&(!S.source||p.source===S.source))}
 const noteText=p=>p.note&&D.pending_notes?D.pending_notes[p.note]||'':'';
-function hay(r){return (r.id+' '+human(r.name)+' '+r.robot_type+' '+r.embodiment+' '+r.source+' '+r.morph+' '+r.form+' '+r.cams.map(c=>c.model).join(' ')+' '+(P[r.project].notes||'')).toLowerCase()}
-
-function crumbs(rows){const parts=[{l:'All',f:()=>{S.cat='all';S.robot=null;S.source=null}}];
-  if(S.cat!=='all')parts.push({l:ML[S.cat],f:()=>{S.robot=null;S.source=null}});
-  if(S.robot)parts.push({l:S.robot,f:()=>{S.source=null}});
-  if(S.source)parts.push({l:S.source,f:()=>{}});
-  const st=state(rows);
-  $('crumbs').innerHTML=parts.map((p,i)=>`${i?'<span class="sep">/</span>':''}<button type="button" class="${i===parts.length-1?'cur':''}" data-i="${i}">${esc(p.l)}</button>`).join('')
-    +(rows.length?`<button type="button" class="lk" id="selAll">${st==='true'?'Deselect all':'Select all '+rows.length.toLocaleString()}</button>`:'');
-  $('crumbs').querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>{parts[+b.dataset.i].f();S.shown=PAGE;tree();render()});
-  const sa=$('selAll');if(sa)sa.onclick=()=>setSel(rows,st!=='true');
-  selbar()}
-
-function thumb(r){const p=P[r.project];const own=p.overlays.find(o=>o.dataset===r.id);const o=own||p.overlays[0];if(!o)return null;const f=`${o.key}__${o.slug}`;
-  return {o,own:!!own,poster:`overlays/posters/${f}.jpg`,src:D.overlay_base+f+'.mp4'}}
+function thumb(r){const p=P[r.project];const o=p.overlays.find(o=>o.dataset===r.id)||p.overlays[0];if(!o)return null;const f=`${o.key}__${o.slug}`;
+  return {poster:`overlays/posters/${f}.jpg`,src:D.overlay_base+f+'.mp4'}}
 
 function card(r){const t=thumb(r),on=sel.has(r.id);
-  const th=t?`<div class="thumb has clip" data-src="${t.src}" title="Play the validation clip"><img src="${t.poster}" alt="" loading="lazy"><span class="tl">${t.own?`validation clip · ep ${t.o.episode}`:'project clip'}</span><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
+  const th=t?`<div class="thumb has clip" data-src="${t.src}" title="Play the example clip"><img src="${t.poster}" alt="" loading="lazy"><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
     :`<div class="thumb"><span class="tl">no example clip</span><span class="dur">${fmtH(r.hours)} h</span></div>`;
   return `<article class="dcard${on?' on':''}" data-id="${esc(r.id)}">${th}${ck(on,'','Select '+human(r.name)+' for download')}<div class="body"><div class="ttl">${esc(human(r.name))}</div>
-    <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
-    <div class="sub">${esc(r.project)} · ${fmt(r.episodes)} ep · ${r.n_views} view${r.n_views===1?'':'s'} · ${Math.round(r.fps)} fps</div></div></article>`}
+    <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div></div></article>`}
 
-function render(){const rows=filtered(),listed=pendFiltered(),pend=SHOW_PEND?listed:[];crumbs(rows);const show=rows.slice(0,S.shown);
-  $('cards').innerHTML=show.length?show.map(card).join(''):pend.length?'':`<div class="empty">${listed.length?'Listed in the paper, not converted on this site yet.':'No datasets match. Try another search or pick a different platform.'}</div>`;
+function render(){const rows=filtered(),listed=pendFiltered(),pend=SHOW_PEND?listed:[];const show=rows.slice(0,S.shown);
+  $('cards').innerHTML=show.length?show.map(card).join(''):pend.length?'':`<div class="empty">${listed.length?'Listed in the paper, not converted on this site yet.':'No datasets here. Pick a different platform.'}</div>`;
   $('loadmore').innerHTML=rows.length>S.shown?`<button type="button" id="more">Load more datasets</button><span class="n">showing ${show.length} of ${rows.length.toLocaleString()}</span>`:(rows.length>PAGE?`<span class="n">all ${rows.length.toLocaleString()} shown</span>`:'');
   const m=$('more');if(m)m.onclick=()=>{S.shown+=PAGE;render()};
   const pe=$('pend');pe.hidden=!pend.length;pe.classList.toggle('solo',!show.length);
-  pe.innerHTML=pend.length?`<h3>Listed in the paper, not converted yet</h3><p class="p">${pend.length} source${pend.length===1?'':'s'} of the appendix source tables ${pend.length===1?'has':'have'} no LeRobot-v3 export on this site yet, so no sample archive and no validation clip. Counts are the paper's; the bracketed letter is its note.</p><div class="cards">${pend.map(pcard).join('')}</div>`:''}
+  pe.innerHTML=pend.length?`<h3>Listed in the paper, not converted yet</h3><p class="p">${pend.length} source${pend.length===1?'':'s'} of the appendix source tables ${pend.length===1?'has':'have'} no LeRobot-v3 export on this site yet, so no sample archive and no example clip. Counts are the paper's; the bracketed letter is its note.</p><div class="cards">${pend.map(pcard).join('')}</div>`:''}
 function pcard(p){const i=PEND.indexOf(p);
   return `<article class="dcard pcard" data-pid="${i}"><div class="thumb"><span class="tl">no sample yet</span>${p.note?`<span class="tag">[${esc(p.note)}]</span>`:''}<span class="dur">${fmtH(p.hours)} h</span></div><div class="body"><div class="ttl">${esc(p.source)}</div>
     <div class="meta"><span class="cat">${esc(ML[p.morph]||p.morph)}</span><span>›</span><span>${esc(p.embodiment)}</span></div>
@@ -427,6 +397,14 @@ function paperShort(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span c
   return '<span class="au">'+ps.map(p=>`<a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(shortCite(p,fb))}</a>`).join(', ')+'</span>'}
 function paperLinks(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="paper none">no paper listed yet</span>';
   return ps.map(p=>`<span class="paper"><span class="au">${esc(shortCite(p,fb))}</span><a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(p.title)}</a></span>`).join('')}
+/* the line under a source row of the tree: "(Chi et al. 2024)" linking to the paper (arXiv where there is one) and the license chip.
+   x.rows = the datasets of that row; one row can span two sources.json entries (FastUMI and FastUMI-100K, the two ALOHA licenses), so both are deduplicated */
+function srcMeta(x){const c={};x.rows.forEach(r=>{const k=srcName(r);c[k]=(c[k]||0)+1});
+  const ps=new Map(),ls=new Map();
+  Object.keys(c).sort((a,b)=>c[b]-c[a]||a.localeCompare(b)).forEach(k=>{const i=SRC[k];if(!i)return;
+    (i.papers||[]).forEach(p=>{if(!ps.has(p.key))ps.set(p.key,`<a class="au" href="${esc(p.url||'#')}" target="_blank" rel="noopener" title="${esc(p.title+(p.arxiv?' · arXiv:'+p.arxiv:''))}">(${esc(shortCite(p,k))})</a>`)});
+    const n=licName(i)||'';if(!ls.has(n))ls.set(n,licChip(i))});
+  return ls.size?`<div class="smeta">${[...ps.values(),...ls.values()].join('')}</div>`:''}
 function bibOf(ss,label){const seen=new Set(),out=[`% CAMX one-episode samples · ${label}`,`% ${ss.length} source dataset${ss.length===1?'':'s'}: ${ss.map(s=>s.name).join(', ')}`,'% Cite CAMX and every source below; each source keeps its own license (see the record of each dataset on the site).','',CAMX_BIB()];
   ss.forEach(s=>{(s.info.papers||[]).forEach(p=>{if(seen.has(p.key))return;seen.add(p.key);out.push('',`% ${s.name}${licName(s.info)?' · '+licName(s.info):''}`,p.bibtex.trim())})});
   return out.join('\n')+'\n'}
@@ -450,7 +428,7 @@ function gate(rows,label,then,verb){const ss=srcOf(rows);if(!ss.length){then();r
 function sizeOf(rows){const sm=sampled(rows);return {n:sm.length,miss:rows.length-sm.length,b:sm.reduce((a,r)=>a+r.sample.bytes,0),s:sm.reduce((a,r)=>a+r.sample.seconds,0)}}
 function slices(){const out=[];
   if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length.toLocaleString()} dataset${rows.length>1?'s':''} ticked while browsing`,rows,sel:true})}
-  out.push({id:'full',name:'Full release',desc:`${L.length.toLocaleString()} datasets · ${MORPHS.length} morphologies`,rows:L});
+  out.push({id:'full',name:'All morphologies',desc:`${L.length.toLocaleString()} datasets · ${MORPHS.length} morphologies`,rows:L});
   MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const plats=new Set(rows.map(r=>r.embodiment)).size;
     out.push({id:m.id,name:m.label,desc:`${rows.length.toLocaleString()} datasets · ${plats} platform${plats>1?'s':''}`,rows})});
   return out}
@@ -489,12 +467,12 @@ function persist(){try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 
 /* ---------- dataset drawer ---------- */
-function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const ov=p.overlays.filter(o=>o.dataset===r.id);const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
+function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
   const kv=[hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
-    ov.length?[ov.length>1?'Validation clips':'Validation clip',ov.map(o=>`<a href="overlays/#${esc(p.key.replace('/','_'))}">ep ${o.episode}</a>`).join(' · ')]:null,
+    p.overlays.length?['Example clips',`<a href="overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`+(p.overlays.some(o=>o.mode==='primitive')?'<br><span class="dim">No gripper CAD is published for this rig, so the clips draw a stand-in: two pads at the recorded jaw width, a bar between them and the tool-centre axes (x red, y green, z blue).</span>':'')]:null,
     ['License',licChip(si)+(si.homepage?` <a class="dim" href="${esc(si.homepage)}" target="_blank" rel="noopener">source page</a>`:'')],
     ['Cite',paperLinks(si,srcName(r))+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]].filter(Boolean);
   $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(human(r.name))}</h3>
@@ -508,7 +486,7 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
 /* record of a source listed from the paper without converted data: the paper's counts, its note, license and paper */
 function drawerPend(i){const p=PEND[i];if(!p)return;const si=SRC[p.entry||p.source]||{};S.open=null;S.openPend=i;
   const kv=[['Datasets',p.datasets.toLocaleString()],['Episodes',esc(fmt(p.episodes))],['Duration',esc(fmtH(p.hours))+' h'],['Views',esc(p.views)],['FPS',esc(p.fps)],
-    ['Status','<span class="dim">not converted yet: no sample archive, no validation clip</span>'+(p.note?`<br><b>[${esc(p.note)}]</b> ${esc(noteText(p))}`:'')+(p.remark?`<br>${esc(p.remark)}`:'')],
+    ['Status','<span class="dim">not converted yet: no sample archive, no example clip</span>'+(p.note?`<br><b>[${esc(p.note)}]</b> ${esc(noteText(p))}`:'')+(p.remark?`<br>${esc(p.remark)}`:'')],
     ['License',licChip(si)+(si.homepage?` <a class="dim" href="${esc(si.homepage)}" target="_blank" rel="noopener">source page</a>`:'')],
     ['Cite',paperLinks(si,p.source)+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]];
   $('drawerBody').innerHTML=`<div class="kicker">Source listed in the paper</div><h3>${esc(p.source)}</h3>
@@ -520,11 +498,9 @@ function drawerPend(i){const p=PEND[i];if(!p)return;const si=SRC[p.entry||p.sour
 function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
 
 document.addEventListener('DOMContentLoaded',()=>{load();
-  $('importSel').onclick=()=>$('importFile').click();
   $('tree').addEventListener('click',e=>{const b=e.target.closest('button[data-cat]');if(!b)return;
-    if(b.classList.contains('ck')){setSel(groupRows(b.dataset),b.getAttribute('aria-checked')!=='true');return}
-    S.cat=b.dataset.cat;S.robot=b.dataset.robot||null;S.source=b.dataset.source||null;S.shown=PAGE;tree();render()});
-  $('q').addEventListener('input',e=>{S.q=e.target.value.trim();S.shown=PAGE;render()});
+    keep(b,()=>{if(b.classList.contains('ck')){setSel(groupRows(b.dataset),b.getAttribute('aria-checked')!=='true');return}
+      S.cat=b.dataset.cat;S.robot=b.dataset.robot||null;S.source=b.dataset.source||null;S.shown=PAGE;tree();render()})});
   $('cards').addEventListener('click',e=>{const k=e.target.closest('.ck');
     if(k){const id=k.closest('.dcard').dataset.id;setSel(L.filter(r=>r.id===id),!sel.has(id));return}
     const t=e.target.closest('.thumb[data-src]');
@@ -534,8 +510,6 @@ document.addEventListener('DOMContentLoaded',()=>{load();
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
   $('citeBtn').onclick=()=>$('cite').classList.toggle('show');
-  $('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const j=JSON.parse(t);
-    const ids=(j.datasets||j).map(x=>typeof x==='string'?x:x.id);const known=new Set(L.map(r=>r.id));let n=0;ids.forEach(i=>{if(known.has(i)){sel.add(i);n++}});persist();S.slice='sel';refresh();alert(`Imported ${n} of ${ids.length} datasets`)}catch(err){alert('Not a selection JSON: '+err)}});e.target.value=''};
 });
 </script>
 </body>

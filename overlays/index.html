@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CAMX Gripper Projection</title>
-<meta name="description" content="The gripper projected through each dataset's own camera poses and intrinsics, for validating the CAMX camera and end-effector calibration.">
+<meta name="description" content="The gripper projected through each dataset's own camera poses and intrinsics, as a check of the CAMX camera and end-effector calibration.">
 <link rel="stylesheet" href="../site.css">
 <script src="../clip.js" defer></script>
 <style>
@@ -38,14 +38,14 @@ footer p{margin:0 0 6px}
     <nav aria-label="Sections">
       <a href="../#browse">Browse</a>
       <a href="../#download">Download</a>
-      <a href="./" aria-current="page">Validation clips</a>
+      <a href="./" aria-current="page">Example clips</a>
     </nav>
     <a class="button primary cta" href="https://camx-anonymous.github.io/camuva-rollouts/">CAMUVA Rollouts</a>
   </div>
 </header>
 <main class="wide">
 <header>
-  <p class="crumbs"><a href="../">CAMX Dataset</a> / validation clips</p>
+  <p class="crumbs"><a href="../">CAMX Dataset</a> / example clips</p>
   <h1>Gripper Projection</h1>
   <p class="sub">A few episodes per project with the gripper projected through the dataset's own camera poses and intrinsics. If the drawn gripper sits on the real one, the calibration is consistent.</p>
   <nav class="links">
@@ -56,7 +56,7 @@ footer p{margin:0 0 6px}
   <section class="pending" id="pending">
     <div class="eyebrow">Queue</div>
     <h2>No example clip</h2>
-    <p class="pnote">Projects in the training tree without an example overlay in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
+    <p class="pnote">Projects without an example clip in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
     <table><thead><tr><th>Project</th><th>Embodiment</th><th class="num">Datasets</th><th class="num">Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
   </section>
   <footer><p>Clips are 10 fps, ~45 s, 360p. Wrist tiles draw the gripper from the end-effector pose in that camera; other tiles place it through the world-frame camera trajectories. Left gripper green, right gripper blue.</p></footer>
@@ -81,7 +81,7 @@ function render(){const projs=D.projects.filter(p=>p.overlays.length);
   document.querySelectorAll('.vid').forEach(v=>v.onclick=()=>openClip(v));
   document.getElementById('pending').style.display=D.projects.some(p=>!p.overlays.length)?'':'none';
   document.getElementById('pendingBody').innerHTML=D.projects.filter(p=>!p.overlays.length).map(p=>{const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const n=p.notes||'';let why='no clip in this release';
-    if(/conversion tree|not in the camx_480p training tree/i.test(n))why='converted after the last render pass';else if(/rolled into the UMI|handheld/i.test(n)&&/single/.test(Object.keys(p.forms).join()))why='single fisheye / GoPro camera: needs the rig\'s lens fit before drawing';
+    if(/conversion tree/i.test(n))why='converted after the last render pass';else if(/rolled into the UMI|handheld/i.test(n)&&/single/.test(Object.keys(p.forms).join()))why='single fisheye / GoPro camera: needs the rig\'s lens fit before drawing';
     return `<tr><td><a href="../#browser">${esc(p.key)}</a></td><td>${esc(emb)}</td><td class="num">${p.datasets}</td><td class="num">${fmtH(p.hours)}</td><td class="why">${why}</td></tr>`}).join('');}
 </script>
 </body>

@@ -148,7 +148,8 @@ def align_paper(out):
 
 def pending_pass(out):
     """data/pending.json: every source of the paper's tables that has no converted data on the site (no sample archive, no
-    clip), with the paper's counts. Copied into out['pending'] so the browse tree lists it under its embodiment group."""
+    clip), with the paper's counts, copied into out['pending']; and the totals of the paper's two tables (`paper`), copied
+    into totals['paper'] for the header and the footer of the site, which quote the paper and not the site's own sums."""
     out['pending'] = []; out['pending_notes'] = {}
     if not os.path.isfile(PENDING):
         print(f'warning: {PENDING} not found, the unconverted sources of the paper are not listed', file=sys.stderr); return out
@@ -169,6 +170,13 @@ def pending_pass(out):
     t['sources'] = len(conv | pend)  # table rows of the paper: one per embodiment and source
     t['pending'] = {'sources': len(out['pending']), 'datasets': sum(e['datasets'] for e in out['pending']),
                     'episodes': sum(e['episodes'] for e in out['pending']), 'hours': round(sum(e['hours'] for e in out['pending']), 1)}
+    if j.get('paper'):
+        t['paper'] = {k: j['paper'][k] for k in ('sources', 'embodiments', 'datasets', 'episodes', 'hours')}
+        site = {'sources': t['sources'], 'embodiments': t['embodiments_listed'],
+                **{k: round(t[k] + t['pending'][k], 1) for k in ('datasets', 'episodes', 'hours')}}
+        for k, v in t['paper'].items():  # hours: the listed sources carry the tables' rounded hours, so allow half an hour
+            if abs(site[k] - v) > (0.5 if k == 'hours' else 0):
+                print(f'warning: {k}: the paper counts {v}, the site (converted + listed) {site[k]}', file=sys.stderr)
     print(f"{len(out['pending'])} unconverted sources listed from {os.path.relpath(PENDING, REPO)}; "
           f"{t['sources']} sources / {t['embodiments_listed']} embodiment groups in all", file=sys.stderr)
     return out

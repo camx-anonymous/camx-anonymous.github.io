@@ -1,4 +1,4 @@
-// Shared click-to-play for the example clips (browse cards and the validation-clips page).
+// Shared click-to-play for the example clips (browse cards and the example-clips page).
 // One clip plays at a time and a clip is unloaded when it scrolls away: iOS Safari stops loading new
 // <video> elements once a page holds more than a handful, so clips must be released, not just paused.
 // A load failure shows a retry state instead of a silent black box.
