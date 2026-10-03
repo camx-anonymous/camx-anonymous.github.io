@@ -490,15 +490,9 @@ DOWNLOAD = {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<proje
 # UMI Data Initiative listing), which the site's license chips link to; "projects" / "datasets" point rows at a more
 # specific entry where one source ships under two licenses (FastUMI-100K, RH20T cfg 6-7, the Apache-2.0 ALOHA repos). The site
 # shows them in the dataset record and in the download gate (cite + license confirmation); this script checks that
-# every source has an entry and no forbidden term, and writes data/citations.bib (CAMX + every source paper).
+# every source has an entry and no forbidden term, and writes data/citations.bib (every source paper).
 SOURCES = os.path.join(REPO, 'data', 'sources.json')
 BIB = os.path.join(REPO, 'data', 'citations.bib')
-CAMX_BIB = '''@misc{camx2026,
-  title  = {CAMX: A Camera-Aware Cross-Embodiment Dataset},
-  author = {Anonymous Authors},
-  year   = {2026},
-  note   = {Under review}
-}'''
 
 
 def sources_pass(out):
@@ -519,8 +513,8 @@ def sources_pass(out):
         if not v.get('license'): print(f'warning: {k}: license not stated', file=sys.stderr)
         elif not v['license'].get('repo'): print(f'warning: {k}: license without the page that states it (license.repo)', file=sys.stderr)
         if not v.get('papers'): print(f'warning: {k}: no paper listed', file=sys.stderr)
-    lines = ['% CAMX one-episode samples: CAMX plus every source dataset it re-exports.',
-             '% Each source keeps its own license; see data/sources.json or the record of each dataset on the site.', '', CAMX_BIB]
+    lines = ['% CAMX one-episode samples: every source dataset CAMX re-exports.',
+             '% Each source keeps its own license; see data/sources.json or the record of each dataset on the site.']
     seen = set()
     for k in sorted(src, key=str.lower):
         for pp in src[k].get('papers') or []:

@@ -99,7 +99,9 @@ SPECS = {
     'aloha/openneo_arx5': NEO('openneo.json', None),
     'aloha/openneo_arx5_single': NEO('openneo_single.json', None),
     'aloha/robodojo': MV(config='robodojo.json'),                                    # piper x / arx x5 per dataset
-    'dahuan/rh20t_cfg1': dict(RH20T, profile='primitive'),                           # Dahuan AG-95: no URDF
+    # RH20T cfg1-3: this tool's checkout has no AG-95 / WSG-50 profile, so it draws the primitive; the site clips come from
+    # tools/rerun_clips.py (rerun route) with the vendor URDFs (grippers/dh_ag95, grippers/wsg50) since 2026-10-03
+    'dahuan/rh20t_cfg1': dict(RH20T, profile='primitive'),
     'dahuan/rh20t_cfg2': dict(RH20T, profile='primitive'),
     'fastumi/fastumi': MV(calib={'main': GOPRO}, profile='umi'),                      # UMI gripper on an xArm, GoPro
     'fastumi/fastumi_100k_single_arm': MV(calib={'main': GOPRO}, profile='umi'),
@@ -145,7 +147,7 @@ SPECS = {
     # f 88 px at 224 (the same focal the 1080p->224 resize implies), UMI paper-figure URDF hung from the GoPro lens
     'umi/vitamin_b': MV(calib={'main': GOPRO}, profile='umi'),
     'ur/openneo_ur': NEO('openneo_ur.json', None, eef_tcp=NEO_UR_TCP),                  # wrist stream only (third_0 dropped)
-    'wsg50/rh20t_cfg3': dict(RH20T, profile='primitive'),                            # WSG-50: no URDF
+    'wsg50/rh20t_cfg3': dict(RH20T, profile='primitive'),                            # see dahuan/rh20t_cfg1
 }
 
 

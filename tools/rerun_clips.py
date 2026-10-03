@@ -60,6 +60,7 @@ STANDIN = {'aloha/openneo_aloha': 'piper', 'aloha/openneo_arx5': 'arx x5', 'aloh
 GOPRO = dict(profile='umi', calib='gopro_hero9_maxlens_2_7k_umi.json', fit='crop')   # GoPro Hero 9/10 + Max Lens Mod, centre crop
 FISHEYE = {p: GOPRO for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm', 'umi/data_scaling_laws', 'umi/exumi', 'umi/humi',
                                'umi/maniwav', 'umi/mvumi', 'umi/touch_in_the_wild', 'umi/umi', 'umi/umi_on_legs', 'umi/vitamin', 'umi/vitamin_b')}
+for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm'): FISHEYE[p] = dict(GOPRO, profile='fastumi')   # UMI mesh at the rig's own TCP (camera-to-tip 145 mm, not UMI's 220)
 FISHEYE['umi/exumi'] = dict(GOPRO, profile='exumi')   # grippers/exumi: the exUMI 9DTact fingertips fitted to the wrist frames (2026-10-03)
 # grippers/vitamin_b: DuoTact fingers fitted to the wrist frames; the release's GoPro lens through the 2028-square crop -> 224 (crop chain assumed);
 # theta-max = the circular image mask, so the other hand is not drawn into the black surround
@@ -70,6 +71,12 @@ FISHEYE['genrobot/10kh'] = dict(profile='genrobot', fit='stretch', calib_episode
 FISHEYE['daimon/dataclaw'] = dict(profile='dataclaw', fit='stretch', calib_device='daimon_dataclaw_{device}.json', calib='daimon_dataclaw_fleet_fallback.json',
                                   extra=['--cross', 'off', '--theta-max-deg', '73'], eef='0,0.0260,0.1172,0.5,0.5,-0.5,0.5', mode='primitive')
 FISHEYE['umi/umi_benchmark'] = dict(profile='umi_benchmark', calib='umi_benchmark_fastumi_pro_seucm.json', fit='crop', mode='primitive')
+# Vista-UMI: the same Lumos FastUMI Pro handheld as UMI-Benchmark (swing gripper, no CAD), so the same stand-in, lens file and
+# gripper label; its info.json carries a placeholder eef_pose_in_main (identity rotation) and labels the gripper `fastumi`, which
+# would draw the GoPro UMI model where the real swing fingers are not (2026-10-03): the UMI-Benchmark calibration of the tcp in the
+# main camera (its info.json, one constant for both hands) is passed instead
+FISHEYE['umi/vista_umi'] = dict(FISHEYE['umi/umi_benchmark'], model='lumos swing gripper',
+                                eef='0.001071,0.067511,0.076303,-0.499159,-0.502619,0.506589,-0.491509')
 # left as they are: pinhole rigs without a gripper CAD (the Rerun viewer draws URDFs only), and rigs whose lens file or viz config
 # is not in this checkout (umi3d / aetherock lens files, robomind_ur5 config, the gripper_v4 DAS lens, hifi_umi's attached cameras)
 # multiview route: rigs the headless Rerun viewer cannot do, drawn by render_multiview_overlay_video.py (or, for GenRobot V4, the
@@ -248,6 +255,7 @@ def fisheye_one(o, d, t0):
         key = f'observation.image.{s}_main_camera_rgb'; shape = info['features'][key]['shape']
         views.append({'name': f'{s}_main_camera_rgb', 'video_key': key, 'entity': None, 'w': int(shape[1]), 'h': int(shape[0]), 'focal_px': None, 'pinhole': False, 'fisheye': True})
         model = info.get(f'{s}_gripper_model'); prof = None if spec.get('mode') == 'primitive' else (gripper_registry.lookup(model) or gripper_registry.lookup(spec['profile']))
+        model = spec.get('model') or model   # the spec's label when the dataset's does not name the rig's gripper (Vista-UMI)
         grip[s] = {'model': model or spec['profile'], 'profile': prof.name if prof else spec['profile'], 'urdf': str(prof.urdf_path(s)) if prof else None,
                    'urdf_present': bool(prof and prof.urdf_path(s).is_file()), 'primitive': prof is None}
     import glob, pyarrow.parquet as pq

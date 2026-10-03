@@ -77,7 +77,7 @@ This repository is anonymized for review.
   e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7; `datasets` does the same per row for the
   five lerobot ALOHA repos whose card says Apache-2.0). Hand-maintained; author given names are
   abbreviated to initials. The build checks it (every source has an entry, no forbidden term) and writes
-  `data/citations.bib` (CAMX plus every source paper) from it.
+  `data/citations.bib` (every source paper) from it.
 - Download gate — every download action (the slice command's Copy / Save .sh, a record's "Copy sample command")
   first opens a compact dialog listing the sources of exactly those samples (name, license chip, short paper
   cite), offers the BibTeX of that set (Copy / Save .bib), and asks the user to agree to cite them and follow
@@ -107,9 +107,9 @@ mp4 and the site poster. Point `CAMX_OVERLAYS_EXTRA` at that directory when buil
 `tools/rerun_clips.py` re-renders the clips of `data/datasets.json` in the curation look, on a machine with the
 camx_480p tree, the curation tree and the camera-cross-embodiment checkout (`plan` prints each clip's route: `reuse`
 a current headless-Rerun export of the curation tree, `rerun` headless Rerun through `lerobot_rerun_viz.py` +
-`mv_site/record_views.py`, `fisheye` the OpenCV renderer through `tools/white_overlay.py`, `multiview` the multi-view
+`mv_site/record_views.py`, `fisheye` the OpenCV renderer through `tools/white_overlay.py`, also Vista-UMI with the UMI-Benchmark stand-in, lens and tool-point calibration (same FastUMI Pro device), `multiview` the multi-view
 renderer through `tools/white_multiview.py` with the arguments of `tools/overlay_picks.py`, for rigs the headless viewer cannot do:
-pinhole rigs without a gripper CAD (primitive stand-in: RH20T cfg1-3, the OpenNeoData Flexiv / UR / ARX X5 / UMI rigs), fisheye rigs
+pinhole rigs without a gripper CAD (primitive stand-in: the OpenNeoData Flexiv / UR / ARX X5 / UMI rigs; RH20T cfg1-3 take the `rerun` route since 2026-10-03, with the vendors' AG-95 / WSG-50 URDFs of `grippers/dh_ag95` and `grippers/wsg50`), fisheye rigs
 with their own lens file (UMI-3D, AetheRock, HiFi-UMI, GenRobot V4), RoboMIND UR5 and the 180p DROID twin; `MULTIVIEW` in the script
 lists them, and `CAMX_VIZ_MV` names a camera-cross-embodiment checkout that carries that renderer and the lens files; `keep` untouched:
 datasets not in the local tree). `render` writes the clip tree

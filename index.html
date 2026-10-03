@@ -24,7 +24,7 @@
 @media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k,.stats .rl{font-size:13px}.button.pin{top:10px;font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
 
 /* ---------- browse ---------- */
-#browse{padding-top:20px;padding-bottom:96px}
+#browse{padding-top:20px;padding-bottom:32px}
 .browse{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
 /* the tree sticks beside the cards and scrolls on its own when it is taller than the window. A scroll box has no
    automatic minimum width, so the width is fixed: 380 of content + the padding that keeps the outdented top row
@@ -115,8 +115,8 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 
 /* ---------- download ---------- */
 #download{background:var(--panel2);border-top:1px solid var(--line)}
-.dl{padding-top:96px;padding-bottom:96px}
-@media (max-width:640px){.dl{padding-top:56px;padding-bottom:56px}}
+.dl{padding-top:32px;padding-bottom:96px}
+@media (max-width:640px){.dl{padding-top:20px;padding-bottom:56px}}
 .dlhead{margin-bottom:24px}
 .dlhead h2{margin:0}
 .dlhead .p{font-size:16px;line-height:1.5;color:var(--ink2);margin:10px 0 0;text-wrap:pretty}
@@ -183,15 +183,6 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 @media (max-width:640px){.gate .head,.gate .srcs,.gate .foot{padding-left:16px;padding-right:16px}.gate .acts .bib{width:100%;margin:0 0 4px}}
 @media (max-width:640px){.code .bar .st{order:3;flex-basis:100%;max-width:none;margin:4px 0 0}}
 @media (max-width:480px){.slices{grid-template-columns:1fr 1fr;gap:8px}.slice{padding:14px}.slice .sz{font-size:22px}}
-
-/* ---------- footer ---------- */
-footer{margin:0}
-.foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.foot nav{display:flex;gap:20px;flex-wrap:wrap}
-.foot nav a,.foot nav button{color:var(--ink3);text-decoration:none;font:inherit;padding:0;border:0;background:none}
-.foot nav a:hover,.foot nav button:hover{color:var(--accent)}
-.cite{display:none;margin-top:20px;max-width:560px}
-.cite.show{display:block}
 
 /* ---------- dataset drawer ---------- */
 .drawer{position:fixed;top:0;right:0;width:min(560px,100vw);height:100vh;background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow-md);padding:24px 28px 40px;overflow:auto;z-index:30;transform:translateX(100%);visibility:hidden;transition:transform .18s cubic-bezier(.22,1,.36,1),visibility 0s .18s}
@@ -302,22 +293,6 @@ footer{margin:0}
     </div>
   </section>
 
-  <footer>
-    <div class="wrap foot">
-      <span id="footInfo">CAMX Dataset · anonymized for review</span>
-      <nav>
-        <a href="https://github.com/camx-anonymous/camx-anonymous.github.io">GitHub</a>
-        <a href="overlays/">Example clips</a>
-        <button type="button" id="citeBtn">Cite</button>
-      </nav>
-    </div>
-    <div class="wrap"><pre class="cite" id="cite">@misc{camx2026,
-  title  = {CAMX: A Camera-Aware Cross-Embodiment Dataset},
-  author = {Anonymous Authors},
-  year   = {2026},
-  note   = {Under review}
-}</pre></div>
-  </footer>
 </main>
 
 <div class="scrim" id="scrim"></div>
@@ -368,12 +343,11 @@ function order(rows){const rank={},seen={};
 function load(){fetch('data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=order(d.datasets);PEND=d.pending||[];
   try{JSON.parse(localStorage.getItem('camx.sel')||'[]').forEach(x=>sel.add(x))}catch(e){}
   fetch('data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};SRCOK=true;tree();downloads();if($('drawer').classList.contains('open')){if(S.open)drawer(S.open);else if(S.openPend!=null)drawerPend(S.openPend)}}).catch(()=>{});
-  $('footInfo').textContent=`CAMX Dataset · anonymized for review · ${tot('datasets').toLocaleString()} datasets, ${d.totals.projects} projects, ${tot('embodiments')} platforms`;
   stats();tree();render();downloads();})}
 
 function agg(rows){return rows.reduce((a,r)=>{a.n++;a.ep+=r.episodes||0;a.h+=r.hours||0;a.b+=r.bytes_est||0;return a},{n:0,ep:0,h:0,b:0})}
 
-// the header and the footer quote the paper: the totals of its two appendix source tables (totals.paper, kept in data/pending.json).
+// the header quotes the paper: the totals of its two appendix source tables (totals.paper, kept in data/pending.json).
 // The site's own sums can differ from them, so they are only the fallback: converted datasets plus the listed sources (totals.pending)
 const tot=k=>{const t=D.totals;return (t.paper||{})[k]??(k==='sources'?t.sources:k==='embodiments'?t.embodiments_listed||t.embodiments:t[k]+((t.pending||{})[k]||0))};
 // two rows: the full dataset (the paper's totals, tot) and the one-episode samples published on this site (summed over the rows with a sample)
@@ -465,7 +439,6 @@ function pcard(p){const i=PEND.indexOf(p);
     <div class="note">${p.note?`<b>[${esc(p.note)}]</b>${esc(noteText(p))}`:esc(p.remark||'conversion pending')}</div></div></article>`}
 
 /* ---------- sources: license + papers per source dataset (data/sources.json), and the gate before any download ---------- */
-const CAMX_BIB=()=>$('cite').textContent.trim();
 const lastName=a=>{a=a.trim();if(/^\{.*\}$/.test(a))return a.slice(1,-1);return (a.includes(',')?a.split(',')[0]:a.split(/\s+/).pop()).replace(/[{}]/g,'')};
 function shortCite(p,fb){const m=/author\s*=\s*[{"]([^]*?)[}"]\s*,?\s*\n/i.exec(p.bibtex||'');const au=m?m[1].split(/\s+and\s+/i):[];
   return (au.length?lastName(au[0])+(au.length>1?' et al.':''):(fb||''))+(p.year?' '+p.year:'')}
@@ -496,7 +469,7 @@ function srcMeta(x){const c={};x.rows.forEach(r=>{const k=srcName(r);c[k]=(c[k]|
     (i.papers||[]).forEach(p=>{if(!ps.has(p.key))ps.set(p.key,`<a class="au" href="${esc(p.url||'#')}" target="_blank" rel="noopener" title="${esc(p.title+(p.arxiv?' · arXiv:'+p.arxiv:''))}">(${esc(shortCite(p,k))})</a>`)});
     const n=licName(i)||'';if(!ls.has(n))ls.set(n,licChip(i))});
   return ls.size?`<div class="smeta">${[...ps.values(),...ls.values()].join('')}</div>`:''}
-function bibOf(ss,label){const seen=new Set(),out=[`% CAMX one-episode samples · ${label}`,`% ${ss.length} source dataset${ss.length===1?'':'s'}: ${ss.map(s=>s.name).join(', ')}`,'% Cite CAMX and every source below; each source keeps its own license (see the record of each dataset on the site).','',CAMX_BIB()];
+function bibOf(ss,label){const seen=new Set(),out=[`% CAMX one-episode samples · ${label}`,`% ${ss.length} source dataset${ss.length===1?'':'s'}: ${ss.map(s=>s.name).join(', ')}`,'% Cite every source below; each source keeps its own license (see the record of each dataset on the site).'];
   ss.forEach(s=>{(s.info.papers||[]).forEach(p=>{if(seen.has(p.key))return;seen.add(p.key);out.push('',`% ${s.name}${licName(s.info)?' · '+licName(s.info):''}`,p.bibtex.trim())})});
   return out.join('\n')+'\n'}
 /* gate(rows,label,then,verb): confirm license + citation for every source of `rows`, then run `then`. Asked before every copy / save. */
@@ -554,9 +527,9 @@ function code(s){const z=sizeOf(s.rows);
   $('save').onclick=()=>gate(s.rows,s.name,save,'save');
   $('copy').onclick=()=>gate(s.rows,s.name,copy,'copy');
   bibBox(s)}
-/* the right pane: every BibTeX entry of the slice (CAMX + one per source paper), the same text the gate copies / saves */
+/* the right pane: every BibTeX entry of the slice (one per source paper), the same text the gate copies / saves */
 function bibBox(s){const ss=srcOf(s.rows),np=new Set();ss.forEach(x=>(x.info.papers||[]).forEach(p=>np.add(p.key)));
-  const txt=bibOf(ss,s.name),n=np.size+1;
+  const txt=bibOf(ss,s.name),n=np.size;
   const body=txt.trim().split('\n').map(l=>l.startsWith('%')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n');
   $('bibbox').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bibtex · ${n} entr${n===1?'y':'ies'}</button><span class="st"><b>${esc(s.name)}</b> · ${ss.length} source${ss.length===1?'':'s'}</span><button type="button" class="cp" id="bibSave">Save .bib</button><button type="button" class="cp" id="bibCopy">Copy</button></div><pre id="bibpre">${body}</pre>`;
   $('bibSave').onclick=()=>dl('camx_citations.bib',txt,'application/x-bibtex');
@@ -689,7 +662,6 @@ document.addEventListener('DOMContentLoaded',()=>{load();
   $('pend').addEventListener('click',e=>{const c=e.target.closest('.pcard');if(c)drawerPend(+c.dataset.pid)});
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
-  $('citeBtn').onclick=()=>$('cite').classList.toggle('show');
 });
 </script>
 </body>
