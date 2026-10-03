@@ -30,8 +30,8 @@ This repository is anonymized for review.
 - `data/pending.json` — hand-maintained: every source of the appendix tables that has no converted LeRobot-v3 data
   on the site yet (no sample archive, no validation clip), with the paper's counts (datasets, episodes, frames, hours,
   views, fps) and the table's note letter ([A]–[D]). The tree lists them under their embodiment group without a tick
-  box; the cards sit in a block under the results and open a record with license and citation. Remove an entry
-  once its data is converted and the build picks the rows up.
+  box; their cards (a block under the results, opening a record with license and citation) are switched off for now
+  by `SHOW_PEND` in `index.html`. Remove an entry once its data is converted and the build picks the rows up.
 - `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the
   rows (`projects` maps a family/project to a more specific entry where one source ships under two licenses,
   e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7; `datasets` does the same per row for the

@@ -317,6 +317,8 @@ const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + 
 const $=id=>document.getElementById(id);
 let D,P={},L=[],PEND=[],sel=new Set(),SRC={},SRCP={},SRCD={};
 // D.pending: the sources of the paper's appendix tables with no converted data here yet (data/pending.json), listed with the paper's counts
+// SHOW_PEND: the "Listed in the paper, not converted yet" cards under the dataset cards; off for now, the tree still lists these sources
+const SHOW_PEND=false;
 const S={cat:'all',robot:null,source:null,q:'',shown:PAGE,slice:'full'};
 // r.sample = {url, bytes, frames, seconds}: the episode-0 archive of the dataset on this repository's GitHub releases (null while unpublished)
 const sampled=rows=>rows.filter(r=>r.sample);
@@ -397,8 +399,8 @@ function card(r){const t=thumb(r),on=sel.has(r.id);
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
     <div class="sub">${esc(r.project)} · ${fmt(r.episodes)} ep · ${r.n_views} view${r.n_views===1?'':'s'} · ${Math.round(r.fps)} fps</div></div></article>`}
 
-function render(){const rows=filtered(),pend=pendFiltered();crumbs(rows);const show=rows.slice(0,S.shown);
-  $('cards').innerHTML=show.length?show.map(card).join(''):pend.length?'':'<div class="empty">No datasets match. Try another search or pick a different platform.</div>';
+function render(){const rows=filtered(),listed=pendFiltered(),pend=SHOW_PEND?listed:[];crumbs(rows);const show=rows.slice(0,S.shown);
+  $('cards').innerHTML=show.length?show.map(card).join(''):pend.length?'':`<div class="empty">${listed.length?'Listed in the paper, not converted on this site yet.':'No datasets match. Try another search or pick a different platform.'}</div>`;
   $('loadmore').innerHTML=rows.length>S.shown?`<button type="button" id="more">Load more datasets</button><span class="n">showing ${show.length} of ${rows.length.toLocaleString()}</span>`:(rows.length>PAGE?`<span class="n">all ${rows.length.toLocaleString()} shown</span>`:'');
   const m=$('more');if(m)m.onclick=()=>{S.shown+=PAGE;render()};
   const pe=$('pend');pe.hidden=!pend.length;pe.classList.toggle('solo',!show.length);
