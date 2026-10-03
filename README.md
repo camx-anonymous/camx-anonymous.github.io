@@ -8,19 +8,24 @@ This repository is anonymized for review.
 
 - `index.html` — the landing page and dataset browser: hero stats, a morphology → platform tree
   over every dataset (each row shows its project count and hours, "13 projects · 434 h"; a project row shows its
-  task count, "34 tasks · 209 h", one task per dataset; cards open a record drawer with the dataset's sample archive and its one-line fetch
-  command), and the download section: one bash command per slice (full release, one morphology, or the
-  datasets added from the drawer) that fetches and unpacks the one-episode samples from the GitHub releases,
-  with JSON export of the selection.
+  task count, "34 tasks · 209 h", where each of its datasets holds one task, and its dataset count, "26 datasets · 209 h",
+  where any holds several; cards open a record drawer with the dataset's sample archive and its one-line fetch
+  command), and the download section: two panes per slice (full release, one morphology, or the
+  datasets added from the drawer). Left, one bash command that fetches and unpacks the one-episode samples
+  from the GitHub releases; right, the BibTeX of that slice (CAMX plus one entry per source paper, with
+  Copy / Save .bib). JSON export of the selection.
 - One-episode samples — episode 0 of every dataset as a valid LeRobot-v3 dataset (`meta/`, `data/`, `videos/`
   holding just that episode), one `.tar.gz` per dataset on the `samples-v1-<family>` GitHub releases of this
   repository. Built with `tools/build_samples.py` (cuts the episode out of the packed files, drops every meta
   file that is not `info.json`, `episodes/`, `tasks.parquet`, `stats.json` or `_SUCCESS`, and runs the
   anonymisation pass), uploaded with `tools/publish_samples.py`, and merged into `data/datasets.json` as each
   row's `sample` (`{url, bytes, frames, seconds}`) by `tools/build_site_data.py --attach-samples-only`.
-- `overlays/` — camera-projection example clips, a few episodes per project: the gripper URDF
-  (or, where no URDF is released, a primitive stand-in: hinged fingers that follow the recorded jaw width plus
-  the tool-centre frame as RGB = xyz axes) projected through each dataset's own poses and intrinsics. Clips are
+- `overlays/` — camera-projection example clips, a few episodes per project: the gripper URDF as the opaque
+  light-grey CAD mesh of the headless Rerun viewer (the look of the curation pages; fisheye rigs, which that viewer
+  cannot draw through, go through the OpenCV fisheye renderer with the same grey, `tools/white_overlay.py`), or,
+  where no URDF is released, a primitive stand-in: hinged fingers that follow the recorded jaw width plus
+  the tool-centre frame as RGB = xyz axes; the OpenNeoData rigs draw the stock PiPER / ARX X5 / UMI gripper CAD as
+  a stand-in (`standin` on the clip record). Everything is projected through each dataset's own poses and intrinsics. Clips are
   served from `overlays/videos/` (tracked, so Pages sends them as `video/mp4`; iOS Safari will not play the
   `application/octet-stream` that GitHub release assets come back as); posters live in `overlays/posters/`. The site is fully static
   (GitHub Pages); there is no rendering backend.
@@ -28,7 +33,26 @@ This repository is anonymized for review.
   camera views, tile order, frame sampling and frame size, with nothing drawn on it (`tools/raw_clips.py`). The
   dataset cards of the landing page show only the raw poster. Clicking a card opens the dataset record and, beside
   it (above it on a phone), a comparison viewer that plays the raw clip next to the overlay clip in step; picking one
-  camera view crops both clips to that tile and shows them side by side.
+  camera view crops both clips to that tile and shows them side by side. Under the clips the viewer shows the caption
+  of the frame on screen: each clip's `task` in `data/datasets.json`, or, for an episode annotated per sub-task whose
+  caption changes while the clip plays, its `captions` track (`[[start second, caption], ...]`, read from the
+  dataset's per-frame `task_index` by the build). A caption with alternate wordings (the datasets' `||`-joined
+  language annotations, 2-20 per task) gets an original / augmented switch that steps through the alternates.
+- `data/captions.json` — the language annotations of every dataset for the Caption row of its record, keyed by row
+  id: `{n: instructions in meta/tasks.parquet, tasks: [the first 3 by task_index, wordings '||'-joined], name?: the
+  task group of info.json task_name (AgiBot), shown as the headline over its sub-task labels}`. The row shows the
+  first instruction (or the group) with the same original / augmented switch, then the count of the others with the
+  next ones as examples. Its own file, fetched when the first record opens: the task strings of all datasets run to
+  13 MB (DROID lists every episode's instruction), so only the first three per dataset are kept.
+- Task mix — most datasets are one task each, but the DROID lab splits, BiPlay, RoboCOIN and FMB hold several tasks
+  (one caption per episode, differing between episodes), and AgiBot World, Galaxea and MolmoAct hold one task annotated
+  per sub-task (several captions per episode). The build's `--tasks-only` pass reads every episode's `tasks` list from
+  `meta/episodes` and writes `tm` on such rows: `{kind: mixed | steps, eps, per_ep, n_task, n_step?, skills: [[class, n]],
+  top: [[caption, n]]}` (skill classes by the first verb of the caption, the taxonomy of the project histograms; the four
+  most frequent captions). The card shows the kind as a tag on its poster ("3.8k tasks · mixed", "1 task · sub-task
+  captions"), the record a Task mix row (the account, a stacked skill bar with legend, the top captions). Rows whose
+  `info.json` carries a `task_name` (AgiBot World, opaque numeric ids) get `title`, shown over the id on the card and
+  the record.
 - `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates. The browse tree follows
   the source tables of the paper's appendix: the build relabels rows into the paper's embodiment groups (iPhUMI,
   TacUMI, Other research projects; Galaxea, UR5, ARX5 and OpenArm each inside one morphology band) and copies
@@ -52,10 +76,14 @@ This repository is anonymized for review.
 - Download gate — every download action (the slice command's Copy / Save .sh, a record's "Copy sample command")
   first opens a compact dialog listing the sources of exactly those samples (name, license chip, short paper
   cite), offers the BibTeX of that set (Copy / Save .bib), and asks the user to agree to cite them and follow
-  the licenses. It is asked every time, nothing is remembered; the command block itself is always visible.
+  the licenses. It is asked every time, nothing is remembered; the command block and the BibTeX pane beside it
+  are always visible (citing is never gated).
   The shortcuts (All morphologies, one morphology) are handled the same way, since the set is derived from the rows
   of the slice. Each record also shows its License and Cite rows, and every source row of the browse tree carries
-  a line with its paper ("(Chi et al. 2024)", linking to arXiv where there is one) and its license chip. The
+  a line with its paper ("(Chi et al. 2024)", linking to arXiv where there is one) and its license chip. Every license
+  chip links to the page that states the license (`license.repo` in `sources.json`: the dataset's Hugging Face /
+  ModelScope repository, else the project's GitHub repository, else the UMI Data Initiative listing); the License row
+  of a record adds the license text and the source page. The
   generated script carries a three-line header that links `data/citations.bib`.
 
 ## Rebuilding the data
@@ -71,11 +99,32 @@ the DataClaw / GenRobot picks) for a pick table of three episodes per project, `
 `<project_key>/<slug>/{stitched.mp4,poster.jpg,meta.json}` in the tree's layout, `encode` makes the 360p release
 mp4 and the site poster. Point `CAMX_OVERLAYS_EXTRA` at that directory when building.
 
+`tools/rerun_clips.py` re-renders the clips of `data/datasets.json` in the curation look, on a machine with the
+camx_480p tree, the curation tree and the camera-cross-embodiment checkout (`plan` prints each clip's route: `reuse`
+a current headless-Rerun export of the curation tree, `rerun` headless Rerun through `lerobot_rerun_viz.py` +
+`mv_site/record_views.py`, `fisheye` the OpenCV renderer through `tools/white_overlay.py`, `keep` untouched: pinhole
+rigs without a gripper CAD, rigs whose lens file or viz config is not in the checkout). `render` writes the clip tree
+(`<key>/<slug>/{stitched.mp4,meta.json,DONE.json,poster.jpg}`, 2 Rerun + 3 fisheye clips in parallel, pausing while
+the user slice's memory pressure is high), `encode` the 360p site mp4 + poster, `attach` the clip records
+(views, grippers, mode, seconds, bytes, caption track):
+
+```
+PY=~/miniforge3/envs/iphumi/bin/python   # rerun, pyarrow, cv2
+$PY tools/rerun_clips.py plan && $PY tools/rerun_clips.py render && $PY tools/rerun_clips.py encode && $PY tools/rerun_clips.py attach
+```
+
 After any change to `overlays/videos/`, refresh the raw companions (it reads each overlay clip's size, frame count
 and frame rate back and cuts the same frames from the dataset's own videos; only stale or missing clips are redone):
 
 ```
 uv run --with pyarrow python tools/raw_clips.py      # overlays/raw/<key>__<slug>.{mp4,jpg}
+```
+
+The captions (each clip's `captions` track, and `data/captions.json` for the records) are read in the same build
+(pyarrow needed; without it they are left out) and can be refreshed alone, against any `camx_480p` tree:
+
+```
+uv run --with pyarrow python tools/build_site_data.py --captions-only --root /data/camx_480p
 ```
 
 One-episode samples (the tree root, the output dir and the scrub list are the `--root`, `--out` and

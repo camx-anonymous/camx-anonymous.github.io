@@ -91,7 +91,7 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .dcard .play i::after{content:"";width:0;height:0;border-left:9px solid #22211E;border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:2px}
 .dcard .thumb.has:hover .play i{background:var(--accent)}
 .dcard .thumb.has:hover .play i::after{border-left-color:#fff}
-.dcard .tl{position:absolute;left:10px;top:10px;font:400 11px/1 var(--mono);color:var(--ink3)}
+.dcard .tl{position:absolute;left:10px;bottom:10px;font:400 11px/1 var(--mono);color:var(--ink3)}
 .dcard .dur{position:absolute;right:8px;bottom:8px;font:400 11px/1 var(--mono);padding:3px 6px;background:rgba(34,33,30,.8);color:#FAF9F6;border-radius:4px}
 .dcard .body{display:flex;flex-direction:column;gap:2px;min-width:0}
 .dcard .ttl{font-size:14px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}
@@ -136,6 +136,11 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .slice .ds{font:400 12px/1.5 var(--mono);color:var(--ink3)}
 .slice .acts{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:-4px}
 .slice .acts .lk{white-space:nowrap}
+.codes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:16px;align-items:stretch}
+.codes .code{margin-top:0;display:flex;flex-direction:column;min-width:0}
+.codes .code pre{flex:1 1 auto}
+@media (min-width:901px){.codes .code .bar{flex-wrap:nowrap}.codes .code .bar .st{flex:1 1 0;min-width:0;max-width:none}}
+@media (max-width:900px){.codes{grid-template-columns:1fr}}
 .code{margin-top:16px;border-radius:var(--r);background:var(--code-bg);color:var(--code-fg);overflow:hidden}
 .code .bar{display:flex;align-items:center;gap:2px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
 .code .bar button{all:unset;cursor:pointer;font:500 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;border-radius:4px}
@@ -144,8 +149,12 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .code .bar .st{margin-left:auto;font:400 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
 .code .bar .st b{font-weight:500;color:var(--code-fg)}
 .code .bar .cp{color:var(--code-fg);border:1px solid rgba(255,255,255,.18);margin-left:6px}
-.code pre{border-radius:0;padding:16px 20px 18px;max-height:420px}
-.code .hint{font:400 12px/1.55 var(--mono);color:var(--code-cm);padding:12px 20px 14px;margin:0;border-top:1px solid rgba(255,255,255,.08)}
+.code pre{border-radius:0;padding:16px 20px 18px;max-height:420px;scrollbar-width:thin;scrollbar-color:var(--code-fg) var(--code-bg)}
+/* older WebKit (Safari) has no scrollbar-color: same track as the box, bright thumb */
+.code pre::-webkit-scrollbar{width:8px;height:8px;background:var(--code-bg)}
+.code pre::-webkit-scrollbar-track{background:var(--code-bg)}
+.code pre::-webkit-scrollbar-thumb{background:var(--code-fg);border-radius:4px;border:2px solid var(--code-bg)}
+.code pre::-webkit-scrollbar-corner{background:var(--code-bg)}
 
 /* ---------- source gate: cite + license confirmation before every copy / save ---------- */
 .gate{width:min(560px,calc(100vw - 32px));max-height:min(88vh,800px);padding:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow-md);overflow:hidden}
@@ -230,6 +239,34 @@ footer{margin:0}
 .cmp .ctl{display:flex;align-items:center;gap:12px;margin-top:12px}
 .cmp .ctl button{width:36px;height:32px;padding:0;justify-content:center;flex:none}
 .cmp .ctl input{flex:1;min-width:0;accent-color:var(--accent)}
+/* the caption of the frame on screen, under the clips like a subtitle */
+.cmp .cap{margin-top:12px}
+.cmp .cap .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 0 4px}
+.cmp .cap .row .k{font:500 11px/1.7 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-right:auto}
+.cmp .cap p{margin:0;font:400 14px/1.5 var(--sans);color:var(--ink);text-wrap:pretty;overflow-wrap:anywhere}
+/* the original / augmented switch of a caption with alternate wordings (capBox; the clip viewer and the Caption row of
+   the dataset record): two chips and, on the augmented side, a stepper through the alternates */
+.capalt{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.capalt .stp{display:inline-flex;align-items:center;gap:2px;font:400 12px/1 var(--mono);color:var(--ink3);font-variant-numeric:tabular-nums}
+.capalt .stp button{width:24px;height:22px;padding:0 0 2px;justify-content:center;font-size:16px;line-height:1;border-color:transparent;color:var(--ink2)}
+.capalt .stp button:hover{background:var(--chipbg);color:var(--ink)}
+.capalt[hidden],.capalt .stp[hidden]{display:none!important}
+/* the Caption row of the record: the dataset's instruction, the switch under it, then the count of its other instructions */
+.drawer dd.capr p{margin:0;color:var(--ink)}
+.drawer dd.capr .capalt{display:flex;margin-top:6px}
+.drawer dd.capr .more{display:block;margin-top:4px}
+/* the Task mix row of the record (a dataset holding several tasks, or one task annotated per sub-task; r.tm): one line
+   on how the episodes divide, a stacked bar of skill classes in accent shades with its legend, then the most frequent
+   captions. A card of such a dataset carries the same account as a tag on its poster (.tk). */
+.drawer dd.mixr p{margin:0 0 8px;color:var(--ink)}
+.drawer .skb{display:flex;height:8px;border-radius:4px;overflow:hidden;gap:1px;background:var(--chipbg)}
+.drawer .skb i{display:block;height:100%;background:var(--accent);min-width:2px}
+.drawer .skb i.rest{background:var(--line-hi)}
+.drawer .skl{margin-top:6px;font:400 11.5px/1.6 var(--mono);color:var(--ink3)}.drawer .skl b{font-weight:500;color:var(--ink2)}
+.drawer .tops{list-style:none;margin:8px 0 0;padding:0}
+.drawer .tops li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.45}
+.drawer .tops li .n{font:400 11.5px/1.6 var(--mono);color:var(--ink4);white-space:nowrap}
+.dcard .tk{position:absolute;left:8px;top:8px;font:400 11px/1 var(--mono);padding:3px 6px;background:rgba(34,33,30,.8);color:#FAF9F6;border-radius:4px}
 </style>
 </head>
 <body>
@@ -260,7 +297,7 @@ footer{margin:0}
         <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command. Take a whole slice, or tick platforms, sources and datasets while browsing to build your own. <b>The full dataset will be available upon official release.</b></p>
       </div>
       <div class="slices" id="dlist"></div>
-      <div class="code" id="code"></div>
+      <div class="codes"><div class="code" id="code"></div><div class="code" id="bibbox"></div></div>
     </div>
   </section>
 
@@ -347,7 +384,8 @@ function stats(){$('stats').innerHTML=[[fmt(tot('episodes')),'episodes'],[fmtH(t
    The tree shows only what can be fetched here under a stated license: the sources listed from the paper with no converted
    data (PEND) are left out, and so is any dataset whose sources.json entry states no license (inTree, once sources.json is in).
    The count on the right follows the rows shown: "7 projects · 749 h" on the rows above a project (one project per platform
-   and source), "34 tasks · 209 h" on a project row (one task per dataset). The hero stats quote the paper instead (tot),
+   and source), "34 tasks · 209 h" on a project row whose datasets each hold one task, "26 datasets · 209 h" where any of
+   them holds several (r.tm: the DROID lab splits, AgiBot World, Galaxea). The hero stats quote the paper instead (tot),
    so the "All morphologies" row carries no count: its sum over the rows shown would sit next to them and disagree. */
 const cnt=(n,w,h)=>`${n.toLocaleString()} ${w}${n===1?'':'s'} · ${fmtH(h)} h`;
 const inTree=r=>!SRCOK||!!licName(SRC[srcName(r)]);
@@ -360,7 +398,7 @@ function tree(){const T=L.filter(inTree);let h='';
     h+='<div>'+row(S.cat===m.id&&!S.robot,{cat:m.id},'<span class="tick"></span><span>'+m.label+'</span>',cnt(mp,'project',a.h),rows,m.label)+'<div class="lvl2">'
       +Object.entries(embs).sort((x,y)=>y[1].h-x[1].h).map(([e,v])=>{const act=S.cat===m.id&&S.robot===e;
         let o=row(act&&!S.source,{cat:m.id,robot:e},'<span class="tick"></span><span>'+esc(e)+'</span>',cnt(Object.keys(v.srcs).length,'project',v.h),v.rows,e,`${esc(e)} · ${v.n} dataset${v.n===1?'':'s'}`);
-        if(act)o+='<div class="lvl3">'+Object.entries(v.srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',cnt(x.n,'task',x.h),x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`)+srcMeta(x)).join('')+'</div>';
+        if(act)o+='<div class="lvl3">'+Object.entries(v.srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',cnt(x.n,x.rows.some(r=>r.tm)?'dataset':'task',x.h),x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`)+srcMeta(x)).join('')+'</div>';
         return o}).join('')+'</div></div>'});
   $('tree').innerHTML=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>','',T,'all datasets')+'<div class="lvl1">'+h+'</div>'}
 function row(on,f,lab,c,rows,name,title){const d=Object.entries(f).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ');
@@ -399,10 +437,15 @@ const clipName=o=>`${o.key}__${o.slug}`;
 const clipOf=r=>{const p=P[r.project];return p.overlays.find(o=>o.dataset===r.id)||p.overlays[0]||null};
 function thumb(r){const o=clipOf(r);return o?{poster:RAW+clipName(o)+'.jpg'}:null}
 
+// the heading of a dataset: info.json's task name where the build found one (AgiBot World, whose ids are opaque numbers;
+// r.title), else the id's last part made readable. A dataset holding several tasks, or one task annotated per sub-task,
+// says so in a tag on its poster (r.tm, tools/build_site_data.py task_mix) and in the Task mix row of its record.
+const title=r=>r.title||human(r.name);
+const mixTag=r=>r.tm?`<span class="tk">${r.tm.kind==='steps'?'sub-task captions':fmt(r.tm.n_task)+' tasks'}</span>`:'';
 function card(r){const t=thumb(r),on=sel.has(r.id);
-  const th=t?`<div class="thumb has" title="Open the example clip"><img src="${t.poster}" alt="" loading="lazy"><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
-    :`<div class="thumb"><span class="tl">no example clip</span><span class="dur">${fmtH(r.hours)} h</span></div>`;
-  return `<article class="dcard${on?' on':''}" data-id="${esc(r.id)}">${th}${ck(on,'','Select '+human(r.name)+' for download')}<div class="body"><div class="ttl">${esc(human(r.name))}</div>
+  const th=t?`<div class="thumb has" title="Open the example clip"><img src="${t.poster}" alt="" loading="lazy"><span class="play"><i></i></span>${mixTag(r)}<span class="dur">${fmtH(r.hours)} h</span></div>`
+    :`<div class="thumb"><span class="tl">no example clip</span>${mixTag(r)}<span class="dur">${fmtH(r.hours)} h</span></div>`;
+  return `<article class="dcard${on?' on':''}" data-id="${esc(r.id)}">${th}${ck(on,'','Select '+title(r)+' for download')}<div class="body"><div class="ttl">${esc(title(r))}</div>${r.title?`<div class="sub">${esc(r.name)}</div>`:''}
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div></div></article>`}
 
 function render(){const rows=filtered(),listed=pendFiltered(),pend=SHOW_PEND?listed:[];const show=rows.slice(0,S.shown);
@@ -427,7 +470,15 @@ const srcName=r=>SRCD[r.id]||SRCP[r.project]||r.source;
 function srcOf(rows){const c={};sampled(rows).forEach(r=>{const k=srcName(r);c[k]=(c[k]||0)+1});
   return Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(n=>({name:n,n:c[n],info:SRC[n]||{}}))}
 const licName=i=>i&&i.license&&i.license.name||null;
-function licChip(i){const l=i&&i.license;return l?`<a class="chip" href="${esc(l.url||'#')}" target="_blank" rel="noopener">${esc(l.name)}</a>`:'<span class="chip none">license not stated</span>'}
+/* the license chip links to the page that states the license (sources.json license.repo: the dataset's Hugging Face / ModelScope
+   repository, else the project's GitHub repository, else the UMI Data Initiative listing); license.url, the license text, is only
+   shown in the License row of a record */
+const licWhere=u=>u.replace(/^https?:\/\/(www\.)?/,'').replace(/[?#].*$/,'').replace(/\/$/,'');
+function licChip(i){const l=i&&i.license;if(!l)return '<span class="chip none">license not stated</span>';
+  return `<a class="chip" href="${esc(l.repo||l.url||'#')}" target="_blank" rel="noopener" title="${esc(l.repo?l.name+' · as stated on '+licWhere(l.repo):l.name)}">${esc(l.name)}</a>`}
+// the License row of a record: the chip, the license text, and the source page unless it is the page the chip links to
+function licRow(si){const l=si.license||{},dim=(h,t)=>` <a class="dim" href="${esc(h)}" target="_blank" rel="noopener">${t}</a>`;
+  return licChip(si)+(l.repo&&l.url?dim(l.url,'license text'):'')+(si.homepage&&!(l.repo&&licWhere(si.homepage)===licWhere(l.repo))?dim(si.homepage,'source page'):'')}
 // compact form for the gate: "Chi et al. 2024" linking to the paper
 function paperShort(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="au">no paper listed yet</span>';
   return '<span class="au">'+ps.map(p=>`<a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(shortCite(p,fb))}</a>`).join(', ')+'</span>'}
@@ -493,12 +544,19 @@ ${sm.map(r=>r.id+' '+r.sample.url).join('\n')}
 EOF`}
 function code(s){const z=sizeOf(s.rows);
   const body=cmdText(s).split('\n').map(l=>l.startsWith('#')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n');
-  const hint='Skips datasets already on disk; re-run it to fill gaps.'+(z.miss?` ${z.miss.toLocaleString()} dataset${z.miss===1?' has':'s have'} no published sample yet and ${z.miss===1?'is':'are'} left out.`:'');
-  $('code').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bash · GitHub releases</button><span class="st"><b>${esc(s.name)}</b> · ${z.n.toLocaleString()} sample${z.n===1?'':'s'} · ${fmtB(z.b)} · ${fmtDur(z.s)}</span><button type="button" class="cp" id="save">Save .sh</button><button type="button" class="cp" id="copy">Copy</button></div><pre id="cmd">${body}</pre><p class="hint">${esc(hint)}</p>`;
+  $('code').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bash · GitHub releases</button><span class="st"><b>${esc(s.name)}</b> · ${z.n.toLocaleString()} sample${z.n===1?'':'s'} · ${fmtB(z.b)} · ${fmtDur(z.s)}</span><button type="button" class="cp" id="save">Save .sh</button><button type="button" class="cp" id="copy">Copy</button></div><pre id="cmd">${body}</pre>`;
   const save=()=>dl('camx_samples.sh',cmdText(s),'text/x-shellscript');
   const copy=()=>navigator.clipboard.writeText(cmdText(s)).then(()=>{$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy',1200)});
   $('save').onclick=()=>gate(s.rows,s.name,save,'save');
-  $('copy').onclick=()=>gate(s.rows,s.name,copy,'copy')}
+  $('copy').onclick=()=>gate(s.rows,s.name,copy,'copy');
+  bibBox(s)}
+/* the right pane: every BibTeX entry of the slice (CAMX + one per source paper), the same text the gate copies / saves */
+function bibBox(s){const ss=srcOf(s.rows),np=new Set();ss.forEach(x=>(x.info.papers||[]).forEach(p=>np.add(p.key)));
+  const txt=bibOf(ss,s.name),n=np.size+1;
+  const body=txt.trim().split('\n').map(l=>l.startsWith('%')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n');
+  $('bibbox').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bibtex · ${n} entr${n===1?'y':'ies'}</button><span class="st"><b>${esc(s.name)}</b> · ${ss.length} source${ss.length===1?'':'s'}</span><button type="button" class="cp" id="bibSave">Save .bib</button><button type="button" class="cp" id="bibCopy">Copy</button></div><pre id="bibpre">${body}</pre>`;
+  $('bibSave').onclick=()=>dl('camx_citations.bib',txt,'application/x-bibtex');
+  $('bibCopy').onclick=()=>navigator.clipboard.writeText(txt).then(()=>{$('bibCopy').textContent='Copied';setTimeout(()=>$('bibCopy').textContent='Copy',1200)})}
 function persist(){try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))}catch(e){}}
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 
@@ -517,13 +575,21 @@ wide.addEventListener('change',placeCmp);
 function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,T}=tilesOf(o),f=clipName(o);
   const el=CMP=document.createElement('div');el.className='cmp';
   const pane=(cap,src)=>`<figure><figcaption>${cap}</figcaption><div class="win"><video src="${esc(src)}" muted loop playsinline preload="auto"></video></div></figure>`;
+  // the clip's captions over time, [[start second, caption], ...]: a track for an episode annotated per sub-task whose
+  // caption changes while the clip plays (o.captions, tools/build_site_data.py), else the one caption of the clip
+  const caps=o.captions||(o.task?[[0,o.task]]:[]);
   el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}</span></div>
     ${o.views.length>1?`<div class="views" role="group" aria-label="Camera view">${['all views',...o.views.map(v=>v.replace(/_rgb$/,''))].map((v,i)=>`<button type="button" class="chip btn" data-v="${i-1}">${esc(v)}</button>`).join('')}</div>`:''}
     <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane(o.mode==='primitive'?'Gripper stand-in overlay <span class="note">(No gripper CAD available. Only showing gripper tip.)</span>':'Gripper CAD overlay',D.overlay_base+f+'.mp4')}</div>
+    ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
     <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
   const [a,b]=el.querySelectorAll('video'),pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
+  // the caption of the frame on screen
+  const cap=el.querySelector('.cap'),capUI=cap&&capBox(cap);let seg=-1;
+  const capAt=t=>{if(!cap)return;let i=0;caps.forEach((c,k)=>{if(c[0]<=t+.05)i=k});if(i!==seg){seg=i;capUI.set(caps[i][1])}};
+  capAt(0);
   // the raw clip leads and the overlay follows it: same frame count and rate, so only decoder drift has to be corrected
-  const sync=()=>{if(Math.abs(b.currentTime-a.currentTime)>.07)b.currentTime=a.currentTime};
+  const sync=()=>{if(Math.abs(b.currentTime-a.currentTime)>.07)b.currentTime=a.currentTime;capAt(a.currentTime)};
   const toggle=()=>{if(a.paused){const p=a.play();if(p&&p.catch)p.catch(()=>{})}else a.pause()};
   a.addEventListener('timeupdate',()=>{sync();if(a.duration)pos.value=1000*a.currentTime/a.duration});
   a.addEventListener('seeked',sync);
@@ -533,9 +599,9 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,T}=tilesO
   pp.onclick=toggle;
   el.querySelectorAll('.win').forEach(w=>{w.onclick=toggle;
     w.firstChild.addEventListener('error',()=>w.insertAdjacentHTML('beforeend','<div class="err">Clip failed to load.</div>'))});
-  // the window takes the aspect of what is shown; its height is capped so both windows and the controls fit the stage
+  // the window takes the aspect of what is shown; its height is capped so both windows, the caption and the controls fit the stage
   const show=i=>{const t=i<0?{x:0,w:1,ar:A}:T[i],side=t.ar<1.9;el.querySelector('.panes').classList.toggle('side',side);
-    el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=t.ar;w.style.width=`min(100%,calc((100vh - 280px)*${(t.ar/(side?1:2)).toFixed(4)}))`;
+    el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=t.ar;w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(t.ar/(side?1:2)).toFixed(4)}))`;
       w.firstChild.style.width=100/t.w+'%';w.firstChild.style.left=-100*t.x/t.w+'%'});
     el.querySelectorAll('.views button').forEach(k=>{const on=+k.dataset.v===i;k.classList.toggle('on',on);k.setAttribute('aria-pressed',on)})};
   el.querySelectorAll('.views button').forEach(k=>k.onclick=()=>show(+k.dataset.v));
@@ -544,27 +610,62 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,T}=tilesO
   let n=0;const go=()=>{if(++n===2&&CMP===el)toggle()};
   [a,b].forEach(v=>{if(v.readyState>=2)go();else{v.addEventListener('loadeddata',go,{once:true});v.addEventListener('error',go,{once:true})}})}
 
+/* a caption and its alternate wordings (the datasets' '||'-joined language annotations): the text and, when there is
+   more than one wording, an original / augmented switch whose augmented side steps through the alternates. The host
+   holds one <p> and one .capalt (CAPALT); set(text) shows a caption. Used by the clip viewer and the dataset record. */
+const CAPALT='<span class="capalt" role="group" aria-label="Caption wording" hidden><button type="button" class="chip btn" data-aug="0">original</button><button type="button" class="chip btn" data-aug="1">augmented</button><span class="stp"><button type="button" aria-label="Previous wording">‹</button><span></span><button type="button" aria-label="Next wording">›</button></span></span>';
+function capBox(host){const alt=host.querySelector('.capalt'),p=host.querySelector('p'),st=alt.querySelector('.stp');let w=[],aug=0,ai=0;
+  const draw=()=>{const alts=w.slice(1),on=aug&&alts.length>0;alt.hidden=!alts.length;p.textContent=on?alts[ai]:w[0]||'';
+    alt.querySelectorAll('[data-aug]').forEach(k=>{const s=+k.dataset.aug===(on?1:0);k.classList.toggle('on',s);k.setAttribute('aria-pressed',s)});
+    st.hidden=!on;if(on)st.children[1].textContent=`${ai+1} / ${alts.length}`};
+  alt.querySelectorAll('[data-aug]').forEach(k=>k.onclick=()=>{aug=+k.dataset.aug;ai=0;draw()});
+  const step=d=>{const n=w.length-1;ai=(ai+n+d)%n;draw()};st.children[0].onclick=()=>step(-1);st.children[2].onclick=()=>step(1);
+  return {set(text){w=String(text??'').split('||').map(s=>s.trim()).filter((s,k,a)=>s&&a.indexOf(s)===k);ai=0;draw()}}}
+/* data/captions.json (tools/build_site_data.py): the language annotations of every dataset, {n: instructions in the
+   dataset, tasks: [the first few, wordings '||'-joined], name?: the task group heading its sub-task labels (AgiBot)};
+   fetched when the first record opens. The Caption row shows the first instruction (or the group) with its switch,
+   then the count of the others with the next few as examples. */
+let CAPS=null,capsLoad=null;
+const loadCaps=()=>capsLoad||(capsLoad=fetch('data/captions.json').then(r=>r.ok?r.json():{}).catch(()=>({})).then(j=>CAPS=j));
+function capRow(dd,c){if(!c||!(c.name||c.tasks.length)){dd.innerHTML='<span class="dim">not available</span>';return}
+  const ex=c.name?c.tasks:c.tasks.slice(1),n=c.n-(c.name?0:1);
+  const more=n>0?`<span class="dim more">${c.name?'':'+ '}${n.toLocaleString()} ${c.name?'sub-task instruction':'more instruction'}${n===1?'':'s'}${ex.length?': '+ex.map(t=>'“'+esc(t.split('||')[0].trim())+'”').join(' · ')+(n>ex.length?' · …':''):''}</span>`:'';
+  dd.innerHTML=`<p></p>${CAPALT}${more}`;capBox(dd).set(c.name||c.tasks[0])}
+
+const pct=(n,t)=>t?Math.round(100*n/t)+'%':'';
+/* the Task mix row (r.tm): how the episodes divide into tasks, the skill classes of their captions (first verb, the
+   taxonomy of the project histograms) as a bar with the six largest classes in accent shades and the rest in grey, then the
+   most frequent captions with how many episodes (mixed) or sub-task captions (steps) carry each */
+function mixRow(m){const st=m.kind==='steps',tot=m.skills.reduce((s,[,n])=>s+n,0),top=m.skills.slice(0,6),rest=tot-top.reduce((s,[,n])=>s+n,0);
+  const line=st?`One task, annotated per sub-task: ${fmt(m.n_step)} distinct step captions, median ${m.per_ep} per episode, over ${fmt(m.eps)} episodes.`
+    :`${fmt(m.n_task)} distinct tasks over ${fmt(m.eps)} episodes, one caption each.`;
+  const seg=(k,n,i,c)=>`<i${c?` class="${c}"`:''} style="flex:${n}${i==null?'':`;opacity:${(1-i*.13).toFixed(2)}`}" title="${esc(k)} · ${pct(n,tot)}"></i>`;
+  return `<p>${line}</p><div class="skb" role="img" aria-label="skill classes of the ${st?'sub-task captions':'episodes'}">${top.map(([k,n],i)=>seg(k,n,i)).join('')}${rest>0?seg('remaining classes',rest,null,'rest'):''}</div>
+    <div class="skl">${top.map(([k,n])=>`${esc(k)} <b>${pct(n,tot)}</b>`).join(' · ')}${rest>0&&pct(rest,tot)!=='0%'?` · remaining <b>${pct(rest,tot)}</b>`:''} <span class="dim">of ${st?'sub-task captions':'episodes'}</span></div>
+    <ul class="tops">${m.top.map(([c,n])=>`<li><span>${esc(c)}</span><span class="n">${fmt(n)} ${st?'×':'ep'}</span></li>`).join('')}</ul>`}
+
 function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
-  const kv=[hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
+  const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
     p.overlays.length?['Example clips',`<a href="overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`]:null,
-    ['License',licChip(si)+(si.homepage?` <a class="dim" href="${esc(si.homepage)}" target="_blank" rel="noopener">source page</a>`:'')],
+    ['License',licRow(si)],
     ['Cite',paperLinks(si,srcName(r))+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]].filter(Boolean);
-  $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(human(r.name))}</h3>
+  $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(title(r))}</h3>
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div>
     <p class="path">${esc(r.id)}</p>
     ${r.sample?'<div class="acts"><button type="button" id="copyOne">Copy sample command</button></div>':''}
-    <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
-  const cp=$('copyOne');if(cp)cp.onclick=()=>gate([r],human(r.name),()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)}),'copy');
-  const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:srcName(r),n:1,info:si}],human(r.name))).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
+    <dl>${kv.map(([k,v,c])=>`<dt>${k}</dt><dd${c?` class="${c}"`:''}>${v}</dd>`).join('')}</dl>`;
+  const cd=$('drawerBody').querySelector('dd.capr');if(CAPS)capRow(cd,CAPS[r.id]);else loadCaps().then(()=>{if(cd.isConnected)capRow(cd,CAPS[r.id])});
+  const cp=$('copyOne');if(cp)cp.onclick=()=>gate([r],title(r),()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)}),'copy');
+  const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:srcName(r),n:1,info:si}],title(r))).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
   $('drawer').classList.add('open');$('scrim').classList.add('show');openCmp(r)}
 /* record of a source listed from the paper without converted data: the paper's counts, its note, license and paper */
 function drawerPend(i){const p=PEND[i];if(!p)return;const si=SRC[p.entry||p.source]||{};S.open=null;S.openPend=i;
   const kv=[['Datasets',p.datasets.toLocaleString()],['Episodes',esc(fmt(p.episodes))],['Duration',esc(fmtH(p.hours))+' h'],['Views',esc(p.views)],['FPS',esc(p.fps)],
     ['Status','<span class="dim">not converted yet: no sample archive, no example clip</span>'+(p.note?`<br><b>[${esc(p.note)}]</b> ${esc(noteText(p))}`:'')+(p.remark?`<br>${esc(p.remark)}`:'')],
-    ['License',licChip(si)+(si.homepage?` <a class="dim" href="${esc(si.homepage)}" target="_blank" rel="noopener">source page</a>`:'')],
+    ['License',licRow(si)],
     ['Cite',paperLinks(si,p.source)+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]];
   $('drawerBody').innerHTML=`<div class="kicker">Source listed in the paper</div><h3>${esc(p.source)}</h3>
     <div class="meta"><span class="cat">${esc(ML[p.morph]||p.morph)}</span><span>›</span><span>${esc(p.embodiment)}</span></div>

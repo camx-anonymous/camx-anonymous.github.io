@@ -1,12 +1,13 @@
 {
- "updated": "2026-10-02",
- "_about": "License and papers of every source dataset, keyed by the source label of data/datasets.json rows; \"projects\" maps a family/project key to a different entry where one source has more than one license. Author given names are abbreviated to initials. Checked and turned into data/citations.bib by tools/build_site_data.py. Licenses of the UMI-family entries follow the UMI Data Initiative table (https://umi-data.github.io/).",
+ "updated": "2026-10-03",
+ "_about": "License and papers of every source dataset, keyed by the source label of data/datasets.json rows; \"projects\" / \"datasets\" map a family/project or a row to a different entry where one source has more than one license. license.url is the license text; license.repo is the page that states the license, which the site's license chips link to: the dataset's Hugging Face / ModelScope repository where its card states it, else the project's GitHub repository, else the UMI Data Initiative listing (https://umi-data.github.io/) for UMI-family entries or the release page for the rest. Author given names are abbreviated to initials. Checked and turned into data/citations.bib by tools/build_site_data.py. Licenses of the UMI-family entries follow the UMI Data Initiative table.",
  "sources": {
   "ABC": {
    "homepage": "https://abc.bot",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/XDOF/ABC-130k"
    },
    "papers": [
     {
@@ -23,7 +24,8 @@
    "homepage": "https://lihongcs.github.io/aetherock/index.html",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://umi-data.github.io/#datasets"
    },
    "papers": [
     {
@@ -40,7 +42,8 @@
    "homepage": "https://huggingface.co/datasets/agibot-world/AgiBotWorld2026",
    "license": {
     "name": "CC BY-NC-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "repo": "https://huggingface.co/datasets/agibot-world/AgiBotWorld2026"
    },
    "papers": [
     {
@@ -57,7 +60,8 @@
    "homepage": "https://agibot-world.com",
    "license": {
     "name": "CC BY-NC-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "repo": "https://huggingface.co/datasets/agibot-world/AgiBotWorld-Beta"
    },
    "papers": [
     {
@@ -74,7 +78,8 @@
    "homepage": "https://aistairc.github.io/aist_bimanip_site/",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://aistairc.github.io/aist_bimanip_site/"
    },
    "papers": [
     {
@@ -91,7 +96,8 @@
    "homepage": "https://huggingface.co/datasets/lerobot/aloha_static_cups_open",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/lerobot/aloha_static_cups_open"
    },
    "papers": [
     {
@@ -108,7 +114,8 @@
    "homepage": "https://huggingface.co/datasets/lerobot/aloha_static_battery",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/lerobot/aloha_static_battery"
    },
    "papers": [
     {
@@ -125,7 +132,8 @@
    "homepage": "https://behavior-prompting.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/behavior_prompting"
    },
    "papers": [
     {
@@ -142,7 +150,8 @@
    "homepage": "https://dit-policy.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/oier-mees/BiPlay"
    },
    "papers": [
     {
@@ -156,10 +165,11 @@
    ]
   },
   "Cosmos Policy ALOHA": {
-   "homepage": "https://arxiv.org/abs/2601.16163",
+   "homepage": "https://research.nvidia.com/labs/cosmos-lab/cosmos-policy/",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://huggingface.co/datasets/nvidia/ALOHA-Cosmos-Policy"
    },
    "papers": [
     {
@@ -176,7 +186,8 @@
    "homepage": "https://data-scaling-laws.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/Fanqi-Lin/Data-Scaling-Laws"
    },
    "papers": [
     {
@@ -193,7 +204,8 @@
    "homepage": "https://modelscope.cn/datasets/daimonrobotics/Daimon-Infinity",
    "license": {
     "name": "CC BY-NC-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "repo": "https://modelscope.cn/datasets/daimonrobotics/Daimon-Infinity"
    },
    "papers": [
     {
@@ -210,7 +222,8 @@
    "homepage": "https://dobb-e.com/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/notmahi/dobb-e"
    },
    "papers": [
     {
@@ -227,7 +240,8 @@
    "homepage": "https://droid-dataset.github.io/",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://huggingface.co/datasets/KarlP/droid"
    },
    "papers": [
     {
@@ -244,7 +258,8 @@
    "homepage": "https://silicx.github.io/exUMI/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/silicx/exUMI"
    },
    "papers": [
     {
@@ -261,7 +276,8 @@
    "homepage": "https://huggingface.co/datasets/IPEC-COMMUNITY/FastUMI-Data",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/IPEC-COMMUNITY/FastUMI-Data"
    },
    "papers": [
     {
@@ -278,7 +294,8 @@
    "homepage": "https://huggingface.co/datasets/IPEC-COMMUNITY/FastUMI_100k_lerobot",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/IPEC-COMMUNITY/FastUMI_100k_lerobot"
    },
    "papers": [
     {
@@ -295,7 +312,8 @@
    "homepage": "https://functional-manipulation-benchmark.github.io/",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://huggingface.co/datasets/charlesxu0124/functional-manipulation-benchmark"
    },
    "papers": [
     {
@@ -309,10 +327,11 @@
    ]
   },
   "Galaxea Open-World": {
-   "homepage": "https://opengalaxea.github.io/G0/",
+   "homepage": "https://opengalaxea.github.io/GalaxeaVLA/",
    "license": {
     "name": "CC BY-NC-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "repo": "https://huggingface.co/datasets/OpenGalaxea/Galaxea-Open-World-Dataset"
    },
    "papers": [
     {
@@ -329,7 +348,8 @@
    "homepage": "https://gated-memory-policy.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/gated-memory-policy"
    },
    "papers": [
     {
@@ -346,7 +366,8 @@
    "homepage": "https://huggingface.co/datasets/genrobot2025/10Kh-RealOmin-OpenData",
    "license": {
     "name": "CC BY-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "repo": "https://huggingface.co/datasets/genrobot2025/10Kh-RealOmin-OpenData"
    },
    "papers": [
     {
@@ -363,7 +384,8 @@
    "homepage": "https://huggingface.co/datasets/simple-world-lab/HiFi-UMI-2K",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://huggingface.co/datasets/simple-world-lab/HiFi-UMI-2K"
    },
    "papers": [
     {
@@ -380,7 +402,8 @@
    "homepage": "https://hommi-robot.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/xxm19/hommi"
    },
    "papers": [
     {
@@ -397,7 +420,8 @@
    "homepage": "https://humanoid-manipulation-interface.github.io/",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://huggingface.co/datasets/Richard-Nai/HuMI-Raw-Data"
    },
    "papers": [
     {
@@ -414,7 +438,8 @@
    "homepage": "https://maniwav.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/maniwav"
    },
    "papers": [
     {
@@ -431,7 +456,8 @@
    "homepage": "https://modpack-robotics.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/modpack"
    },
    "papers": [
     {
@@ -448,7 +474,8 @@
    "homepage": "https://mofpo.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/pointW/mofpo"
    },
    "papers": [
     {
@@ -465,7 +492,8 @@
    "homepage": "https://huggingface.co/datasets/allenai/MolmoAct2-BimanualYAM-Dataset",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/allenai/MolmoAct2-BimanualYAM-Dataset"
    },
    "papers": [
     {
@@ -482,7 +510,8 @@
    "homepage": "https://mv-umi.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://umi-data.github.io/#datasets"
    },
    "papers": [
     {
@@ -499,7 +528,8 @@
    "homepage": "https://openarm.dev/",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://github.com/enactic/openarm"
    },
    "papers": [
     {
@@ -516,7 +546,8 @@
    "homepage": "https://huggingface.co/datasets/NeoteAIEmbodied/OpenNeoData",
    "license": {
     "name": "CC BY-NC-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "repo": "https://huggingface.co/datasets/NeoteAIEmbodied/OpenNeoData"
    },
    "papers": [
     {
@@ -533,7 +564,8 @@
    "homepage": "https://rdt-robotics.github.io/rdt-robotics/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/robotics-diffusion-transformer/rdt-ft-data"
    },
    "papers": [
     {
@@ -547,10 +579,11 @@
    ]
   },
   "RealSource-World": {
-   "homepage": "https://huggingface.co/datasets/RealSourceData/RealSource-World",
+   "homepage": "https://huggingface.co/datasets/RealmanRobot/RealSource-World",
    "license": {
     "name": "CC BY-NC-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "repo": "https://huggingface.co/datasets/RealmanRobot/RealSource-World"
    },
    "papers": [
     {
@@ -558,8 +591,8 @@
      "title": "RealSource World: A Large-Scale Real-World Dual-Arm Manipulation Dataset",
      "year": 2025,
      "arxiv": null,
-     "url": "https://huggingface.co/datasets/RealSourceData/RealSource-World",
-     "bibtex": "@misc{realsourceworld2025,\n  title        = {RealSource World: A Large-Scale Real-World Dual-Arm Manipulation Dataset},\n  author       = {{RealMan Robotics}},\n  howpublished = {\\url{https://huggingface.co/datasets/RealSourceData/RealSource-World}},\n  year         = {2025}\n}"
+     "url": "https://huggingface.co/datasets/RealmanRobot/RealSource-World",
+     "bibtex": "@misc{realsourceworld2025,\n  title        = {RealSource World: A Large-Scale Real-World Dual-Arm Manipulation Dataset},\n  author       = {{RealMan Robotics}},\n  howpublished = {\\url{https://huggingface.co/datasets/RealmanRobot/RealSource-World}},\n  year         = {2025}\n}"
     }
    ]
   },
@@ -567,7 +600,8 @@
    "homepage": "https://rh20t.github.io/",
    "license": {
     "name": "CC BY-SA 4.0 (RH20T-C, configs 1-5)",
-    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "repo": "https://rh20t.github.io/#License"
    },
    "papers": [
     {
@@ -584,7 +618,8 @@
    "homepage": "https://rh20t.github.io/",
    "license": {
     "name": "CC BY-NC 4.0 (RH20T-NC, configs 6-10)",
-    "url": "https://creativecommons.org/licenses/by-nc/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "repo": "https://rh20t.github.io/#License"
    },
    "papers": [
     {
@@ -601,7 +636,8 @@
    "homepage": "https://flagopen.github.io/RoboCOIN/",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://github.com/FlagOpen/RoboCOIN"
    },
    "papers": [
     {
@@ -618,7 +654,8 @@
    "homepage": "https://robodojo-benchmark.com/",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo"
    },
    "papers": [
     {
@@ -635,7 +672,8 @@
    "homepage": "https://x-humanoid-robomind.github.io/",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/x-humanoid-robomind/RoboMIND"
    },
    "papers": [
     {
@@ -652,7 +690,8 @@
    "homepage": "https://modelscope.cn/datasets/X-Humanoid/RoboMIND2.0-UR5",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://modelscope.cn/datasets/X-Humanoid/RoboMIND2.0-UR5"
    },
    "papers": [
     {
@@ -669,7 +708,8 @@
    "homepage": "https://robopen.github.io/roboset/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/jdvakil/RoboSet-Teleoperation"
    },
    "papers": [
     {
@@ -686,7 +726,8 @@
    "homepage": "https://binghao-huang.github.io/touch_in_the_wild/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/binghaohuang-robot/touch_in_the_wild-dataset"
    },
    "papers": [
     {
@@ -703,7 +744,8 @@
    "homepage": "https://umi-gripper.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/universal_manipulation_interface"
    },
    "papers": [
     {
@@ -720,7 +762,8 @@
    "homepage": "https://umi-3d.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/Physical-Intelligence-Laboratory/UMI-3D-Dataset"
    },
    "papers": [
     {
@@ -737,7 +780,8 @@
    "homepage": "https://umibenchmark.github.io/",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://huggingface.co/datasets/UMIbenchmark/UMI-Benchmark-v1"
    },
    "papers": [
     {
@@ -754,7 +798,8 @@
    "homepage": "https://umi-on-legs.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/umi-on-legs"
    },
    "papers": [
     {
@@ -771,7 +816,8 @@
    "homepage": "https://umi-ft.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/UMI-FT"
    },
    "papers": [
     {
@@ -788,7 +834,8 @@
    "homepage": "https://chuanyune.github.io/ViTaMIn_page/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/chuanyune/ViTaMIn_dataset"
    },
    "papers": [
     {
@@ -805,7 +852,8 @@
    "homepage": "https://chuanyune.github.io/ViTaMIn-B_page/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://umi-data.github.io/#datasets"
    },
    "papers": [
     {
@@ -822,7 +870,8 @@
    "homepage": "https://huggingface.co/datasets/Facebear/XVLA-Soft-Fold",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/Facebear/XVLA-Soft-Fold"
    },
    "papers": [
     {
@@ -839,7 +888,8 @@
    "homepage": "https://huggingface.co/datasets/ember-lab-berkeley/bridge_v2",
    "license": {
     "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/"
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://rail-berkeley.github.io/bridgedata/"
    },
    "papers": [
     {
@@ -856,7 +906,8 @@
    "homepage": "https://real.stanford.edu/dexumi/dataset/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/real-stanford/DexUMI"
    },
    "papers": [
     {
@@ -873,14 +924,15 @@
    "homepage": "https://huggingface.co/datasets/boardd/dexwild-dataset",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/boardd/dexwild-dataset"
    },
    "papers": [
     {
      "key": "tao2025dexwild",
      "title": "DexWild: Dexterous Human Interactions for In-the-Wild Robot Policies",
      "year": 2025,
-     "arxiv": null,
+     "arxiv": "2505.07813",
      "url": "https://www.roboticsproceedings.org/rss21/p075.html",
      "bibtex": "@inproceedings{tao2025dexwild,\n  title     = {{DexWild}: Dexterous Human Interactions for In-the-Wild Robot Policies},\n  author    = {Tao, T. and Srirama, M. K. and Liu, J. J. and Shaw, K. and Pathak, D.},\n  booktitle = {Robotics: Science and Systems (RSS)},\n  year      = {2025},\n  doi       = {10.15607/RSS.2025.XXI.075},\n  url       = {https://www.roboticsproceedings.org/rss21/p075.html}\n}"
     }
@@ -890,16 +942,17 @@
    "homepage": "https://huggingface.co/datasets/Dexora/Dexora_Real-World_Dataset",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/Dexora/Dexora_Real-World_Dataset"
    },
    "papers": [
     {
      "key": "zhang2026dexora",
      "title": "Dexora: Open-source VLA for High-DoF Bimanual Dexterity",
      "year": 2026,
-     "arxiv": null,
-     "url": "https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#weat1_01",
-     "bibtex": "@inproceedings{zhang2026dexora,\n  title     = {{Dexora}: Open-source {VLA} for High-{DoF} Bimanual Dexterity},\n  author    = {Zhang, Z. and Pang, J. and Yang, Z. and Li, K. and Liao, M. and Zhang, S. and Chi, G. and Guo, J. and Gao, H. and Shi, M. and Ge, D. and Mu, Y. and Gu, J. and Chen, R. and Dong, H. and Xu, H. and Yi, L. and Zhu, Y. and Zhao, H. and Wang, P. and Zhang, S. and Yao, G. and Chen, J. and Li, H. and Zhao, H.},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026}\n}"
+     "arxiv": "2605.18722",
+     "url": "https://arxiv.org/abs/2605.18722",
+     "bibtex": "@inproceedings{zhang2026dexora,\n  title     = {{Dexora}: Open-source {VLA} for High-{DoF} Bimanual Dexterity},\n  author    = {Zhang, Z. and Pang, J. and Yang, Z. and Li, K. and Liao, M. and Zhang, S. and Chi, G. and Guo, J. and Gao, H. and Shi, M. and Ge, D. and Mu, Y. and Gu, J. and Chen, R. and Dong, H. and Xu, H. and Yi, L. and Zhu, Y. and Zhao, H. and Wang, P. and Zhang, S. and Yao, G. and Chen, J. and Li, H. and Zhao, H.},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026},\n  eprint    = {2605.18722},\n  archivePrefix = {arXiv},\n  url       = {https://arxiv.org/abs/2605.18722}\n}"
     }
    ]
   },
@@ -911,34 +964,36 @@
      "key": "lin2026evo1",
      "title": "Evo-1: Lightweight Vision-Language-Action Model with Preserved Semantic Alignment",
      "year": 2026,
-     "arxiv": null,
+     "arxiv": "2511.04555",
      "url": "https://openaccess.thecvf.com/content/CVPR2026/html/Lin_Evo-1_Lightweight_Vision-Language-Action_Model_with_Preserved_Semantic_Alignment_CVPR_2026_paper.html",
      "bibtex": "@inproceedings{lin2026evo1,\n  title     = {{Evo-1}: Lightweight Vision-Language-Action Model with Preserved Semantic Alignment},\n  author    = {Lin, T. and Zhong, Y. and Du, Y. and Zhang, J. and Liu, J. and Chen, Y. and Gu, E. and Liu, Z. and Cai, H. and Zou, Y. and Zou, L. and Zhou, Z. and Li, G. and Zhao, B.},\n  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},\n  pages     = {13397--13406},\n  year      = {2026}\n}"
     }
    ]
   },
   "FreeTacMan": {
-   "homepage": null,
+   "homepage": "https://freetacman.github.io/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://huggingface.co/datasets/OpenDriveLab/FreeTacMan"
    },
    "papers": [
     {
      "key": "wu2026freetacman",
      "title": "FreeTacMan: Robot-Free Visuo-Tactile Data Collection System for Contact-Rich Manipulation",
      "year": 2026,
-     "arxiv": null,
-     "url": "https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#tui2i_177",
-     "bibtex": "@inproceedings{wu2026freetacman,\n  title     = {{FreeTacMan}: Robot-Free Visuo-Tactile Data Collection System for Contact-Rich Manipulation},\n  author    = {Wu, L. and Yu, C. and Ren, J. and Chen, L. and Jiang, Y. and others},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026}\n}"
+     "arxiv": "2506.01941",
+     "url": "https://arxiv.org/abs/2506.01941",
+     "bibtex": "@inproceedings{wu2026freetacman,\n  title     = {{FreeTacMan}: Robot-Free Visuo-Tactile Data Collection System for Contact-Rich Manipulation},\n  author    = {Wu, L. and Yu, C. and Ren, J. and Chen, L. and Jiang, Y. and others},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026},\n  eprint    = {2506.01941},\n  archivePrefix = {arXiv},\n  url       = {https://arxiv.org/abs/2506.01941}\n}"
     }
    ]
   },
   "LEGATO": {
-   "homepage": "https://doi.org/10.1109/LRA.2025.3535182",
+   "homepage": "https://ut-hcrl.github.io/LEGATO/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/UT-HCRL/LEGATO"
    },
    "papers": [
     {
@@ -952,19 +1007,20 @@
    ]
   },
   "ManipForce": {
-   "homepage": null,
+   "homepage": "https://sites.google.com/view/manipforce/",
    "license": {
     "name": "MIT",
-    "url": "https://opensource.org/license/mit"
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://umi-data.github.io/#datasets"
    },
    "papers": [
     {
      "key": "lee2026manipforce",
      "title": "ManipForce: Force-Guided Policy Learning with Frequency-Aware Representation for Contact-Rich Manipulation",
      "year": 2026,
-     "arxiv": null,
-     "url": "https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#thi2i_257",
-     "bibtex": "@inproceedings{lee2026manipforce,\n  title     = {{ManipForce}: Force-Guided Policy Learning with Frequency-Aware Representation for Contact-Rich Manipulation},\n  author    = {Lee, G. and Lee, Y. and Kim, K. and Lee, S. and Noh, S. and Back, S. and Lee, K.},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026}\n}"
+     "arxiv": "2509.19047",
+     "url": "https://arxiv.org/abs/2509.19047",
+     "bibtex": "@inproceedings{lee2026manipforce,\n  title     = {{ManipForce}: Force-Guided Policy Learning with Frequency-Aware Representation for Contact-Rich Manipulation},\n  author    = {Lee, G. and Lee, Y. and Kim, K. and Lee, S. and Noh, S. and Back, S. and Lee, K.},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026},\n  eprint    = {2509.19047},\n  archivePrefix = {arXiv},\n  url       = {https://arxiv.org/abs/2509.19047}\n}"
     }
    ]
   },
@@ -972,7 +1028,8 @@
    "homepage": "https://mobile-aloha.github.io/",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/lerobot/aloha_mobile_cabinet"
    },
    "papers": [
     {
@@ -988,22 +1045,23 @@
   "MolmoAct (Franka)": {
    "homepage": "https://huggingface.co/datasets/allenai/MolmoAct-Dataset",
    "license": {
-    "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "name": "CC BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "repo": "https://huggingface.co/datasets/allenai/MolmoAct-Dataset"
    },
    "papers": [
     {
      "key": "lee2026molmoact",
      "title": "MolmoAct: Action Reasoning Models that can Reason in Space",
      "year": 2026,
-     "arxiv": null,
-     "url": "https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#tui1i_327",
-     "bibtex": "@inproceedings{lee2026molmoact,\n  title     = {{MolmoAct}: Action Reasoning Models that can Reason in Space},\n  author    = {Lee, J. and Duan, J. and Fang, H. and Deng, Y. and Liu, S. and Li, B. and Fang, B. and Zhang, J. and Wang, Y. R. and Lee, S. and Han, W. and Pumacay, W. and Wu, A. and Hendrix, R. and Farley, K. and VanderBilt, E. and Farhadi, A. and Fox, D. and Krishna, R.},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026}\n}"
+     "arxiv": "2508.07917",
+     "url": "https://arxiv.org/abs/2508.07917",
+     "bibtex": "@inproceedings{lee2026molmoact,\n  title     = {{MolmoAct}: Action Reasoning Models that can Reason in Space},\n  author    = {Lee, J. and Duan, J. and Fang, H. and Deng, Y. and Liu, S. and Li, B. and Fang, B. and Zhang, J. and Wang, Y. R. and Lee, S. and Han, W. and Pumacay, W. and Wu, A. and Hendrix, R. and Farley, K. and VanderBilt, E. and Farhadi, A. and Fox, D. and Krishna, R.},\n  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},\n  year      = {2026},\n  eprint    = {2508.07917},\n  archivePrefix = {arXiv},\n  url       = {https://arxiv.org/abs/2508.07917}\n}"
     }
    ]
   },
   "MuSe": {
-   "homepage": "https://arxiv.org/abs/2606.30988",
+   "homepage": "https://jadenvc.github.io/multisensory-continual-learning/",
    "license": null,
    "papers": [
     {
@@ -1020,7 +1078,8 @@
    "homepage": "https://huggingface.co/datasets?search=openarm",
    "license": {
     "name": "varies by repository",
-    "url": "https://huggingface.co/datasets?search=openarm"
+    "url": "https://huggingface.co/datasets?search=openarm",
+    "repo": "https://huggingface.co/datasets?search=openarm"
    },
    "papers": [
     {
@@ -1034,10 +1093,11 @@
    ]
   },
   "TAMEn": {
-   "homepage": "https://huggingface.co/datasets/OpenDriveLab-org/TAMEn",
+   "homepage": "https://huggingface.co/datasets/OpenDriveLab-org/BiTacMan",
    "license": {
     "name": "CC BY-NC-SA 4.0",
-    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "repo": "https://huggingface.co/datasets/OpenDriveLab-org/BiTacMan"
    },
    "papers": [
     {
@@ -1054,7 +1114,8 @@
    "homepage": "https://arxiv.org/abs/2606.04708",
    "license": {
     "name": "Apache-2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/TeleEmbodied/VISTA-UMI-5K"
    },
    "papers": [
     {

@@ -1,0 +1,33 @@
+{
+  "_README": "OpenNeoData aloha (ALOHA-PiPER): wrist cameras + HEAD camera; hardware not published, PRIOR hfov 70 everywhere. SAMPLE COPY 2026-10-03: wrist hfov 92.6 (fx 306, calib/openneo_wrist_aloha_fx306_assumed.json).",
+  "videos": [
+    {
+      "name": "left_main_camera_rgb",
+      "video_key": "observation.image.left_main_camera_rgb",
+      "camera_trajectory_key": "observation.state.left_main_camera_trajectory_xyz_wxyz",
+      "hfov_deg": 92.6
+    },
+    {
+      "name": "right_main_camera_rgb",
+      "video_key": "observation.image.right_main_camera_rgb",
+      "camera_trajectory_key": "observation.state.right_main_camera_trajectory_xyz_wxyz",
+      "hfov_deg": 92.6
+    },
+    {
+      "name": "head_main_camera_rgb",
+      "video_key": "observation.image.head_main_camera_rgb",
+      "camera_trajectory_key": "observation.state.head_main_camera_trajectory_xyz_wxyz",
+      "hfov_deg": 70.0
+    }
+  ],
+  "scalars": [
+    {
+      "name": "left_gripper_width",
+      "data_key": "observation.state.left_gripper_width_m"
+    },
+    {
+      "name": "right_gripper_width",
+      "data_key": "observation.state.right_gripper_width_m"
+    }
+  ]
+}

@@ -12,6 +12,10 @@ Usage: python3 tools/build_site_data.py [--root /data/camx_480p]
        python3 tools/build_site_data.py --scrub-only   # re-run the anonymisation pass over data/datasets.json
        python3 tools/build_site_data.py --attach-samples-only   # merge the published one-episode samples
                                                                 # ($CAMX_SAMPLES/{index,published}.jsonl) into it
+       python3 tools/build_site_data.py --captions-only   # re-read the captions (--root): the caption tracks of the
+                                                          # example clips, and data/captions.json for the records
+       python3 tools/build_site_data.py --tasks-only      # re-read the task mix of every dataset (--root): rows' tm / title
+The captions and the task mix need pyarrow (uv run --with pyarrow python tools/build_site_data.py); without it they are left out.
 """
 import argparse, collections, glob, json, os, re, sys, datetime
 
@@ -242,6 +246,179 @@ def overlay_metas():
     return [m for k in sorted(by_proj) for m in by_proj[k]]
 
 
+def caption_track(root, dataset, ep, seconds):
+    """Captions of one example clip over time, [[start second, caption], ...], for an episode annotated per sub-task
+    (every frame carries a task_index) whose caption changes inside the clip; None when one caption covers the clip,
+    since `task` already holds it. The clip plays the episode's first `seconds` in real time. Alternate wordings of one
+    caption stay '||'-joined inside the string, as in `task`."""
+    import pyarrow.parquet as pq
+    d = os.path.join(root, dataset); info = json.load(open(os.path.join(d, 'meta', 'info.json'))); want = [('episode_index', '=', ep)]
+    for f in sorted(glob.glob(os.path.join(d, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
+        rows = pq.read_table(f, columns=['data/chunk_index', 'data/file_index'], filters=want).to_pylist()
+        if rows: break
+    else: raise KeyError(f'episode {ep} not in meta/episodes')
+    data = os.path.join(d, info['data_path'].format(chunk_index=rows[0]['data/chunk_index'], file_index=rows[0]['data/file_index']))
+    t = pq.read_table(data, columns=['frame_index', 'task_index'], filters=want).sort_by('frame_index')
+    names = {r['task_index']: r['task'] for r in pq.read_table(os.path.join(d, 'meta', 'tasks.parquet')).to_pylist()}
+    track = []
+    for fi, ti in zip(t['frame_index'].to_pylist(), t['task_index'].to_pylist()):
+        if fi / info['fps'] >= seconds: break
+        if not track or track[-1][1] != names[ti]: track.append([round(fi / info['fps'], 2), names[ti]])
+    return track if len(track) > 1 else None
+
+
+def captions_pass(out, root):
+    """o['captions'] (caption_track) on every example clip whose caption changes while it plays; the comparison viewer
+    of the main page shows the caption of the frame on screen. A clip whose dataset cannot be read keeps what it had."""
+    try: import pyarrow.parquet  # noqa: F401
+    except ImportError:
+        print('warning: no pyarrow, caption tracks of the example clips not read', file=sys.stderr); return out
+    n = 0
+    for o in (o for p in out['projects'] for o in p['overlays']):
+        try: track = caption_track(root, o['dataset'], int(o['episode']), o['seconds'])
+        except (OSError, KeyError) as e:
+            print(f"warning: {o['dataset']} ep {o['episode']}: caption track not read ({e!r})", file=sys.stderr); continue
+        o.pop('captions', None)
+        if track: o['captions'] = track; n += 1
+    print(f'{n} example clips with a caption track', file=sys.stderr)
+    return out
+
+
+CAPTIONS = os.path.join(REPO, 'data', 'captions.json')
+CAPTION_TASKS = 3   # instructions of a dataset listed in data/captions.json; the rest is a count
+
+
+def dataset_captions(out, root):
+    """data/captions.json: the language annotations of every dataset for the Caption row of its record, keyed by the
+    row's id: {"n": tasks in meta/tasks.parquet, "tasks": [the first CAPTION_TASKS by task_index, alternate wordings
+    kept '||'-joined], "name": info.json task_name where there is one (AgiBot's task group over its sub-task labels)}.
+    Its own file, fetched when the first record opens: the task strings of all datasets run to 13 MB (DROID lists
+    every episode's instruction), too much for datasets.json. Goes through the anonymisation pass like the rest."""
+    try: import pyarrow.parquet as pq
+    except ImportError:
+        print(f'warning: no pyarrow, {os.path.relpath(CAPTIONS, REPO)} not written', file=sys.stderr); return
+    back = {v: k for k, v in ID_RENAMES.items()}   # the rows carry the renamed ids, the tree the original ones
+    caps = {}
+    for r in out['datasets']:
+        d = os.path.join(root, back.get(r['id'], r['id']), 'meta')
+        try:
+            tasks = pq.read_table(os.path.join(d, 'tasks.parquet'), columns=['task_index', 'task']).sort_by('task_index').column('task').to_pylist()
+            name = json.load(open(os.path.join(d, 'info.json'))).get('task_name')
+        except OSError as e:
+            print(f"warning: {r['id']}: captions not read ({e!r})", file=sys.stderr); continue
+        e = {'n': len(tasks), 'tasks': [str(t) for t in tasks[:CAPTION_TASKS]]}
+        if name: e['name'] = str(name)
+        caps[r['id']] = scrub(e)
+    hits = sorted({m.group(0).lower() for m in FORBIDDEN.finditer(json.dumps(caps))})
+    if hits: sys.exit(f'anonymisation failed in the captions, still present: {hits}')
+    json.dump(caps, open(CAPTIONS, 'w'), separators=(',', ':'))
+    print(f'{len(caps)} datasets -> {os.path.relpath(CAPTIONS, REPO)} ({os.path.getsize(CAPTIONS) // 1024} KB)', file=sys.stderr)
+
+
+# --- task mix of every dataset ----------------------------------------------------------------------------------
+# Skill taxonomy of the curation site's stats page (cam_uva/scripts/monitor/camx_stats_page/skills.py): the first verb of
+# the first wording of a caption names its skill class. Copied so the per-dataset task mix uses the same classes as the
+# project skill histograms that stats.json brings in.
+SKILLS = {
+    'pick / grasp': 'pick grasp grab take retrieve lift get collect gather hold grip catch fetch raise elevate pickup',
+    'place / put': 'place put set deposit position load store return drop lower release',
+    'move / carry / hand over': 'move carry transfer transport bring deliver pass hand shift relocate slide swap exchange',
+    'open': 'open uncap unzip unlock unscrew lift-lid',
+    'close': 'close shut cover zip lock screw-on',
+    'fold / unfold': 'fold unfold spread flatten smooth roll layout lay straighten wrap',
+    'pour / scoop / fill': 'pour fill empty drain scoop spoon serve dispense squeeze',
+    'wipe / clean / sweep': 'wipe clean mop sweep scrub brush dust wash rinse dry',
+    'stack / arrange / sort': 'stack arrange organize organise sort tidy align line group separate unstack neatly assemble reassemble pack unpack',
+    'insert / plug / attach': 'insert plug peg thread attach connect mount install hang hook fit clip',
+    'push / press / toggle': 'push press poke tap toggle switch',
+    'pull / remove / detach': 'pull drag tug extract unplug detach remove unwrap peel tear disassemble take-off',
+    'rotate / turn / flip': 'rotate turn tilt flip twist spin invert orient adjust reorient',
+    'cut / slice': 'cut slice chop',
+    'toss / throw': 'toss throw tossing throwing',
+    'stir / cook / prepare': 'stir mix whisk brew cook steam toast make bake heat microwave prepare cooking',
+    'write / draw / point': 'write draw point scan',
+    'walk / navigate': 'walk navigate go approach come drive',
+    'unlabeled / play': 'unlabeled unlabelled unknown random play no-action',
+}
+_SKILL_WORD = {w: k for k, ws in SKILLS.items() for w in ws.split()}
+
+
+def skill_of(t):
+    t = (t or '').split('||')[0].lower()
+    if t.strip() in ('no action', 'no-action'): return 'unlabeled / play'
+    toks = re.findall(r'[a-z]+', t.replace('_', ' '))
+    for i, w in enumerate(toks):
+        if w in _SKILL_WORD: return _SKILL_WORD[w]
+        if w.endswith('ing') and w[:-3] in _SKILL_WORD: return _SKILL_WORD[w[:-3]]
+        if w.endswith('ing') and w[:-3] + 'e' in _SKILL_WORD: return _SKILL_WORD[w[:-3] + 'e']
+        if w.endswith('s') and w[:-1] in _SKILL_WORD and i == 0: return _SKILL_WORD[w[:-1]]
+    return 'other'
+
+
+MIX_TOP = 4   # most frequent captions kept per mixed / steps dataset
+
+
+def task_mix(root, dataset):
+    """How the episodes of one dataset divide into tasks, from the `tasks` list of every episode (meta/episodes):
+      single  one task: every episode carries the same caption (the dataset is split by task, like most of the site),
+      mixed   several tasks: one caption per episode, differing between episodes (the DROID lab splits, BiPlay, RoboCOIN),
+      steps   one task annotated per sub-task: several captions per episode (AgiBot World, Galaxea, MolmoAct).
+    Returns None for a single-task dataset (its name and Caption row already say what it is), else
+    {kind, eps, per_ep: median captions per episode, n_task: distinct episode-level captions, n_step: distinct sub-task
+    captions (steps), skills: [[class, n], ...] (per episode for mixed, per sub-task caption for steps), top: the MIX_TOP
+    most frequent captions with their counts}. Alternate wordings of a caption ('||'-joined) count as one wording."""
+    import pyarrow.parquet as pq
+    files = sorted(glob.glob(os.path.join(root, dataset, 'meta', 'episodes', '**', '*.parquet'), recursive=True))
+    if not files: raise KeyError('no meta/episodes')
+    first = lambda c: (c or '').split('||')[0].strip()
+    eps = 0; per = []; ep_task = collections.Counter(); steps = collections.Counter()
+    for f in files:
+        for s in pq.read_table(f, columns=['tasks']).column('tasks').to_pylist():
+            try: caps = json.loads(s) if isinstance(s, str) else list(s or [])
+            except ValueError: caps = [s]
+            caps = [first(c) for c in caps if c]
+            if not caps: continue
+            eps += 1; per.append(len(caps)); ep_task[caps[0]] += 1
+            for c in caps: steps[c] += 1
+    if not eps: raise KeyError('no episode with a caption')
+    per.sort(); per_ep = per[len(per) // 2]
+    kind = 'steps' if per_ep > 1 else 'mixed' if len(ep_task) > 1 else 'single'
+    if kind == 'single': return None
+    src = steps if kind == 'steps' else ep_task
+    sk = collections.Counter()
+    for c, n in src.items(): sk[skill_of(c)] += n
+    out = {'kind': kind, 'eps': eps, 'per_ep': per_ep, 'n_task': len(ep_task),
+           'skills': [[k, n] for k, n in sk.most_common()], 'top': [[c if len(c) <= 120 else c[:119].rstrip() + '…', n] for c, n in src.most_common(MIX_TOP)]}
+    if kind == 'steps': out['n_step'] = len(steps)
+    return out
+
+
+def tasks_pass(out, root):
+    """r['tm'] (task_mix) on every dataset row that holds more than one task, and r['title'] from the dataset's
+    info.json `task_name` where the converter wrote one (AgiBot World, whose dataset ids are opaque numbers); the cards
+    and the record show the title over the id. A dataset that cannot be read keeps what it had."""
+    try: import pyarrow.parquet  # noqa: F401
+    except ImportError:
+        print('warning: no pyarrow, task mix of the datasets not read', file=sys.stderr); return out
+    back = {v: k for k, v in ID_RENAMES.items()}   # the rows carry the renamed ids, the tree the original ones
+    kinds = collections.Counter()
+    for r in out['datasets']:
+        rel = back.get(r['id'], r['id'])
+        try: info = json.load(open(os.path.join(root, rel, 'meta', 'info.json')))
+        except (OSError, ValueError): info = {}
+        tn = str(info.get('task_name') or '').strip().rstrip('.')
+        if tn and tn.lower() != r['name'].replace('_', ' ').lower(): r['title'] = tn
+        else: r.pop('title', None)
+        try: tm = task_mix(root, rel)
+        except (OSError, KeyError) as e:
+            print(f"warning: {r['id']}: task mix not read ({e!r})", file=sys.stderr); continue
+        r.pop('tm', None)
+        if tm: r['tm'] = tm
+        kinds[tm['kind'] if tm else 'single'] += 1
+    print(f'task mix of {sum(kinds.values())} of {len(out["datasets"])} datasets: {dict(kinds)}', file=sys.stderr)
+    return out
+
+
 def scan_leaves(root):
     out = []
     def walk(d, depth):
@@ -265,9 +442,11 @@ DOWNLOAD = {'samples': RELEASES, 'sample_episode': 0, 'layout': '<family>/<proje
             'citations': SITE + 'data/citations.bib'}
 
 # --- sources: license + papers of every source dataset (hand-maintained data/sources.json) ---------------------------
-# {"sources": {"<source label>": {"homepage", "license": {"name", "url"} | null, "papers": [{"key", "title", "year",
+# {"sources": {"<source label>": {"homepage", "license": {"name", "url", "repo"} | null, "papers": [{"key", "title", "year",
 #  "arxiv", "url", "bibtex"}]}}, "projects": {"family/project": "<label>"}, "datasets": {"<row id>": "<label>"}}, keyed by
-# the inventory "source" label that every row carries (SOURCE_OF); "projects" / "datasets" point rows at a more
+# the inventory "source" label that every row carries (SOURCE_OF); license.url is the license text and license.repo the page
+# that states the license (the dataset's Hugging Face / ModelScope repository, else the project's GitHub repository, else the
+# UMI Data Initiative listing), which the site's license chips link to; "projects" / "datasets" point rows at a more
 # specific entry where one source ships under two licenses (FastUMI-100K, RH20T cfg 6-7, the Apache-2.0 ALOHA repos). The site
 # shows them in the dataset record and in the download gate (cite + license confirmation); this script checks that
 # every source has an entry and no forbidden term, and writes data/citations.bib (CAMX + every source paper).
@@ -297,6 +476,7 @@ def sources_pass(out):
     if unused: print(f'warning: sources.json entries no dataset uses: {unused}', file=sys.stderr)
     for k, v in src.items():
         if not v.get('license'): print(f'warning: {k}: license not stated', file=sys.stderr)
+        elif not v['license'].get('repo'): print(f'warning: {k}: license without the page that states it (license.repo)', file=sys.stderr)
         if not v.get('papers'): print(f'warning: {k}: no paper listed', file=sys.stderr)
     lines = ['% CAMX one-episode samples: CAMX plus every source dataset it re-exports.',
              '% Each source keeps its own license; see data/sources.json or the record of each dataset on the site.', '', CAMX_BIB]
@@ -342,10 +522,17 @@ def main():
                     help='only re-run the anonymisation pass over --out (and the sources check + data/citations.bib)')
     ap.add_argument('--attach-samples-only', action='store_true',
                     help=f'only merge the published sample archives ({SAMPLES}) into --out')
+    ap.add_argument('--captions-only', action='store_true',
+                    help='only re-read the captions from --root: the caption tracks of the example clips into --out, '
+                         f'and {os.path.relpath(CAPTIONS, REPO)} for the dataset records')
+    ap.add_argument('--tasks-only', action='store_true',
+                    help='only re-read the task mix of every dataset (rows\' tm / title) from --root into --out')
     a = ap.parse_args()
-    if a.scrub_only or a.attach_samples_only:
+    if a.scrub_only or a.attach_samples_only or a.captions_only or a.tasks_only:
         out = json.load(open(a.out))
         if a.attach_samples_only: out = attach_samples(out, SAMPLES)
+        if a.captions_only: out = captions_pass(out, a.root); dataset_captions(out, a.root)
+        if a.tasks_only: out = tasks_pass(out, a.root)
         out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
@@ -462,10 +649,11 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(out, SAMPLES))))))
+    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(tasks_pass(captions_pass(out, a.root), a.root), SAMPLES))))))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)
+    dataset_captions(out, a.root)
     # cross-check against the inventory
     inv_h = collections.defaultdict(float)
     for r in rows: inv_h[(r['embodiment'], r['source'])] += r['hours']
