@@ -6,7 +6,6 @@
 <title>CAMX — Cross-Embodiment Robot Manipulation Dataset</title>
 <meta name="description" content="CAMX: real-world robot manipulation across handheld, single-arm, bimanual and mobile-manipulator embodiments, re-exported into one camera-aware LeRobot-v3 layout. Browse every dataset and fetch one-episode samples from GitHub with a single command (anonymous submission).">
 <link rel="stylesheet" href="site.css">
-<script src="clip.js" defer></script>
 <style>
 /* ---------- hero ---------- */
 .hero{padding-top:64px;padding-bottom:20px}
@@ -72,7 +71,12 @@ button.ck[aria-checked="true"],.tree button.ck[aria-checked="true"]{background:v
 button.ck[aria-checked="true"]::after{content:"";width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
 button.ck[aria-checked="mixed"],.tree button.ck[aria-checked="mixed"]{border-color:var(--accent)}
 button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;background:var(--accent)}
-.results{flex:999 1 480px;min-width:0}
+/* the cards scroll in a box of their own beside the tree: same sticky box, same height, same thin bar. The bar sits
+   outside the column, in the page margin, so the cards keep the column's right edge: the box is outdented by its 2px
+   of padding (which keeps the accent ring of a ticked card from being cut) plus the scrollbar gutter, --sb, measured
+   at load (0 where scrollbars overlay the content). Stacked under the tree (narrow windows) the cards are a plain block. */
+.results{flex:999 1 480px;min-width:0;position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line-hi) transparent;scrollbar-gutter:stable;margin:0 calc(-2px - var(--sb,10px)) 0 -2px;padding:2px 2px 4px}
+@media (max-width:980px){.results{position:static;max-height:none;overflow:visible;margin:0;padding:0}}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px 14px}
 @media (max-width:480px){.cards{grid-template-columns:1fr 1fr;gap:16px 12px}}
 .dcard{position:relative;display:flex;flex-direction:column;gap:8px;cursor:pointer;min-width:0}
@@ -201,6 +205,31 @@ footer{margin:0}
 .drawer dd .lk{display:inline;font:500 12px/1 var(--mono);color:var(--accent);background:none;border:0;padding:0;cursor:pointer}
 .scrim{position:fixed;inset:0;background:rgba(20,15,5,.25);z-index:29;opacity:0;pointer-events:none;transition:opacity .18s}
 .scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- example clip: the raw video next to the gripper overlay ---------- */
+/* opens with the dataset record: beside the drawer on a wide window, inside the drawer (above the record) on a narrow one.
+   The stage lets clicks through to the scrim, so a click beside the panel still closes the record. */
+.stage{position:fixed;top:0;left:0;right:min(560px,100vw);height:100vh;z-index:30;display:none;align-items:center;justify-content:center;padding:24px;pointer-events:none}
+.stage.show{display:flex}
+.cmp{width:100%;min-width:0}
+.stage .cmp{pointer-events:auto;max-height:100%;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-md);padding:16px 18px}
+.drawer .cmp{margin:16px 0 4px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.cmp .hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0 0 10px}
+.cmp .hd b{font:500 14px/1.4 var(--sans)}
+.cmp .hd span{font:400 12px/1.5 var(--mono);color:var(--ink3);overflow-wrap:anywhere}
+.cmp .views{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.cmp .panes{display:grid;gap:12px}
+.cmp .panes.side{grid-template-columns:1fr 1fr;align-items:end}
+.cmp figure{margin:0;min-width:0}
+.cmp figcaption{font:500 11px/1.7 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin:0 0 4px}
+.cmp figcaption .note{font:400 12px/1.5 var(--sans);text-transform:none;letter-spacing:0}
+/* one window per clip; the video is wider than its window when a single camera view is picked (the strip is cropped to that tile) */
+.cmp .win{position:relative;overflow:hidden;border-radius:8px;background:#000;cursor:pointer;margin:0 auto}
+.cmp .win video{position:absolute;top:0;height:100%;max-width:none;display:block}
+.cmp .win .err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+.cmp .ctl{display:flex;align-items:center;gap:12px;margin-top:12px}
+.cmp .ctl button{width:36px;height:32px;padding:0;justify-content:center;flex:none}
+.cmp .ctl input{flex:1;min-width:0;accent-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -266,6 +295,7 @@ footer{margin:0}
   </form>
 </dialog>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Dataset record"><button class="close" id="drawerClose" aria-label="Close">✕</button><div id="drawerBody"></div></div>
+<div class="stage" id="stage"></div>
 
 <script>
 const MORPHS=[
@@ -317,23 +347,24 @@ function stats(){$('stats').innerHTML=[[fmt(tot('episodes')),'episodes'],[fmtH(t
    The tree shows only what can be fetched here under a stated license: the sources listed from the paper with no converted
    data (PEND) are left out, and so is any dataset whose sources.json entry states no license (inTree, once sources.json is in).
    The count on the right follows the rows shown: "7 projects · 749 h" on the rows above a project (one project per platform
-   and source), "34 tasks · 209 h" on a project row (one task per dataset). The hero stats quote the paper instead (tot). */
+   and source), "34 tasks · 209 h" on a project row (one task per dataset). The hero stats quote the paper instead (tot),
+   so the "All morphologies" row carries no count: its sum over the rows shown would sit next to them and disagree. */
 const cnt=(n,w,h)=>`${n.toLocaleString()} ${w}${n===1?'':'s'} · ${fmtH(h)} h`;
 const inTree=r=>!SRCOK||!!licName(SRC[srcName(r)]);
-function tree(){const T=L.filter(inTree);let np=0,h='';
+function tree(){const T=L.filter(inTree);let h='';
   MORPHS.forEach(m=>{const rows=T.filter(r=>r.morph===m.id);const a=agg(rows);const embs={};
     const emb=e=>embs[e]||(embs[e]={n:0,h:0,rows:[],srcs:{}});
     const src=(e,n)=>e.srcs[n]||(e.srcs[n]={n:0,h:0,rows:[]});
     rows.forEach(r=>{const e=emb(r.embodiment),x=src(e,r.source);e.n++;e.h+=r.hours||0;e.rows.push(r);x.n++;x.h+=r.hours||0;x.rows.push(r)});
-    const mp=Object.values(embs).reduce((s,v)=>s+Object.keys(v.srcs).length,0);np+=mp;
+    const mp=Object.values(embs).reduce((s,v)=>s+Object.keys(v.srcs).length,0);
     h+='<div>'+row(S.cat===m.id&&!S.robot,{cat:m.id},'<span class="tick"></span><span>'+m.label+'</span>',cnt(mp,'project',a.h),rows,m.label)+'<div class="lvl2">'
       +Object.entries(embs).sort((x,y)=>y[1].h-x[1].h).map(([e,v])=>{const act=S.cat===m.id&&S.robot===e;
         let o=row(act&&!S.source,{cat:m.id,robot:e},'<span class="tick"></span><span>'+esc(e)+'</span>',cnt(Object.keys(v.srcs).length,'project',v.h),v.rows,e,`${esc(e)} · ${v.n} dataset${v.n===1?'':'s'}`);
         if(act)o+='<div class="lvl3">'+Object.entries(v.srcs).sort((x,y)=>y[1].h-x[1].h).map(([sn,x])=>row(S.source===sn,{cat:m.id,robot:e,source:sn},'<span class="tick"></span><span>'+esc(sn)+'</span>',cnt(x.n,'task',x.h),x.rows,sn,`${esc(sn)} · ${x.n} dataset${x.n===1?'':'s'}`)+srcMeta(x)).join('')+'</div>';
         return o}).join('')+'</div></div>'});
-  $('tree').innerHTML=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>',cnt(np,'project',agg(T).h),T,'all datasets')+'<div class="lvl1">'+h+'</div>'}
+  $('tree').innerHTML=row(S.cat==='all',{cat:'all'},'<span class="dia"></span><span>All morphologies</span>','',T,'all datasets')+'<div class="lvl1">'+h+'</div>'}
 function row(on,f,lab,c,rows,name,title){const d=Object.entries(f).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ');
-  return `<div class="row"><button type="button" class="${on?'on':''}" ${d}${title?` title="${title}"`:''}><span class="lab">${lab}</span><span class="c">${c}</span></button>${ck(state(rows),d,'Select '+name+' for download')}</div>`}
+  return `<div class="row"><button type="button" class="${on?'on':''}" ${d}${title?` title="${title}"`:''}><span class="lab">${lab}</span>${c?`<span class="c">${c}</span>`:''}</button>${ck(state(rows),d,'Select '+name+' for download')}</div>`}
 function groupRows(d){return L.filter(r=>inTree(r)&&(d.cat==='all'||r.morph===d.cat)&&(!d.robot||r.embodiment===d.robot)&&(!d.source||r.source===d.source))}
 /* a click in the tree re-renders the tree and the cards, and both move the tree: a cards column shorter than the tree
    ends the sticky range and takes the tree off screen, and the sources of the platform left behind collapse above the
@@ -341,7 +372,8 @@ function groupRows(d){return L.filter(r=>inTree(r)&&(d.cat==='all'||r.morph===d.
    Beside the cards: a stuck tree sits at the same place when the page is at the first card, so the page goes there
    and the tree scrolls its own box until the clicked row is under the pointer again. Stacked above the cards (narrow
    windows): the page scrolls by however far the row moved. A tick box changes no filter, so the page stays where it
-   is. Scroll amounts are rounded to device pixels: the browser cuts a fraction off, which shows as a one-pixel twitch. */
+   is; a new filter also starts the cards' own scroll box over at its first card (the click handler). Scroll amounts
+   are rounded to device pixels: the browser cuts a fraction off, which shows as a one-pixel twitch. */
 function keep(b,fn){const T=$('tree'),box=T.parentNode,d=b.dataset,ck=b.classList.contains('ck'),y0=b.getBoundingClientRect().top,b0=box.getBoundingClientRect().top;
   fn();
   const cs=getComputedStyle(T),px=devicePixelRatio||1,snap=y=>Math.round(y*px)/px,by=y=>window.scrollBy({top:snap(y),behavior:'instant'});
@@ -360,11 +392,15 @@ function syncCards(){$('cards').querySelectorAll('.dcard').forEach(c=>{const on=
 function filtered(){return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source))}
 function pendFiltered(){return PEND.filter(p=>(S.cat==='all'||p.morph===S.cat)&&(!S.robot||p.embodiment===S.robot)&&(!S.source||p.source===S.source))}
 const noteText=p=>p.note&&D.pending_notes?D.pending_notes[p.note]||'':'';
-function thumb(r){const p=P[r.project];const o=p.overlays.find(o=>o.dataset===r.id)||p.overlays[0];if(!o)return null;const f=`${o.key}__${o.slug}`;
-  return {poster:`overlays/posters/${f}.jpg`,src:D.overlay_base+f+'.mp4'}}
+// the example clip of a dataset: its own, else the first of its project. Every clip has a raw companion with the same
+// frames, size and tiling (overlays/raw/, tools/raw_clips.py); the cards show only the raw poster
+const RAW='overlays/raw/';
+const clipName=o=>`${o.key}__${o.slug}`;
+const clipOf=r=>{const p=P[r.project];return p.overlays.find(o=>o.dataset===r.id)||p.overlays[0]||null};
+function thumb(r){const o=clipOf(r);return o?{poster:RAW+clipName(o)+'.jpg'}:null}
 
 function card(r){const t=thumb(r),on=sel.has(r.id);
-  const th=t?`<div class="thumb has clip" data-src="${t.src}" title="Play the example clip"><img src="${t.poster}" alt="" loading="lazy"><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
+  const th=t?`<div class="thumb has" title="Open the example clip"><img src="${t.poster}" alt="" loading="lazy"><span class="play"><i></i></span><span class="dur">${fmtH(r.hours)} h</span></div>`
     :`<div class="thumb"><span class="tl">no example clip</span><span class="dur">${fmtH(r.hours)} h</span></div>`;
   return `<article class="dcard${on?' on':''}" data-id="${esc(r.id)}">${th}${ck(on,'','Select '+human(r.name)+' for download')}<div class="body"><div class="ttl">${esc(human(r.name))}</div>
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div></div></article>`}
@@ -467,12 +503,53 @@ function persist(){try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 
 /* ---------- dataset drawer ---------- */
+/* example clip viewer: the raw video next to the gripper overlay, frame for frame. Both clips are strips of the same
+   camera views (equal heights, left to right in o.views). "all views" shows the strips one above the other; picking a
+   view crops both to that tile and shows them side by side. */
+let CMP=null;
+const wide=matchMedia('(min-width:1100px)');
+function tilesOf(o){const row=L.find(x=>x.id===o.dataset);const ar=o.views.map(v=>{const c=row&&row.cams.find(c=>c.name===v);return c?c.w/c.h:4/3});
+  const A=ar.reduce((a,b)=>a+b,0);let x=0;return {A,T:ar.map(a=>{const t={x:x/A,w:a/A,ar:a};x+=a;return t})}}
+function closeCmp(){if(!CMP)return;CMP.querySelectorAll('video').forEach(v=>{v.pause();v.removeAttribute('src');v.load()});CMP.remove();CMP=null;$('stage').classList.remove('show')}
+function placeCmp(){if(!CMP)return;const st=$('stage'),dl=$('drawerBody').querySelector('dl');
+  if(wide.matches){st.appendChild(CMP);st.classList.add('show')}else{st.classList.remove('show');if(dl)dl.before(CMP)}}
+wide.addEventListener('change',placeCmp);
+function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,T}=tilesOf(o),f=clipName(o);
+  const el=CMP=document.createElement('div');el.className='cmp';
+  const pane=(cap,src)=>`<figure><figcaption>${cap}</figcaption><div class="win"><video src="${esc(src)}" muted loop playsinline preload="auto"></video></div></figure>`;
+  el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}</span></div>
+    ${o.views.length>1?`<div class="views" role="group" aria-label="Camera view">${['all views',...o.views.map(v=>v.replace(/_rgb$/,''))].map((v,i)=>`<button type="button" class="chip btn" data-v="${i-1}">${esc(v)}</button>`).join('')}</div>`:''}
+    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane(o.mode==='primitive'?'Gripper stand-in overlay <span class="note">(No gripper CAD available. Only showing gripper tip.)</span>':'Gripper CAD overlay',D.overlay_base+f+'.mp4')}</div>
+    <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
+  const [a,b]=el.querySelectorAll('video'),pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
+  // the raw clip leads and the overlay follows it: same frame count and rate, so only decoder drift has to be corrected
+  const sync=()=>{if(Math.abs(b.currentTime-a.currentTime)>.07)b.currentTime=a.currentTime};
+  const toggle=()=>{if(a.paused){const p=a.play();if(p&&p.catch)p.catch(()=>{})}else a.pause()};
+  a.addEventListener('timeupdate',()=>{sync();if(a.duration)pos.value=1000*a.currentTime/a.duration});
+  a.addEventListener('seeked',sync);
+  a.addEventListener('play',()=>{const p=b.play();if(p&&p.catch)p.catch(()=>{});pp.textContent='❚❚';pp.setAttribute('aria-label','Pause')});
+  a.addEventListener('pause',()=>{b.pause();pp.textContent='▶';pp.setAttribute('aria-label','Play')});
+  pos.oninput=()=>{if(a.duration)a.currentTime=b.currentTime=pos.value/1000*a.duration};
+  pp.onclick=toggle;
+  el.querySelectorAll('.win').forEach(w=>{w.onclick=toggle;
+    w.firstChild.addEventListener('error',()=>w.insertAdjacentHTML('beforeend','<div class="err">Clip failed to load.</div>'))});
+  // the window takes the aspect of what is shown; its height is capped so both windows and the controls fit the stage
+  const show=i=>{const t=i<0?{x:0,w:1,ar:A}:T[i],side=t.ar<1.9;el.querySelector('.panes').classList.toggle('side',side);
+    el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=t.ar;w.style.width=`min(100%,calc((100vh - 280px)*${(t.ar/(side?1:2)).toFixed(4)}))`;
+      w.firstChild.style.width=100/t.w+'%';w.firstChild.style.left=-100*t.x/t.w+'%'});
+    el.querySelectorAll('.views button').forEach(k=>{const on=+k.dataset.v===i;k.classList.toggle('on',on);k.setAttribute('aria-pressed',on)})};
+  el.querySelectorAll('.views button').forEach(k=>k.onclick=()=>show(+k.dataset.v));
+  show(-1);placeCmp();
+  // start both together once each has a frame; if one fails to load, the other still plays
+  let n=0;const go=()=>{if(++n===2&&CMP===el)toggle()};
+  [a,b].forEach(v=>{if(v.readyState>=2)go();else{v.addEventListener('loadeddata',go,{once:true});v.addEventListener('error',go,{once:true})}})}
+
 function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
   const kv=[hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
-    p.overlays.length?['Example clips',`<a href="overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`+(p.overlays.some(o=>o.mode==='primitive')?'<br><span class="dim">No gripper CAD is published for this rig, so the clips draw a stand-in: two pads at the recorded jaw width, a bar between them and the tool-centre axes (x red, y green, z blue).</span>':'')]:null,
+    p.overlays.length?['Example clips',`<a href="overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`]:null,
     ['License',licChip(si)+(si.homepage?` <a class="dim" href="${esc(si.homepage)}" target="_blank" rel="noopener">source page</a>`:'')],
     ['Cite',paperLinks(si,srcName(r))+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]].filter(Boolean);
   $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(human(r.name))}</h3>
@@ -482,7 +559,7 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
     <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   const cp=$('copyOne');if(cp)cp.onclick=()=>gate([r],human(r.name),()=>navigator.clipboard.writeText(oneCmd(r)).then(()=>{cp.textContent='Copied';setTimeout(()=>cp.textContent='Copy sample command',1200)}),'copy');
   const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:srcName(r),n:1,info:si}],human(r.name))).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
-  $('drawer').classList.add('open');$('scrim').classList.add('show')}
+  $('drawer').classList.add('open');$('scrim').classList.add('show');openCmp(r)}
 /* record of a source listed from the paper without converted data: the paper's counts, its note, license and paper */
 function drawerPend(i){const p=PEND[i];if(!p)return;const si=SRC[p.entry||p.source]||{};S.open=null;S.openPend=i;
   const kv=[['Datasets',p.datasets.toLocaleString()],['Episodes',esc(fmt(p.episodes))],['Duration',esc(fmtH(p.hours))+' h'],['Views',esc(p.views)],['FPS',esc(p.fps)],
@@ -494,17 +571,19 @@ function drawerPend(i){const p=PEND[i];if(!p)return;const si=SRC[p.entry||p.sour
     <p class="path">counts from the source release, as in the appendix table</p>
     <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:p.entry||p.source,n:1,info:si}],p.source)).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
-  $('drawer').classList.add('open');$('scrim').classList.add('show')}
-function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
+  closeCmp();$('drawer').classList.add('open');$('scrim').classList.add('show')}
+function closeDrawer(){closeCmp();$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
 
 document.addEventListener('DOMContentLoaded',()=>{load();
+  // --sb: the gutter a thin scrollbar takes from its box in this browser, for the outdent of the cards' scroll box (.results);
+  // measured on a box that reserves it the same way, since a stable gutter and a shown scrollbar need not be the same width
+  const sb=document.body.appendChild(document.createElement('div'));sb.style.cssText='position:absolute;visibility:hidden;width:50px;overflow-y:auto;scrollbar-gutter:stable;scrollbar-width:thin';
+  document.documentElement.style.setProperty('--sb',sb.offsetWidth-sb.clientWidth+'px');sb.remove();
   $('tree').addEventListener('click',e=>{const b=e.target.closest('button[data-cat]');if(!b)return;
     keep(b,()=>{if(b.classList.contains('ck')){setSel(groupRows(b.dataset),b.getAttribute('aria-checked')!=='true');return}
-      S.cat=b.dataset.cat;S.robot=b.dataset.robot||null;S.source=b.dataset.source||null;S.shown=PAGE;tree();render()})});
+      S.cat=b.dataset.cat;S.robot=b.dataset.robot||null;S.source=b.dataset.source||null;S.shown=PAGE;tree();render();$('cards').parentNode.scrollTop=0})});
   $('cards').addEventListener('click',e=>{const k=e.target.closest('.ck');
     if(k){const id=k.closest('.dcard').dataset.id;setSel(L.filter(r=>r.id===id),!sel.has(id));return}
-    const t=e.target.closest('.thumb[data-src]');
-    if(t){openClip(t);return}
     const c=e.target.closest('.dcard');if(c)drawer(c.dataset.id)});
   $('pend').addEventListener('click',e=>{const c=e.target.closest('.pcard');if(c)drawerPend(+c.dataset.pid)});
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;

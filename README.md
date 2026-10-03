@@ -24,6 +24,11 @@ This repository is anonymized for review.
   served from `overlays/videos/` (tracked, so Pages sends them as `video/mp4`; iOS Safari will not play the
   `application/octet-stream` that GitHub release assets come back as); posters live in `overlays/posters/`. The site is fully static
   (GitHub Pages); there is no rendering backend.
+- `overlays/raw/` — the raw companion of every example clip (`<key>__<slug>.mp4` + `.jpg` poster): the same episode,
+  camera views, tile order, frame sampling and frame size, with nothing drawn on it (`tools/raw_clips.py`). The
+  dataset cards of the landing page show only the raw poster. Clicking a card opens the dataset record and, beside
+  it (above it on a phone), a comparison viewer that plays the raw clip next to the overlay clip in step; picking one
+  camera view crops both clips to that tile and shows them side by side.
 - `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates. The browse tree follows
   the source tables of the paper's appendix: the build relabels rows into the paper's embodiment groups (iPhUMI,
   TacUMI, Other research projects; Galaxea, UR5, ARX5 and OpenArm each inside one morphology band) and copies
@@ -65,6 +70,13 @@ checkout (`render_multiview_overlay_video.py` for every camera stream of a datas
 the DataClaw / GenRobot picks) for a pick table of three episodes per project, `pack` writes
 `<project_key>/<slug>/{stitched.mp4,poster.jpg,meta.json}` in the tree's layout, `encode` makes the 360p release
 mp4 and the site poster. Point `CAMX_OVERLAYS_EXTRA` at that directory when building.
+
+After any change to `overlays/videos/`, refresh the raw companions (it reads each overlay clip's size, frame count
+and frame rate back and cuts the same frames from the dataset's own videos; only stale or missing clips are redone):
+
+```
+uv run --with pyarrow python tools/raw_clips.py      # overlays/raw/<key>__<slug>.{mp4,jpg}
+```
 
 One-episode samples (the tree root, the output dir and the scrub list are the `--root`, `--out` and
 `$CAMX_SCRUB` defaults; re-running either script only does what is still missing):
