@@ -1132,7 +1132,8 @@
  "projects": {
   "fastumi/fastumi_100k_single_arm": "FastUMI-100K",
   "robotiq/rh20t_cfg6": "RH20T (cfg 6-7)",
-  "robotiq/rh20t_cfg7": "RH20T (cfg 6-7)"
+  "robotiq/rh20t_cfg7": "RH20T (cfg 6-7)",
+  "fastumi/fastumi_100k_dual_arm": "FastUMI-100K"
  },
  "datasets": {
   "aloha/aloha_lerobot/battery": "ALOHA (Apache-2.0 repos)",

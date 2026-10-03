@@ -21,7 +21,7 @@ import argparse, collections, glob, json, os, re, sys, datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-INVENTORY = os.path.expanduser('~/projects/camera-cross-embodiment/camx/figures/dataset_inventory.json')
+INVENTORY = os.path.expanduser(os.environ.get('CAMX_INVENTORY', '~/projects/camera-cross-embodiment/camx/figures/dataset_inventory.json'))
 BROWSER = os.environ.get('CAMX_BROWSER', '/data/camx_480p_browser')
 STATS = os.path.join(BROWSER, 'stats', 'stats.json')
 OVERLAYS = os.path.join(BROWSER, 'mv_urdf', 'videos')
@@ -94,7 +94,18 @@ SOURCE_OF = {
     'umi/openneo_umi_single': 'OpenNeoData', 'umi/touch_in_the_wild': 'Touch in the Wild', 'umi/umi': 'UMI', 'umi/umi3d': 'UMI-3D',
     'umi/umi_benchmark': 'UMI-Benchmark', 'umi/umi_on_legs': 'UMI-on-Legs', 'umi/vitamin': 'ViTaMIn', 'umi/vitamin_b': 'ViTaMIn-B',
     'ur/openneo_ur': 'OpenNeoData', 'wsg50/rh20t_cfg3': 'RH20T',
+    # the 2026-10-03 conversion pass of the sources the paper lists that had no data on the site (data/pending.json)
+    'xarm/mint_xarm': 'Evo-1 xArm6', 'umi/vista_umi': 'Vista-UMI', 'aloha/aloha_lerobot_mobile': 'Mobile ALOHA',
+    'fastumi/fastumi_100k_dual_arm': 'FastUMI-100K (dual-arm)', 'freetacman/freetacman': 'FreeTacMan', 'iphumi/muse': 'MuSe',
+    'dexumi/dexumi': 'DexUMI', 'umi/tamen': 'TAMEn', 'xhand/dexora': 'Dexora', 'widowx/bridge_v2': 'Bridge V2',
+    'franka_hand/molmoact': 'MolmoAct (Franka)', 'dexwild/dexwild': 'DexWild',
 }
+# dataset id -> source, where one collection spans two paper rows: openarm/openarm holds the three OpenArm datasets of the
+# training mix (full_folding, high_quality_folding, pickplace) and the eight community uploads the paper lists as their
+# own row (coordinating conversion session, 2026-10-03)
+SOURCE_OF_DATASET = {f'openarm/openarm/{d}': 'OpenArm community' for d in (
+    'blue_cube_to_bin', 'box_pick', 'grab_sth', 'mini_dual_camera_blue_sponge', 'pick_and_place', 'pick_and_place_clean',
+    'tablewares_sort_merged', 'tape_to_box')}
 
 # projects shown as one on the site: the leaf ids (and so the sample archives) keep their own path, but rows, the
 # browse tree's source level, the overlays page and the project totals all fold the first into the second
@@ -134,6 +145,9 @@ PAPER_EMBODIMENT = {  # (inventory embodiment, source) -> embodiment group of th
 }
 PAPER_MORPH = {  # embodiment -> the band the paper lists it under (Galaxea RoboCOIN, RoboMIND 2.0 UR, single-arm ARX5 leaves)
     'Galaxea R1-Lite': 'Mobile manipulator', 'UR5': 'Single-arm robot', 'ARX5': 'Bimanual robot', 'OpenArm': 'Bimanual robot',
+    # groups of the 2026-10-03 conversion pass (the morph column of data/pending.json)
+    'xArm6': 'Single-arm robot', 'WidowX 250S': 'Single-arm robot', 'AIRBOT MMK2 + XHAND': 'Bimanual robot',
+    'Dexterous hands': 'Handheld, robot-free', 'Other research projects': 'Handheld, robot-free', 'iPhUMI': 'Handheld, robot-free',
 }
 PENDING = os.path.join(REPO, 'data', 'pending.json')
 
@@ -201,7 +215,13 @@ CAM_ROLE = [(r'wrist|hand|left_main|right_main|gripper|eef|cam_(left|right)|(^|_
             (r'head|top|front|third|exterior|scene|neck|base|side|back|overhead|global|external|main', 'external')]
 
 
-PROJECT_EMBODIMENT = {'fastumi/fastumi': 'UMI', 'fastumi/fastumi_100k_single_arm': 'UMI'}  # inventory rolls FastUMI (XARM6 rows) into UMI
+PROJECT_EMBODIMENT = {'fastumi/fastumi': 'UMI', 'fastumi/fastumi_100k_single_arm': 'UMI',  # inventory rolls FastUMI (XARM6 rows) into UMI
+                      # paper table rows of the 2026-10-03 conversion pass (the embodiment column of data/pending.json)
+                      'xarm/mint_xarm': 'xArm6', 'umi/vista_umi': 'UMI', 'aloha/aloha_lerobot_mobile': 'ALOHA',
+                      'fastumi/fastumi_100k_dual_arm': 'UMI', 'freetacman/freetacman': 'Other research projects',
+                      'iphumi/muse': 'iPhUMI', 'dexumi/dexumi': 'Dexterous hands', 'umi/tamen': 'Other research projects',
+                      'xhand/dexora': 'AIRBOT MMK2 + XHAND', 'widowx/bridge_v2': 'WidowX 250S', 'franka_hand/molmoact': 'Franka',
+                      'dexwild/dexwild': 'Dexterous hands'}
 
 
 def embodiment_of(robot_type, project=None):
@@ -218,7 +238,7 @@ def form_of(row, setup, robot_type, project):
         want = 'bimanual' if setup == 'bimanual' else 'single-arm'
         ff = next((p for p in parts if want in p), parts[0])
     if not ff:
-        hand = bool(re.search(r'UMI|handheld|DataClaw|Dobb|AetheRock|Vitamin|HuMI|genrobot', robot_type or '', re.I))
+        hand = bool(re.search(r'UMI|handheld|DataClaw|Dobb|AetheRock|Vitamin|HuMI|genrobot|FreeTacMan|TAMEn|MuSe|DexWild', robot_type or '', re.I))
         ff = ('handheld (%s)' if hand else '%s (fixed base)') % ('bimanual' if setup == 'bimanual' else 'single-arm')
     return ff
 
@@ -246,11 +266,11 @@ def overlay_metas():
     return [m for k in sorted(by_proj) for m in by_proj[k]]
 
 
-def caption_track(root, dataset, ep, seconds):
-    """Captions of one example clip over time, [[start second, caption], ...], for an episode annotated per sub-task
-    (every frame carries a task_index) whose caption changes inside the clip; None when one caption covers the clip,
-    since `task` already holds it. The clip plays the episode's first `seconds` in real time. Alternate wordings of one
-    caption stay '||'-joined inside the string, as in `task`."""
+def clip_captions(root, dataset, ep, seconds):
+    """Captions of one example clip over time, [[start second, caption], ...], from the dataset's current data: the
+    episode's per-frame task_index resolved through meta/tasks.parquet. One entry when a single caption covers the
+    clip, several for an episode annotated per sub-task. The clip plays the episode's first `seconds` in real time.
+    Alternate wordings of one caption stay '||'-joined inside the string."""
     import pyarrow.parquet as pq
     d = os.path.join(root, dataset); info = json.load(open(os.path.join(d, 'meta', 'info.json'))); want = [('episode_index', '=', ep)]
     for f in sorted(glob.glob(os.path.join(d, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
@@ -264,23 +284,36 @@ def caption_track(root, dataset, ep, seconds):
     for fi, ti in zip(t['frame_index'].to_pylist(), t['task_index'].to_pylist()):
         if fi / info['fps'] >= seconds: break
         if not track or track[-1][1] != names[ti]: track.append([round(fi / info['fps'], 2), names[ti]])
+    return track
+
+
+def caption_track(root, dataset, ep, seconds):
+    """clip_captions of an episode whose caption changes inside the clip; None when one caption covers it."""
+    track = clip_captions(root, dataset, ep, seconds)
     return track if len(track) > 1 else None
 
 
 def captions_pass(out, root):
-    """o['captions'] (caption_track) on every example clip whose caption changes while it plays; the comparison viewer
-    of the main page shows the caption of the frame on screen. A clip whose dataset cannot be read keeps what it had."""
+    """The captions of every example clip, from the dataset's current data (clip_captions): o['task'], the caption at
+    the start of the clip, and o['captions'], the whole track, on a clip whose caption changes while it plays. The
+    render tree's meta.json `tasks` is a snapshot of the dataset at render time and goes stale when an annotation
+    bank is re-expanded (RDT: 20 wordings at render time, 25 now), so it only stands in for a dataset that cannot be
+    read here. The record's Caption row (dataset_captions) reads the same tasks.parquet, so the clip viewer, the
+    overlays page and the record always agree."""
     try: import pyarrow.parquet  # noqa: F401
     except ImportError:
-        print('warning: no pyarrow, caption tracks of the example clips not read', file=sys.stderr); return out
-    n = 0
+        print('warning: no pyarrow, the captions of the example clips not read', file=sys.stderr); return out
+    back = {v: k for k, v in ID_RENAMES.items()}   # the clip records carry the renamed ids, the tree the original ones
+    n = changed = 0
     for o in (o for p in out['projects'] for o in p['overlays']):
-        try: track = caption_track(root, o['dataset'], int(o['episode']), o['seconds'])
+        try: track = clip_captions(root, back.get(o['dataset'], o['dataset']), int(o['episode']), o['seconds'])
         except (OSError, KeyError) as e:
-            print(f"warning: {o['dataset']} ep {o['episode']}: caption track not read ({e!r})", file=sys.stderr); continue
-        o.pop('captions', None)
-        if track: o['captions'] = track; n += 1
-    print(f'{n} example clips with a caption track', file=sys.stderr)
+            print(f"warning: {o['dataset']} ep {o['episode']}: captions not read, keeping the render-time task ({e!r})", file=sys.stderr); continue
+        if not track: continue
+        if o.get('task') != track[0][1]: changed += 1
+        o['task'] = track[0][1]; o.pop('captions', None)
+        if len(track) > 1: o['captions'] = track; n += 1
+    print(f'{n} example clips with a caption track; {changed} clips whose task string differed from the render tree', file=sys.stderr)
     return out
 
 
@@ -293,26 +326,32 @@ def dataset_captions(out, root):
     row's id: {"n": tasks in meta/tasks.parquet, "tasks": [the first CAPTION_TASKS by task_index, alternate wordings
     kept '||'-joined], "name": info.json task_name where there is one (AgiBot's task group over its sub-task labels)}.
     Its own file, fetched when the first record opens: the task strings of all datasets run to 13 MB (DROID lists
-    every episode's instruction), too much for datasets.json. Goes through the anonymisation pass like the rest."""
+    every episode's instruction), too much for datasets.json. Goes through the anonymisation pass like the rest.
+    Merges into the existing file: a row whose dataset is not readable under `root` keeps its entry (an incremental
+    build against a tree that holds only the new leaves must not drop the others), ids no longer in `out` go."""
     try: import pyarrow.parquet as pq
     except ImportError:
         print(f'warning: no pyarrow, {os.path.relpath(CAPTIONS, REPO)} not written', file=sys.stderr); return
     back = {v: k for k, v in ID_RENAMES.items()}   # the rows carry the renamed ids, the tree the original ones
-    caps = {}
+    old = json.load(open(CAPTIONS)) if os.path.isfile(CAPTIONS) else {}
+    caps = {}; kept = []
     for r in out['datasets']:
         d = os.path.join(root, back.get(r['id'], r['id']), 'meta')
         try:
             tasks = pq.read_table(os.path.join(d, 'tasks.parquet'), columns=['task_index', 'task']).sort_by('task_index').column('task').to_pylist()
             name = json.load(open(os.path.join(d, 'info.json'))).get('task_name')
         except OSError as e:
-            print(f"warning: {r['id']}: captions not read ({e!r})", file=sys.stderr); continue
+            if r['id'] in old: caps[r['id']] = old[r['id']]; kept.append(r['id'])
+            else: print(f"warning: {r['id']}: captions not read, no entry ({e!r})", file=sys.stderr)
+            continue
         e = {'n': len(tasks), 'tasks': [str(t) for t in tasks[:CAPTION_TASKS]]}
         if name: e['name'] = str(name)
         caps[r['id']] = scrub(e)
     hits = sorted({m.group(0).lower() for m in FORBIDDEN.finditer(json.dumps(caps))})
     if hits: sys.exit(f'anonymisation failed in the captions, still present: {hits}')
     json.dump(caps, open(CAPTIONS, 'w'), separators=(',', ':'))
-    print(f'{len(caps)} datasets -> {os.path.relpath(CAPTIONS, REPO)} ({os.path.getsize(CAPTIONS) // 1024} KB)', file=sys.stderr)
+    print(f'{len(caps)} datasets -> {os.path.relpath(CAPTIONS, REPO)} ({os.path.getsize(CAPTIONS) // 1024} KB)'
+          + (f'; {len(kept)} not under {root}, entries kept from the previous file' if kept else ''), file=sys.stderr)
 
 
 # --- task mix of every dataset ----------------------------------------------------------------------------------
@@ -393,16 +432,17 @@ def task_mix(root, dataset):
     return out
 
 
-def tasks_pass(out, root):
+def tasks_pass(out, root, rows=None):
     """r['tm'] (task_mix) on every dataset row that holds more than one task, and r['title'] from the dataset's
     info.json `task_name` where the converter wrote one (AgiBot World, whose dataset ids are opaque numbers); the cards
-    and the record show the title over the id. A dataset that cannot be read keeps what it had."""
+    and the record show the title over the id. A dataset that cannot be read keeps what it had. `rows`: only these
+    rows of out['datasets'] (the --add path), default all."""
     try: import pyarrow.parquet  # noqa: F401
     except ImportError:
         print('warning: no pyarrow, task mix of the datasets not read', file=sys.stderr); return out
     back = {v: k for k, v in ID_RENAMES.items()}   # the rows carry the renamed ids, the tree the original ones
     kinds = collections.Counter()
-    for r in out['datasets']:
+    for r in (out['datasets'] if rows is None else rows):
         rel = back.get(r['id'], r['id'])
         try: info = json.load(open(os.path.join(root, rel, 'meta', 'info.json')))
         except (OSError, ValueError): info = {}
@@ -514,10 +554,174 @@ def attach_samples(out, samples_dir):
     return out
 
 
+def leaf_row(root, p, inv_rows):
+    """The dataset row of one leaf (a folder with meta/info.json) of the camx_480p tree."""
+    rel = p[len(root.rstrip('/')) + 1:]
+    family, project = rel.split('/')[:2]
+    pk = f'{family}/{project}'
+    d = json.load(open(os.path.join(p, 'meta', 'info.json')))
+    feat = d.get('features', {})
+    cams = []
+    for k, v in feat.items():
+        if v.get('dtype') != 'video': continue
+        name = k.split('.')[-1]; base = name.replace('_rgb', '')
+        g = lambda suf: d.get(base + suf, d.get(name + suf))
+        shape = v.get('shape') or [None, None, None]
+        cams.append({'name': name, 'h': shape[0], 'w': shape[1], 'model': g('_model'),
+                     'fisheye': bool(g('_is_fisheye')), 'role': cam_role(name)})
+    fps = float(d.get('fps') or 0)
+    frames = int(d.get('total_frames') or 0)
+    eps = int(d.get('total_episodes') or 0)
+    rt = d.get('robot_type') or ''
+    setup = d.get('robot_setup_type') or ('bimanual' if 'bimanual' in rt.lower() else 'single_arm')
+    emb = embodiment_of(rt, pk)
+    src = SOURCE_OF_DATASET.get(rel) or SOURCE_OF.get(pk, project)
+    row = inv_rows.get((emb, src))
+    ff = form_of(row, setup, rt, pk)
+    state = [k for k in feat if k.startswith('observation.state')]
+    has_eef = any('trajectory' in k or 'eef' in k or 'pose' in k for k in state)
+    has_joint = any('joint' in k for k in state)
+    has_grip = any('gripper' in k for k in state)
+    # samples-first conversion (2026-10-03): the converter kept one episode per dataset and stamped the rest as pending;
+    # the row carries that episode's counts and `partial`, the record says so, the paper's counts stay in data/pending.json
+    partial = d.get('camx_partial_export')
+    return {**({'partial': partial} if partial else {}),
+        'id': rel, 'family': family, 'project': pk, 'name': '/'.join(rel.split('/')[2:]),
+        'embodiment': emb, 'source': src, 'robot_type': rt, 'setup': setup, 'form': ff, 'morph': morph_of(ff),
+        'episodes': eps, 'frames': frames, 'fps': round(fps, 2), 'hours': round(frames / fps / 3600, 3) if fps else 0,
+        'tasks': int(d.get('total_tasks') or 0), 'cams': cams, 'n_views': len(cams),
+        'fisheye': any(c['fisheye'] for c in cams), 'wrist': sum(c['role'] == 'wrist' for c in cams),
+        'external': sum(c['role'] == 'external' for c in cams),
+        'res': sorted({f"{c['w']}x{c['h']}" for c in cams if c['w']}),
+        'fk_urdf': d.get('fk_urdf'), 'eef': has_eef, 'joints': has_joint, 'gripper': has_grip,
+        'export_id': (d.get('camx_export') or {}).get('export_id'),
+        'released': os.path.exists(os.path.join(p, 'meta', '_SUCCESS')),
+        'quality': os.path.isdir(os.path.join(p, 'meta', 'quality')),
+        'mobile': 'mobile' in ff,
+        'station': d.get('station_type'), 'source_dataset': d.get('source_dataset'),
+    }
+
+
+def size_estimates(rows, inv_rows):
+    """r['bytes_est']: the inventory row's bytes shared among its leaves by frames (None without an inventory row)."""
+    by_row = collections.defaultdict(list)
+    for r in rows: by_row[(r['embodiment'], r['source'])].append(r)
+    for key, rs in by_row.items():
+        row = inv_rows.get(key)
+        tot = ((row or {}).get('size') or {}).get('total_bytes')
+        fr = sum(r['frames'] for r in rs)
+        for r in rs:
+            r['bytes_est'] = int(tot * r['frames'] / fr) if tot and fr else None
+
+
+def build_projects(rows, stats, inv_rows):
+    """The project records (one per family/project of the rows) with empty overlay lists."""
+    projects = {}
+    for r in rows:
+        pj = projects.setdefault(r['project'], {'key': r['project'], 'family': r['family'], 'datasets': 0, 'episodes': 0,
+                                                'frames': 0, 'hours': 0.0, 'embodiments': collections.Counter(),
+                                                'sources': set(), 'forms': collections.Counter(), 'views': collections.Counter()})
+        pj['datasets'] += 1; pj['episodes'] += r['episodes']; pj['frames'] += r['frames']; pj['hours'] += r['hours']
+        pj['embodiments'][r['embodiment']] += 1; pj['sources'].add(r['source']); pj['forms'][r['form']] += 1
+        pj['views'][r['n_views']] += r['episodes']
+    for k, pj in projects.items():
+        st = stats['by_project'].get(k) or {}
+        emb = pj['embodiments'].most_common(1)[0][0]
+        src = sorted(pj['sources'])[0]
+        row = inv_rows.get((emb, src)) or {}
+        pj.update({'embodiments': dict(pj['embodiments']), 'sources': sorted(pj['sources']), 'forms': dict(pj['forms']),
+                   'views': dict(pj['views']), 'hours': round(pj['hours'], 2),
+                   'skills': st.get('skills'), 'dur_hist': st.get('dur_hist'), 'median_s': st.get('median_s'),
+                   'n_instr': st.get('n_instr'), 'platforms': st.get('platforms'), 'notes': row.get('notes'),
+                   'inventory_hours': row.get('hours'), 'inventory_bytes': (row.get('size') or {}).get('total_bytes'),
+                   'overlays': []})
+    return projects
+
+
+def overlay_records(metas):
+    """(project key, clip record) of every meta.json of the clip trees, as the site's projects[].overlays carry them."""
+    out = []
+    for m in metas:
+        d = json.load(open(m)); pkey, slug = m.split('/')[-3:-1]
+        st = os.path.join(os.path.dirname(m), 'stitched.mp4')
+        grips = {s: {'model': g.get('model'), 'profile': g.get('profile'), 'urdf': bool(g.get('urdf_present'))}
+                 for s, g in (d.get('grippers') or {}).items() if g.get('model')}
+        # overlay_mode is written by tools/overlay_picks.py ('primitive' = hinged stand-in fingers + TCP axes for rigs
+        # without a URDF); the shared tree's meta.json has no such field, so fall back on the gripper profiles.
+        mode = d.get('overlay_mode') or ('urdf' if any(g['urdf'] for g in grips.values()) else ('camera-path' if 'dataclaw' in pkey else 'none'))
+        try: tasks = json.loads(d.get('tasks') or '[]')
+        except Exception: tasks = [d.get('tasks')]
+        rec = {'key': pkey, 'slug': slug, 'dataset': d.get('dataset'), 'episode': d.get('episode_index'),
+               'task': (tasks or [''])[0], 'views': [v['name'] for v in d.get('views', [])], 'grippers': grips, 'mode': mode,
+               'fisheye': bool(d.get('fisheye')), 'accept': d.get('accept') or 'unmeasured',
+               'export_id': d.get('source_export_id'), 'rendered_from': d.get('source_success_mtime'),
+               'seconds': round((d.get('n_frames') or 0) / (d.get('out_fps') or 10), 1),
+               'bytes': os.path.getsize(st) if os.path.exists(st) else 0}
+        if any(g.get('standin') for g in (d.get('grippers') or {}).values()):
+            rec['standin'] = sorted({g['profile'] for g in d['grippers'].values() if g.get('standin')})
+        out.append((d.get('project'), rec))
+    return out
+
+
+def retotal(out):
+    rows, projects = out['datasets'], out['projects']
+    out['totals'].update({'datasets': len(rows), 'projects': len(projects), 'episodes': sum(r['episodes'] for r in rows),
+                          'frames': sum(r['frames'] for r in rows), 'hours': round(sum(r['hours'] for r in rows), 1),
+                          'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects),
+                          'samples': sum(1 for r in rows if r.get('sample'))})
+    return out
+
+
+def add_leaves(out, root, prefixes, stats, inv_rows):
+    """Incremental build: the rows of the leaves under the root-relative `prefixes` (family/project[/dataset]) replace or
+    join those of --out, the other rows stay as they were built (the live site is built from desktop001's tree, which
+    this machine's tree does not match leaf for leaf: user, 2026-10-03). The touched projects are re-aggregated, keeping
+    their clip records; new rows carry sample=None until their archives are published."""
+    want = [x.strip().strip('/').split('/') for x in prefixes if x.strip()]
+    leaves = [p for p in scan_leaves(root) if any(p[len(root.rstrip('/')) + 1:].split('/')[:len(w)] == w for w in want)]
+    new = [leaf_row(root, p, inv_rows) for p in leaves]
+    if not new: sys.exit(f'--add: no dataset under {prefixes} in {root}')
+    size_estimates(new, inv_rows)
+    had = {r['id']: r for r in out['datasets']}
+    for r in new:  # a rebuilt row keeps its published sample archive and task mix (tasks_pass rewrites the latter)
+        r['sample'] = (had.get(r['id']) or {}).get('sample')
+        for k in ('tm', 'title'):
+            if k in (had.get(r['id']) or {}): r[k] = had[r['id']][k]
+    ids = {r['id'] for r in new}
+    replaced = sum(1 for r in out['datasets'] if r['id'] in ids)
+    out['datasets'] = [r for r in out['datasets'] if r['id'] not in ids] + new
+    touched = {r['project'] for r in new}
+    prev = {p['key']: p for p in out['projects']}
+    # clip records of the touched projects: rebuilt from the clip trees where they hold any (the site's 360p mp4s are
+    # encoded from the same trees by tools/rerun_clips.py / tools/add_clips.py), else kept; captions from the dataset
+    # itself as rerun_clips.attach does, meta.json's `tasks` only when the dataset cannot be read
+    clips = collections.defaultdict(list)
+    for proj, rec in overlay_records(overlay_metas()):
+        if proj not in touched: continue
+        try: track = clip_captions(root, rec['dataset'], int(rec['episode']), rec['seconds'])
+        except (OSError, KeyError, ImportError, TypeError, ValueError) as e:
+            track = None; print(f"warning: {rec['dataset']}: clip captions kept from the render tree ({e!r})", file=sys.stderr)
+        else: rec['task'] = track[0][1]
+        if track and len(track) > 1: rec['captions'] = track
+        clips[proj].append(rec)
+    for k, pj in build_projects([r for r in out['datasets'] if r['project'] in touched], stats, inv_rows).items():
+        had_clips = {(o['key'], o['slug']): o for o in (prev.get(k) or {}).get('overlays') or []}
+        had_clips.update({(o['key'], o['slug']): o for o in clips.get(k, [])})   # the tree's record wins, clips it lacks stay
+        pj['overlays'] = [had_clips[x] for x in sorted(had_clips)]
+        prev[k] = pj
+    out['projects'] = sorted(prev.values(), key=lambda p: p['key'])
+    out['built'] = datetime.datetime.now().astimezone().strftime('%Y-%m-%d %H:%M %Z')
+    print(f'--add: {len(new)} rows under {prefixes} ({replaced} replaced), projects {sorted(touched)}', file=sys.stderr)
+    return retotal(out), new
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--root', default=os.environ.get('CAMX_ROOT', '/data/camx_480p'))
     ap.add_argument('--out', default=os.path.join(REPO, 'data', 'datasets.json'))
+    ap.add_argument('--add', default=None, metavar='PREFIXES',
+                    help='incremental: comma-separated root-relative family/project[/dataset] prefixes whose leaves are '
+                         '(re)built into --out; every other row of --out is kept as it is')
     ap.add_argument('--scrub-only', action='store_true',
                     help='only re-run the anonymisation pass over --out (and the sources check + data/citations.bib)')
     ap.add_argument('--attach-samples-only', action='store_true',
@@ -540,104 +744,27 @@ def main():
     inv_rows = {(e['embodiment'], e['source']): e for e in inv['entries'] if e.get('status') == 'counted'}
     stats = json.load(open(STATS))
 
+    if a.add:
+        out, new = add_leaves(json.load(open(a.out)), a.root, a.add.split(','), stats, inv_rows)
+        out = tasks_pass(out, a.root, rows=new)
+        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
+        json.dump(out, open(a.out, 'w'), separators=(',', ':'))
+        print(json.dumps(out['totals']), file=sys.stderr)
+        dataset_captions(out, a.root)
+        for r in sorted(new, key=lambda r: r['id']):
+            print(f"  {r['id']:60s} {r['embodiment']:22s} {r['source']:26s} {r['morph']:20s} {r['episodes']:6d} ep {r['hours']:7.2f} h "
+                  f"{r['n_views']} views{'' if r['released'] else '  (no _SUCCESS)'}", file=sys.stderr)
+        return
+
     leaves = scan_leaves(a.root)
     print(f'{len(leaves)} leaves under {a.root}', file=sys.stderr)
-    rows = []
-    for p in leaves:
-        rel = p[len(a.root.rstrip('/')) + 1:]
-        family, project = rel.split('/')[:2]
-        pk = f'{family}/{project}'
-        d = json.load(open(os.path.join(p, 'meta', 'info.json')))
-        feat = d.get('features', {})
-        cams = []
-        for k, v in feat.items():
-            if v.get('dtype') != 'video': continue
-            name = k.split('.')[-1]; base = name.replace('_rgb', '')
-            g = lambda suf: d.get(base + suf, d.get(name + suf))
-            shape = v.get('shape') or [None, None, None]
-            cams.append({'name': name, 'h': shape[0], 'w': shape[1], 'model': g('_model'),
-                         'fisheye': bool(g('_is_fisheye')), 'role': cam_role(name)})
-        fps = float(d.get('fps') or 0)
-        frames = int(d.get('total_frames') or 0)
-        eps = int(d.get('total_episodes') or 0)
-        rt = d.get('robot_type') or ''
-        setup = d.get('robot_setup_type') or ('bimanual' if 'bimanual' in rt.lower() else 'single_arm')
-        emb = embodiment_of(rt, pk)
-        src = SOURCE_OF.get(pk, project)
-        row = inv_rows.get((emb, src))
-        ff = form_of(row, setup, rt, pk)
-        state = [k for k in feat if k.startswith('observation.state')]
-        has_eef = any('trajectory' in k or 'eef' in k or 'pose' in k for k in state)
-        has_joint = any('joint' in k for k in state)
-        has_grip = any('gripper' in k for k in state)
-        rows.append({
-            'id': rel, 'family': family, 'project': pk, 'name': '/'.join(rel.split('/')[2:]),
-            'embodiment': emb, 'source': src, 'robot_type': rt, 'setup': setup, 'form': ff, 'morph': morph_of(ff),
-            'episodes': eps, 'frames': frames, 'fps': round(fps, 2), 'hours': round(frames / fps / 3600, 3) if fps else 0,
-            'tasks': int(d.get('total_tasks') or 0), 'cams': cams, 'n_views': len(cams),
-            'fisheye': any(c['fisheye'] for c in cams), 'wrist': sum(c['role'] == 'wrist' for c in cams),
-            'external': sum(c['role'] == 'external' for c in cams),
-            'res': sorted({f"{c['w']}x{c['h']}" for c in cams if c['w']}),
-            'fk_urdf': d.get('fk_urdf'), 'eef': has_eef, 'joints': has_joint, 'gripper': has_grip,
-            'export_id': (d.get('camx_export') or {}).get('export_id'),
-            'released': os.path.exists(os.path.join(p, 'meta', '_SUCCESS')),
-            'quality': os.path.isdir(os.path.join(p, 'meta', 'quality')),
-            'mobile': 'mobile' in ff,
-            'station': d.get('station_type'), 'source_dataset': d.get('source_dataset'),
-        })
-
-    # size estimate per leaf: inventory row bytes shared by frames
-    by_row = collections.defaultdict(list)
-    for r in rows: by_row[(r['embodiment'], r['source'])].append(r)
-    for key, rs in by_row.items():
-        row = inv_rows.get(key)
-        tot = ((row or {}).get('size') or {}).get('total_bytes')
-        fr = sum(r['frames'] for r in rs)
-        for r in rs:
-            r['bytes_est'] = int(tot * r['frames'] / fr) if tot and fr else None
-
-    # projects
-    projects = {}
-    for r in rows:
-        pj = projects.setdefault(r['project'], {'key': r['project'], 'family': r['family'], 'datasets': 0, 'episodes': 0,
-                                                'frames': 0, 'hours': 0.0, 'embodiments': collections.Counter(),
-                                                'sources': set(), 'forms': collections.Counter(), 'views': collections.Counter()})
-        pj['datasets'] += 1; pj['episodes'] += r['episodes']; pj['frames'] += r['frames']; pj['hours'] += r['hours']
-        pj['embodiments'][r['embodiment']] += 1; pj['sources'].add(r['source']); pj['forms'][r['form']] += 1
-        pj['views'][r['n_views']] += r['episodes']
-    for k, pj in projects.items():
-        st = stats['by_project'].get(k) or {}
-        emb = pj['embodiments'].most_common(1)[0][0]
-        src = sorted(pj['sources'])[0]
-        row = inv_rows.get((emb, src)) or {}
-        pj.update({'embodiments': dict(pj['embodiments']), 'sources': sorted(pj['sources']), 'forms': dict(pj['forms']),
-                   'views': dict(pj['views']), 'hours': round(pj['hours'], 2),
-                   'skills': st.get('skills'), 'dur_hist': st.get('dur_hist'), 'median_s': st.get('median_s'),
-                   'n_instr': st.get('n_instr'), 'platforms': st.get('platforms'), 'notes': row.get('notes'),
-                   'inventory_hours': row.get('hours'), 'inventory_bytes': (row.get('size') or {}).get('total_bytes'),
-                   'overlays': []})
+    rows = [leaf_row(a.root, p, inv_rows) for p in leaves]
+    size_estimates(rows, inv_rows)
+    projects = build_projects(rows, stats, inv_rows)
 
     # overlay clips
-    for m in overlay_metas():
-        d = json.load(open(m)); pkey, slug = m.split('/')[-3:-1]
-        proj = d.get('project')
-        if proj not in projects: continue
-        st = os.path.join(os.path.dirname(m), 'stitched.mp4')
-        grips = {s: {'model': g.get('model'), 'profile': g.get('profile'), 'urdf': bool(g.get('urdf_present'))}
-                 for s, g in (d.get('grippers') or {}).items() if g.get('model')}
-        # overlay_mode is written by tools/overlay_picks.py ('primitive' = hinged stand-in fingers + TCP axes for rigs
-        # without a URDF); the shared tree's meta.json has no such field, so fall back on the gripper profiles.
-        mode = d.get('overlay_mode') or ('urdf' if any(g['urdf'] for g in grips.values()) else ('camera-path' if 'dataclaw' in pkey else 'none'))
-        try: tasks = json.loads(d.get('tasks') or '[]')
-        except Exception: tasks = [d.get('tasks')]
-        projects[proj]['overlays'].append({
-            'key': pkey, 'slug': slug, 'dataset': d.get('dataset'), 'episode': d.get('episode_index'),
-            'task': (tasks or [''])[0], 'views': [v['name'] for v in d.get('views', [])], 'grippers': grips, 'mode': mode,
-            'fisheye': bool(d.get('fisheye')), 'accept': d.get('accept') or 'unmeasured',
-            'export_id': d.get('source_export_id'), 'rendered_from': d.get('source_success_mtime'),
-            'seconds': round((d.get('n_frames') or 0) / (d.get('out_fps') or 10), 1),
-            'bytes': os.path.getsize(st) if os.path.exists(st) else 0,
-        })
+    for proj, rec in overlay_records(overlay_metas()):
+        if proj in projects: projects[proj]['overlays'].append(rec)
 
     total_h = sum(r['hours'] for r in rows)
     out = {'built': datetime.datetime.now().astimezone().strftime('%Y-%m-%d %H:%M %Z'), 'root': a.root,
