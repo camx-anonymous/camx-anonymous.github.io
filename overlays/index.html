@@ -59,7 +59,7 @@ footer p{margin:0 0 6px}
     <p class="pnote">Projects without an example clip in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
     <table><thead><tr><th>Project</th><th>Embodiment</th><th class="num">Datasets</th><th class="num">Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
   </section>
-  <footer><p>Clips are 10 fps, ~45 s, 360p. Wrist tiles draw the gripper from the end-effector pose in that camera; other tiles place it through the world-frame camera trajectories. Left gripper green, right gripper blue.</p></footer>
+  <footer><p>Clips are 10 fps, ~45 s, 360p. Wrist tiles draw the gripper from the end-effector pose in that camera; other tiles place it through the world-frame camera trajectories; where the two hands are not in one world frame (<em>own gripper only</em>) each view draws its own gripper and nothing else. Left gripper green, right gripper blue.</p></footer>
 </main>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -76,7 +76,7 @@ function render(){const projs=D.projects.filter(p=>p.overlays.length);
     h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`;const src=D.overlay_base+file+'.mp4';
       return `<div class="card"><div class="vid clip" data-src="${src}"><img src="posters/${file}.jpg" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
         <div class="title">${esc(o.dataset)} · ep ${o.episode}</div>
-        <div class="meta">${o.fisheye?'<div class="row"><span class="chip">fisheye</span></div>':''}
+        <div class="meta">${o.fisheye||o.own_only?'<div class="row">'+(o.fisheye?'<span class="chip">fisheye</span>':'')+(o.own_only?'<span class="chip" title="the two hands are not in a shared world frame: each view draws its own gripper only">own gripper only</span>':'')+'</div>':''}
         ${capsOf(o).length?`<div><span class="k">task</span>${esc(capsOf(o).slice(0,3).join(' · '))}${capsOf(o).length>3?' …':''}</div>`:''}
         <div><span class="k">views</span>${o.views.map(esc).join(' · ')}</div></div></div>`}).join('')+'</div></section>';});
   document.getElementById('content').innerHTML=h;

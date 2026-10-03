@@ -111,7 +111,7 @@ a current headless-Rerun export of the curation tree, `rerun` headless Rerun thr
 renderer through `tools/white_multiview.py` with the arguments of `tools/overlay_picks.py`, for rigs the headless viewer cannot do:
 pinhole rigs without a gripper CAD (primitive stand-in: the OpenNeoData Flexiv / UR / ARX X5 / UMI rigs; RH20T cfg1-3 take the `rerun` route since 2026-10-03, with the vendors' AG-95 / WSG-50 URDFs of `grippers/dh_ag95` and `grippers/wsg50`), fisheye rigs
 with their own lens file (UMI-3D, AetheRock, HiFi-UMI, GenRobot V4), RoboMIND UR5 and the 180p DROID twin; `MULTIVIEW` in the script
-lists them, and `CAMX_VIZ_MV` names a camera-cross-embodiment checkout that carries that renderer and the lens files; `keep` untouched:
+lists them, and `CAMX_VIZ_MV` names a camera-cross-embodiment checkout that carries that renderer and the lens files; Bimanual rigs whose two hands are not in one world frame (`OWN_ONLY`: Vista-UMI, FastUMI-100K dual-arm, OpenNeoData UMI; `WORLD_FRAME_NOTES` in `tools/build_site_data.py` puts the reason on the dataset record and the detail panel) draw each view's own gripper only (`--cross off` / `--own-only`), and their clip records carry `own_only`. `keep` untouched:
 datasets not in the local tree). `render` writes the clip tree
 (`<key>/<slug>/{stitched.mp4,meta.json,DONE.json,poster.jpg}`, 2 Rerun + 3 OpenCV clips in parallel, pausing while
 the user slice's memory pressure is high), `encode` the 360p site mp4 + poster, `attach` the clip records

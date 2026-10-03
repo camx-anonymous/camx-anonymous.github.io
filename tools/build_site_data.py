@@ -101,6 +101,16 @@ SOURCE_OF = {
     'dexumi/dexumi': 'DexUMI', 'umi/tamen': 'TAMEn', 'xhand/dexora': 'Dexora', 'widowx/bridge_v2': 'Bridge V2',
     'franka_hand/molmoact': 'MolmoAct (Franka)', 'dexwild/dexwild': 'DexWild',
 }
+# bimanual datasets whose two hands are NOT in one world frame (checked 2026-10-03 on the data: both main-camera trajectories
+# start at the same point in every episode, or the right hand sits at a manual layout prior). Rows carry `world_frame`
+# (`shared: false` + the note); the detail panel shows it and the example clips draw each view's own gripper only
+# (tools/rerun_clips.py OWN_ONLY). Every other bimanual dataset shares a frame: a robot base, a SLAM / VIO world (HiFi-UMI,
+# iPhUMI, HuMI, UMI, ViTaMIn-B) or released left-to-right transforms (UMI-Benchmark).
+WORLD_FRAME_NOTES = {
+    'umi/vista_umi': "each hand's trajectory is in its own VIO frame, starting at its own origin; the release gives no transform between the two hands",
+    'fastumi/fastumi_100k_dual_arm': "each hand's trajectory is in its own frame, starting at its own origin; the release gives no transform between the two hands",
+    'umi/openneo_umi': "the two devices are tracked in separate frames that both start at the same home pose; the right hand is placed 0.60 m to the right of the left by a manual prior, not a measurement",
+}
 # dataset id -> source, where one collection spans two paper rows: openarm/openarm holds the three OpenArm datasets of the
 # training mix (full_folding, high_quality_folding, pickplace) and the eight community uploads the paper lists as their
 # own row (coordinating conversion session, 2026-10-03)
@@ -598,6 +608,7 @@ def leaf_row(root, p, inv_rows):
         'quality': os.path.isdir(os.path.join(p, 'meta', 'quality')),
         'mobile': 'mobile' in ff,
         'station': d.get('station_type'), 'source_dataset': d.get('source_dataset'),
+        **({'world_frame': {'shared': False, 'note': WORLD_FRAME_NOTES[pk]}} if pk in WORLD_FRAME_NOTES else {}),
     }
 
 

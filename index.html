@@ -138,18 +138,15 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .slice .acts{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:-4px}
 .slice .acts .lk{white-space:nowrap}
 .codes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:16px;align-items:stretch}
-.codes .code{margin-top:0;display:flex;flex-direction:column;min-width:0}
-.codes .code pre{flex:1 1 auto}
-@media (min-width:901px){.codes .code .bar{flex-wrap:nowrap}.codes .code .bar .st{flex:1 1 0;min-width:0;max-width:none}}
+.codes .col{display:flex;flex-direction:column;min-width:0}
+.codes .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+.codes .chead h3{margin:0;font:500 15px/1.3 var(--sans);letter-spacing:-.01em}
+.codes .chead .acts{display:flex;gap:6px}
+.codes .chead button{font-size:13px;padding:7px 12px}
+.codes .code{margin-top:0;display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
+.codes .code pre{flex:1 1 auto;margin:0}
 @media (max-width:900px){.codes{grid-template-columns:1fr}}
 .code{margin-top:16px;border-radius:var(--r);background:var(--code-bg);color:var(--code-fg);overflow:hidden}
-.code .bar{display:flex;align-items:center;gap:2px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
-.code .bar button{all:unset;cursor:pointer;font:500 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;border-radius:4px}
-.code .bar button:hover{color:var(--code-fg)}
-.code .bar button.on{background:rgba(255,255,255,.1);color:var(--code-fg);cursor:default}
-.code .bar .st{margin-left:auto;font:400 12px/1 var(--mono);color:var(--code-cm);padding:5px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
-.code .bar .st b{font-weight:500;color:var(--code-fg)}
-.code .bar .cp{color:var(--code-fg);border:1px solid rgba(255,255,255,.18);margin-left:6px}
 .code pre{border-radius:0;padding:16px 20px 18px;max-height:420px;scrollbar-width:thin;scrollbar-color:var(--code-fg) var(--code-bg)}
 /* older WebKit (Safari) has no scrollbar-color: same track as the box, bright thumb */
 .code pre::-webkit-scrollbar{width:8px;height:8px;background:var(--code-bg)}
@@ -181,7 +178,6 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .gate .acts .bib button{font:500 12.5px/1 var(--mono);padding:8px 10px;color:var(--ink2)}
 .gate .close{position:absolute;top:12px;right:12px;width:32px;height:32px;padding:0;justify-content:center;border-radius:999px}
 @media (max-width:640px){.gate .head,.gate .srcs,.gate .foot{padding-left:16px;padding-right:16px}.gate .acts .bib{width:100%;margin:0 0 4px}}
-@media (max-width:640px){.code .bar .st{order:3;flex-basis:100%;max-width:none;margin:4px 0 0}}
 @media (max-width:480px){.slices{grid-template-columns:1fr 1fr;gap:8px}.slice{padding:14px}.slice .sz{font-size:22px}}
 
 /* ---------- dataset drawer ---------- */
@@ -289,7 +285,10 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
         <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command. Take a whole slice, or tick platforms, sources and datasets while browsing to build your own. <b>The full dataset will be available upon official release.</b></p>
       </div>
       <div class="slices" id="dlist"></div>
-      <div class="codes"><div class="code" id="code"></div><div class="code" id="bibbox"></div></div>
+      <div class="codes">
+        <div class="col"><div class="chead"><h3>Download script</h3><span class="acts"><button type="button" id="save">Save .sh</button><button type="button" id="copy">Copy</button></span></div><div class="code" id="code"></div></div>
+        <div class="col"><div class="chead"><h3>BibTeX</h3><span class="acts"><button type="button" id="bibSave">Save .bib</button><button type="button" id="bibCopy">Copy</button></span></div><div class="code" id="bibbox"></div></div>
+      </div>
     </div>
   </section>
 
@@ -519,19 +518,19 @@ while read -r id url; do
 done <<'EOF'
 ${sm.map(r=>r.id+' '+r.sample.url).join('\n')}
 EOF`}
-function code(s){const z=sizeOf(s.rows);
+function code(s){
   const body=cmdText(s).split('\n').map(l=>l.startsWith('#')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n');
-  $('code').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bash · GitHub releases</button><span class="st"><b>${esc(s.name)}</b> · ${z.n.toLocaleString()} sample${z.n===1?'':'s'} · ${fmtB(z.b)} · ${fmtDur(z.s)}</span><button type="button" class="cp" id="save">Save .sh</button><button type="button" class="cp" id="copy">Copy</button></div><pre id="cmd">${body}</pre>`;
+  $('code').innerHTML=`<pre id="cmd">${body}</pre>`;
   const save=()=>dl('camx_samples.sh',cmdText(s),'text/x-shellscript');
   const copy=()=>navigator.clipboard.writeText(cmdText(s)).then(()=>{$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy',1200)});
   $('save').onclick=()=>gate(s.rows,s.name,save,'save');
   $('copy').onclick=()=>gate(s.rows,s.name,copy,'copy');
   bibBox(s)}
 /* the right pane: every BibTeX entry of the slice (one per source paper), the same text the gate copies / saves */
-function bibBox(s){const ss=srcOf(s.rows),np=new Set();ss.forEach(x=>(x.info.papers||[]).forEach(p=>np.add(p.key)));
-  const txt=bibOf(ss,s.name),n=np.size;
+function bibBox(s){const ss=srcOf(s.rows);
+  const txt=bibOf(ss,s.name);
   const body=txt.trim().split('\n').map(l=>l.startsWith('%')?`<span class="cm">${esc(l)}</span>`:esc(l)).join('\n');
-  $('bibbox').innerHTML=`<div class="bar"><button type="button" class="on" tabindex="-1">bibtex · ${n} entr${n===1?'y':'ies'}</button><span class="st"><b>${esc(s.name)}</b> · ${ss.length} source${ss.length===1?'':'s'}</span><button type="button" class="cp" id="bibSave">Save .bib</button><button type="button" class="cp" id="bibCopy">Copy</button></div><pre id="bibpre">${body}</pre>`;
+  $('bibbox').innerHTML=`<pre id="bibpre">${body}</pre>`;
   $('bibSave').onclick=()=>dl('camx_citations.bib',txt,'application/x-bibtex');
   $('bibCopy').onclick=()=>navigator.clipboard.writeText(txt).then(()=>{$('bibCopy').textContent='Copied';setTimeout(()=>$('bibCopy').textContent='Copy',1200)})}
 function persist(){try{localStorage.setItem('camx.sel',JSON.stringify([...sel]))}catch(e){}}
@@ -559,7 +558,7 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesO
   // caption changes while the clip plays (o.captions, tools/build_site_data.py), else the one caption of the clip
   const caps=o.captions||(o.task?[[0,o.task]]:[]);
   el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}</span></div>
-    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane(o.mode==='primitive'?'Gripper stand-in overlay <span class="note">(No gripper CAD available. Only showing gripper tip.)</span>':o.standin?`Gripper CAD overlay <span class="note">(No gripper CAD published for this rig: the stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper stands in.)</span>`:'Gripper CAD overlay',D.overlay_base+f+'.mp4')}</div>
+    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane((o.mode==='primitive'?'Gripper stand-in overlay <span class="note">(No gripper CAD available. Only showing gripper tip.)</span>':o.standin?`Gripper CAD overlay <span class="note">(No gripper CAD published for this rig: the stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper stands in.)</span>`:'Gripper CAD overlay')+(o.own_only?' <span class="note">(Each view shows its own gripper only: the two hands are not in a shared frame.)</span>':''),D.overlay_base+f+'.mp4')}</div>
     ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
     <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
   const [a,b]=el.querySelectorAll('video'),pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
@@ -619,8 +618,9 @@ function mixRow(m){const st=m.kind==='steps',tot=m.skills.reduce((s,[,n])=>s+n,0
 
 function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
-  const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))+(r.partial?' <span class="dim">'+(r.partial.source_totals?'in the source release; episode 0 is converted here as the sample':'sample conversion; the full dataset is still being converted')+'</span>':'')],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
+  const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))+(r.partial?' <span class="dim">'+(r.partial.source_totals?'in the source release; episode 0 is converted here as the sample':r.partial.episodes_kept===0?'metadata of the full conversion; the videos are still being transcoded':'sample conversion; the full dataset is still being converted')+'</span>':'')],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
+    r.world_frame&&r.world_frame.shared===false?['World frame','<b>Not shared between the hands.</b> <span class="dim">'+esc(r.world_frame.note)+'. Poses can be compared within one hand only; the example clips draw each view\'s own gripper.</span>']:null,
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
     p.overlays.length?['Example clips',`<a href="overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`]:null,
     ['License',licRow(si)],

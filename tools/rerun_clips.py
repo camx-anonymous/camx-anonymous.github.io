@@ -60,7 +60,7 @@ STANDIN = {'aloha/openneo_aloha': 'piper', 'aloha/openneo_arx5': 'arx x5', 'aloh
 GOPRO = dict(profile='umi', calib='gopro_hero9_maxlens_2_7k_umi.json', fit='crop')   # GoPro Hero 9/10 + Max Lens Mod, centre crop
 FISHEYE = {p: GOPRO for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm', 'umi/data_scaling_laws', 'umi/exumi', 'umi/humi',
                                'umi/maniwav', 'umi/mvumi', 'umi/touch_in_the_wild', 'umi/umi', 'umi/umi_on_legs', 'umi/vitamin', 'umi/vitamin_b')}
-for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm'): FISHEYE[p] = dict(GOPRO, profile='fastumi')   # UMI mesh at the rig's own TCP (camera-to-tip 145 mm, not UMI's 220)
+for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm', 'fastumi/fastumi_100k_dual_arm'): FISHEYE[p] = dict(GOPRO, profile='fastumi')   # UMI mesh at the rig's own TCP (camera-to-tip 145 mm, not UMI's 220)
 FISHEYE['umi/exumi'] = dict(GOPRO, profile='exumi')   # grippers/exumi: the exUMI 9DTact fingertips fitted to the wrist frames (2026-10-03)
 # grippers/vitamin_b: DuoTact fingers fitted to the wrist frames; the release's GoPro lens through the 2028-square crop -> 224 (crop chain assumed);
 # theta-max = the circular image mask, so the other hand is not drawn into the black surround
@@ -90,6 +90,9 @@ MULTIVIEW = {'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
              'umi/openneo_umi', 'umi/openneo_umi_single', 'robotiq/droid_lowres'}
 VIZ_MV = os.path.expanduser(os.environ.get('CAMX_VIZ_MV', '/data/camx/visualization'))
 KEEP = set()
+# bimanual rigs whose two hands are NOT in one world frame (build_site_data.WORLD_FRAME_NOTES): each view draws its own gripper only
+# (fisheye route: --cross off; multiview route: --own-only); the clip record carries own_only for the viewers' note
+OWN_ONLY = {'umi/vista_umi', 'fastumi/fastumi_100k_dual_arm', 'umi/openneo_umi'}
 
 
 def log(msg): print(f'{datetime.datetime.now():%H:%M:%S} {msg}', flush=True)
@@ -241,6 +244,7 @@ def fisheye_one(o, d, t0):
     sides = [s for s in ('right', 'left') if f'observation.image.{s}_main_camera_rgb' in info['features']]   # the renderer's tile order
     cmd = [PY, os.path.join(HERE, 'white_overlay.py'), '--dataset-root', os.path.join(ROOT, rel), '--episode', str(ep), '--profile', spec['profile'],
            '--calib-fit', spec['fit'], '--stride', str(step), '--max-seconds', str(MAX_SEC), '--alpha', '1.0', '--output', os.path.join(d, 'stitched.mp4')] + spec.get('extra', [])
+    if proj in OWN_ONLY: cmd += ['--cross', 'off']
     if 'calib_episode' in spec:
         for s in sides: cmd += [f'--calib-{s}', os.path.join(VIZ, 'calib', spec['calib_episode'].format(ds=ds, ep=ep, side=s))]
     else:
@@ -282,6 +286,7 @@ def multiview_one(o, d, t0):
     cmd[1] = os.path.join(HERE, 'white_multiview.py' if spec['tool'] == OP.MULTIVIEW else 'white_overlay.py')
     while '--alpha' in cmd: i = cmd.index('--alpha'); del cmd[i:i + 2]
     cmd += ['--alpha', '1.0']
+    if proj in OWN_ONLY and spec['tool'] == OP.MULTIVIEW: cmd += ['--own-only']
     with open(os.path.join(d, '_render.log'), 'w') as lg:
         lg.write(' '.join(cmd) + '\n'); lg.flush()
         subprocess.run(cmd, cwd=VIZ_MV, env=dict(os.environ, CAMX_VIZ=VIZ_MV), stdout=lg, stderr=subprocess.STDOUT, check=True)
@@ -364,6 +369,7 @@ def attach():
                    'seconds': round((m.get('n_frames') or 0) / (m.get('out_fps') or OUT_FPS), 1),
                    'bytes': os.path.getsize(mp4) if os.path.isfile(mp4) else os.path.getsize(os.path.join(d, 'stitched.mp4'))}
             if any(g.get('standin') for g in (m.get('grippers') or {}).values()): rec['standin'] = sorted({g['profile'] for g in m['grippers'].values() if g.get('standin')})
+            if proj_of(o) in OWN_ONLY: rec['own_only'] = True
             # the captions from the dataset's current data, as build_site_data.captions_pass: meta.json's `tasks` is a snapshot
             # from render time (stale once an annotation bank is re-expanded) and only stands in when the dataset cannot be read
             try: track = S.clip_captions(ROOT, rec['dataset'], int(rec['episode']), rec['seconds'])
