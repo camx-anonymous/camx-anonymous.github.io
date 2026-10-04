@@ -20,13 +20,14 @@
    "morph": "Handheld, robot-free",
    "embodiment": "Other research projects",
    "source": "ManipForce",
-   "datasets": 6,
-   "episodes": 597,
-   "frames": 122982,
-   "hours": 1.1,
+   "datasets": 3,
+   "episodes": 320,
+   "frames": 68126,
+   "hours": 0.6,
    "views": "2",
    "fps": "30",
-   "note": "A"
+   "note": "A",
+   "remark": "the remaining 3 of the 6 tasks (open lid, battery disassembly, LAN plug insertion); the other 3 are converted and browsable"
   },
   {
    "morph": "Handheld, robot-free",
