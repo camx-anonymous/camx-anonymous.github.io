@@ -1,5 +1,4 @@
-/* Shared chrome for camx-anonymous.github.io (CAMX data manager, overlays) and /camuva-rollouts/,
-   which loads this file by absolute URL. Source of truth lives in the camx-anonymous.github.io repo.
+/* Shared chrome for camx-anonymous.github.io (CAMX data manager with the CamUVA rollouts section, overlays).
    Design: warm off-white paper, Geist for text and display, Geist Mono for labels and data, terracotta accent. */
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap');
 
