@@ -43,19 +43,6 @@
    "remark": "of the 582-dataset release, 486 are fully converted and 41 more are listed with their complete metadata only (their videos failed to transcode or await a re-export); still to come: 19 datasets whose names collide across USB-backup folders (re-export pending), 21 datasets that ship without any videos (not convertible), and 12 bimanual pair exports (each hand in its own frame)"
   },
   {
-   "morph": "Handheld, robot-free",
-   "embodiment": "Dexterous hands",
-   "source": "DexWild",
-   "datasets": 8,
-   "episodes": 8773,
-   "frames": 3287396,
-   "hours": 31.3,
-   "views": "3–5",
-   "fps": "30",
-   "note": "D",
-   "remark": "the remaining 8 task and embodiment sets of the release; the two pour sets are converted as samples and browsable"
-  },
-  {
    "morph": "Bimanual robot",
    "embodiment": "OpenArm",
    "source": "OpenArm community",
