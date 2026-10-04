@@ -43,7 +43,7 @@ def asset_name(site_id):
     return f'{family}_{project}__{dataset}'.replace('/', '_')
 
 
-LOCAL_PATH = re.compile(r'(^|[\s"\'=:])/(storage|data|home|mnt|tmp)/')
+LOCAL_PATH = re.compile(r'(^|[\s"\'=:])/(storage|data|home|mnt|media|nfs|tmp)/')
 
 
 def drop_local_paths(obj):

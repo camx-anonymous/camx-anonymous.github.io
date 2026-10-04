@@ -40,7 +40,7 @@
    "views": "1–2",
    "fps": "30",
    "note": "C",
-   "remark": "of the 582-dataset release, 2 are fully converted and 525 more are listed with their complete metadata while their videos are transcoded; still to come: 19 datasets whose names collide across USB-backup folders (re-export pending), 21 datasets that ship without any videos (not convertible), and 12 bimanual pair exports (each hand in its own frame)"
+   "remark": "of the 582-dataset release, 486 are fully converted and 41 more are listed with their complete metadata only (their videos failed to transcode or await a re-export); still to come: 19 datasets whose names collide across USB-backup folders (re-export pending), 21 datasets that ship without any videos (not convertible), and 12 bimanual pair exports (each hand in its own frame)"
   },
   {
    "morph": "Handheld, robot-free",
