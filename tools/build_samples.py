@@ -196,8 +196,8 @@ def main():
     # de-duplicate the index: keep the last line per id
     last = {}
     for line in open(index_path): r = json.loads(line); last[r['id']] = r
-    with open(index_path, 'w') as f:
-        for i in ids:
+    with open(index_path, 'w') as f:  # every id ever built, this run's (--ids / --limit) first
+        for i in ids + [i for i in last if i not in set(ids)]:
             if i in last: f.write(json.dumps(last[i]) + '\n')
     tot = sum(r.get('bytes', 0) for r in last.values() if r.get('ok'))
     print(f'done: {sum(1 for r in last.values() if r.get("ok"))} ok, {sum(1 for r in last.values() if not r.get("ok"))} failed, '

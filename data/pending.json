@@ -44,14 +44,14 @@
    "morph": "Handheld, robot-free",
    "embodiment": "DataClaw",
    "source": "DM-DataClaw",
-   "datasets": 580,
-   "episodes": 262171,
-   "frames": 120198007,
-   "hours": 1113.0,
+   "datasets": 52,
+   "episodes": 21762,
+   "frames": 11125381,
+   "hours": 103.1,
    "views": "1–2",
    "fps": "30",
    "note": "C",
-   "remark": "the remaining 580 datasets of the 582-dataset release; 2 are converted and browsable"
+   "remark": "of the 582-dataset release, 2 are fully converted and 525 more are listed with their complete metadata while their videos are transcoded; still to come: 19 datasets whose names collide across USB-backup folders (re-export pending), 21 datasets that ship without any videos (not convertible), and 12 bimanual pair exports (each hand in its own frame)"
   },
   {
    "morph": "Handheld, robot-free",
