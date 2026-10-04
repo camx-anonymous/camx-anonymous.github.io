@@ -884,24 +884,6 @@
     }
    ]
   },
-  "Bridge V2": {
-   "homepage": "https://huggingface.co/datasets/ember-lab-berkeley/bridge_v2",
-   "license": {
-    "name": "CC BY 4.0",
-    "url": "https://creativecommons.org/licenses/by/4.0/",
-    "repo": "https://rail-berkeley.github.io/bridgedata/"
-   },
-   "papers": [
-    {
-     "key": "walke2023bridgev2",
-     "title": "BridgeData V2: A Dataset for Robot Learning at Scale",
-     "year": 2023,
-     "arxiv": null,
-     "url": "https://proceedings.mlr.press/v229/walke23a.html",
-     "bibtex": "@inproceedings{walke2023bridgev2,\n  title     = {{BridgeData V2}: A Dataset for Robot Learning at Scale},\n  author    = {Walke, H. and Black, K. and Lee, A. and Kim, M. J. and Du, M. and Zheng, C. and Zhao, T. and Hansen-Estruch, P. and Vuong, Q. and He, A. and Myers, V. and Fang, K. and Finn, C. and Levine, S.},\n  booktitle = {Conference on Robot Learning (CoRL)},\n  pages     = {1723--1736},\n  year      = {2023},\n  url       = {https://proceedings.mlr.press/v229/walke23a.html}\n}"
-    }
-   ]
-  },
   "DexUMI": {
    "homepage": "https://real.stanford.edu/dexumi/dataset/",
    "license": {
