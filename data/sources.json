@@ -958,7 +958,11 @@
   },
   "Evo-1 xArm6": {
    "homepage": "https://huggingface.co/MINT-SJTU",
-   "license": null,
+   "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/MINT-SJTU/Evo-1"
+   },
    "papers": [
     {
      "key": "lin2026evo1",
