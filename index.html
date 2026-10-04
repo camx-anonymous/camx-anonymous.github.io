@@ -349,10 +349,10 @@ function agg(rows){return rows.reduce((a,r)=>{a.n++;a.ep+=r.episodes||0;a.h+=r.h
 // the header quotes the paper: the totals of its two appendix source tables (totals.paper, kept in data/pending.json).
 // The site's own sums can differ from them, so they are only the fallback: converted datasets plus the listed sources (totals.pending)
 const tot=k=>{const t=D.totals;return (t.paper||{})[k]??(k==='sources'?t.sources:k==='embodiments'?t.embodiments_listed||t.embodiments:t[k]+((t.pending||{})[k]||0))};
-// two rows: the full dataset (the paper's totals, tot) and the one-episode samples published on this site (summed over the rows with a sample)
+// two rows: the full dataset (the paper's totals, tot) and the one-episode samples published on this site (summed over the rows with a sample); sources are counted like the paper's table rows, one per embodiment and source
 function stats(){const sm=sampled(L),uniq=k=>new Set(sm.map(r=>r[k])).size;
   const rows=[['Full dataset',[[fmt(tot('episodes')),'episodes'],[fmtH(tot('hours'))+' h','of video'],[tot('datasets').toLocaleString(),'datasets'],[tot('sources')||'–','sources'],[tot('embodiments'),'robot platforms'],[MORPHS.length,'morphologies']]],
-    ['Sample dataset',[[fmt(sm.length),'episodes'],[fmtH(sm.reduce((a,r)=>a+r.sample.seconds,0)/3600)+' h','of video'],[sm.length.toLocaleString(),'datasets'],[uniq('source'),'sources'],[uniq('embodiment'),'robot platforms'],[uniq('morph'),'morphologies']]]];
+    ['Sample dataset',[[fmt(sm.length),'episodes'],[fmtH(sm.reduce((a,r)=>a+r.sample.seconds,0)/3600)+' h','of video'],[sm.length.toLocaleString(),'datasets'],[new Set(sm.map(r=>r.embodiment+'|'+r.source)).size,'sources'],[uniq('embodiment'),'robot platforms'],[uniq('morph'),'morphologies']]]];
   $('stats').innerHTML=rows.map(([l,c])=>`<div class="rl">${l}</div>`+c.map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')).join('')}
 
 /* ---------- browse: tree, cards ---------- */
