@@ -17,19 +17,6 @@
  },
  "entries": [
   {
-   "morph": "Single-arm robot",
-   "embodiment": "WidowX 250S",
-   "source": "Bridge V2",
-   "datasets": 1,
-   "episodes": 25965,
-   "frames": 902037,
-   "hours": 51.5,
-   "views": "1",
-   "fps": "5",
-   "note": "A",
-   "remark": "converted in full on 2026-10-04 but withdrawn the same day: the stream the release labels as the wrist camera is a fixed exterior camera; the real wrist views sit in another stream for about a third of the episodes, so the dataset is being re-converted from that stream"
-  },
-  {
    "morph": "Handheld, robot-free",
    "embodiment": "Other research projects",
    "source": "ManipForce",
