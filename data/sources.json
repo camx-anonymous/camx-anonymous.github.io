@@ -1062,7 +1062,11 @@
   },
   "MuSe": {
    "homepage": "https://jadenvc.github.io/multisensory-continual-learning/",
-   "license": null,
+   "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit",
+    "repo": "https://github.com/jadenvc/multisensory_wm"
+   },
    "papers": [
     {
      "key": "clark2026muse",
