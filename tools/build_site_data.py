@@ -46,8 +46,8 @@ FORBIDDEN = re.compile(_sc.get('forbidden') or r'(?!x)x', re.I)
 
 # Label fixes applied to every string (before the anonymisation pass): upstream metadata (inventory, info.json
 # robot_type, stats platforms) still carries these spellings, so a rebuild must not bring them back.
-LABEL_FIXES = [(r'RB-Y1m', 'RB-Y1'), (r'GenRobot DAS handheld gripper \(bimanual\)', 'GenRobot (bimanual)'),
-               (r'real\.stanford\.edu/dexumi, ', '')]   # a lab domain in DexUMI's source_dataset: no institution names on the site
+LABEL_FIXES = [(r'RB-Y1m', 'RB-Y1'), (r'GenRobot DAS handheld gripper \(bimanual\)', 'GenRobot (bimanual)')]
+# (a lab domain inside DexUMI's source_dataset label is stripped by the scrub list's replace rules, not here)
 
 
 def scrub_text(s):
