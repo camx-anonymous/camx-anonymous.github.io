@@ -98,7 +98,7 @@ SOURCE_OF = {
     # the 2026-10-03 conversion pass of the sources the paper lists that had no data on the site (data/pending.json)
     'xarm/mint_xarm': 'Evo-1 xArm6', 'umi/vista_umi': 'Vista-UMI', 'aloha/aloha_lerobot_mobile': 'Mobile ALOHA',
     'fastumi/fastumi_100k_dual_arm': 'FastUMI-100K (dual-arm)', 'freetacman/freetacman': 'FreeTacMan', 'iphumi/muse': 'MuSe',
-    'dexumi/dexumi': 'DexUMI', 'umi/tamen': 'TAMEn', 'xhand/dexora': 'Dexora',
+    'dexumi/dexumi': 'DexUMI', 'umi/tamen': 'TAMEn', 'xhand/dexora': 'Dexora', 'widowx/bridge_v2': 'Bridge V2',
     'franka_hand/molmoact': 'MolmoAct (Franka)', 'dexwild/dexwild': 'DexWild',
     'legato/legato': 'LEGATO', 'manipforce/manipforce': 'ManipForce',  # included 2026-10-04 (user reversed the 09-19 skip)
 }
@@ -158,7 +158,7 @@ PAPER_EMBODIMENT = {  # (inventory embodiment, source) -> embodiment group of th
 PAPER_MORPH = {  # embodiment -> the band the paper lists it under (Galaxea RoboCOIN, RoboMIND 2.0 UR, single-arm ARX5 leaves)
     'Galaxea R1-Lite': 'Mobile manipulator', 'UR5': 'Single-arm robot', 'ARX5': 'Bimanual robot', 'OpenArm': 'Bimanual robot',
     # groups of the 2026-10-03 conversion pass (the morph column of data/pending.json)
-    'xArm6': 'Single-arm robot', 'AIRBOT MMK2 + XHAND': 'Bimanual robot',
+    'xArm6': 'Single-arm robot', 'WidowX 250S': 'Single-arm robot', 'AIRBOT MMK2 + XHAND': 'Bimanual robot',
     'Dexterous hands': 'Handheld, robot-free', 'Other research projects': 'Handheld, robot-free', 'iPhUMI': 'Handheld, robot-free',
 }
 PENDING = os.path.join(REPO, 'data', 'pending.json')
@@ -232,7 +232,7 @@ PROJECT_EMBODIMENT = {'fastumi/fastumi': 'UMI', 'fastumi/fastumi_100k_single_arm
                       'xarm/mint_xarm': 'xArm6', 'umi/vista_umi': 'UMI', 'aloha/aloha_lerobot_mobile': 'ALOHA',
                       'fastumi/fastumi_100k_dual_arm': 'UMI', 'freetacman/freetacman': 'Other research projects',
                       'iphumi/muse': 'iPhUMI', 'dexumi/dexumi': 'Dexterous hands', 'umi/tamen': 'Other research projects',
-                      'xhand/dexora': 'AIRBOT MMK2 + XHAND', 'franka_hand/molmoact': 'Franka',
+                      'xhand/dexora': 'AIRBOT MMK2 + XHAND', 'widowx/bridge_v2': 'WidowX 250S', 'franka_hand/molmoact': 'Franka',
                       'dexwild/dexwild': 'Dexterous hands', 'legato/legato': 'Other research projects',
                       'manipforce/manipforce': 'Other research projects'}
 

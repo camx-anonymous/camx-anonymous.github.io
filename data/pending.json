@@ -8,12 +8,12 @@
   "D": "dexterous-hand data recorded with a wrist camera; the current model has no dexterous-hand action head, so it is listed for future training"
  },
  "paper": {
-  "_about": "Totals of the paper's two appendix source tables, quoted by the header and the footer of the site: the training mix (37 sources, 1,998 datasets, 1,738,358 episodes, 18,632.1 h) plus the sources outside it (32 sources, 2,470 datasets, 686,665 episodes, 7,167.1 h), over 23 embodiment groups. Bridge V2 (WidowX 250S) was dropped on 2026-10-04: its release has no usable wrist-camera stream, so it is not part of CAMX. Copy them from the generated table bodies when the paper's tables change; tools/build_site_data.py writes them to `totals.paper` and warns when the site's own sums differ.",
-  "sources": 69,
-  "embodiments": 23,
-  "datasets": 4468,
-  "episodes": 2425023,
-  "hours": 25799.2
+  "_about": "Totals of the paper's two appendix source tables, quoted by the header and the footer of the site: the training mix (37 sources, 1,998 datasets, 1,738,358 episodes, 18,632.1 h) plus the sources outside it (33 sources, 2,471 datasets, 712,630 episodes, 7,218.6 h), over 24 embodiment groups. Copy them from the generated table bodies when the paper's tables change; tools/build_site_data.py writes them to `totals.paper` and warns when the site's own sums differ.",
+  "sources": 70,
+  "embodiments": 24,
+  "datasets": 4469,
+  "episodes": 2450988,
+  "hours": 25850.7
  },
  "entries": [
   {
