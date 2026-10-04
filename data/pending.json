@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-03",
+ "updated": "2026-10-04",
  "_about": "Sources of the paper's appendix source tables that have no converted LeRobot-v3 data on the site yet (no sample archive, no example clip). One entry per embodiment and source with the counts the paper lists (datasets, episodes, frames, hours = frames / fps, camera views, fps); `note` is the bracketed letter of the appendix table ([A]-[D], text in `notes`), null for a source of the training mix whose remaining datasets are still unconverted. `entry` names the data/sources.json key when it differs from `source`. Hand-maintained; tools/build_site_data.py copies it into data/datasets.json as `pending` and checks every entry against data/sources.json.",
  "notes": {
   "A": "not included when the training mix was frozen",
@@ -16,18 +16,6 @@
   "hours": 25850.7
  },
  "entries": [
-  {
-   "morph": "Handheld, robot-free",
-   "embodiment": "Other research projects",
-   "source": "LEGATO",
-   "datasets": 3,
-   "episodes": 450,
-   "frames": 97297,
-   "hours": 2.7,
-   "views": "2",
-   "fps": "10",
-   "note": "A"
-  },
   {
    "morph": "Handheld, robot-free",
    "embodiment": "Other research projects",

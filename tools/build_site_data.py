@@ -100,6 +100,7 @@ SOURCE_OF = {
     'fastumi/fastumi_100k_dual_arm': 'FastUMI-100K (dual-arm)', 'freetacman/freetacman': 'FreeTacMan', 'iphumi/muse': 'MuSe',
     'dexumi/dexumi': 'DexUMI', 'umi/tamen': 'TAMEn', 'xhand/dexora': 'Dexora', 'widowx/bridge_v2': 'Bridge V2',
     'franka_hand/molmoact': 'MolmoAct (Franka)', 'dexwild/dexwild': 'DexWild',
+    'legato/legato': 'LEGATO', 'manipforce/manipforce': 'ManipForce',  # included 2026-10-04 (user reversed the 09-19 skip)
 }
 # bimanual datasets whose two hands are NOT in one world frame (checked 2026-10-03 on the data: both main-camera trajectories
 # start at the same point in every episode, or the right hand sits at a manual layout prior). Rows carry `world_frame`
@@ -232,7 +233,8 @@ PROJECT_EMBODIMENT = {'fastumi/fastumi': 'UMI', 'fastumi/fastumi_100k_single_arm
                       'fastumi/fastumi_100k_dual_arm': 'UMI', 'freetacman/freetacman': 'Other research projects',
                       'iphumi/muse': 'iPhUMI', 'dexumi/dexumi': 'Dexterous hands', 'umi/tamen': 'Other research projects',
                       'xhand/dexora': 'AIRBOT MMK2 + XHAND', 'widowx/bridge_v2': 'WidowX 250S', 'franka_hand/molmoact': 'Franka',
-                      'dexwild/dexwild': 'Dexterous hands'}
+                      'dexwild/dexwild': 'Dexterous hands', 'legato/legato': 'Other research projects',
+                      'manipforce/manipforce': 'Other research projects'}
 
 
 def embodiment_of(robot_type, project=None):
@@ -249,7 +251,7 @@ def form_of(row, setup, robot_type, project):
         want = 'bimanual' if setup == 'bimanual' else 'single-arm'
         ff = next((p for p in parts if want in p), parts[0])
     if not ff:
-        hand = bool(re.search(r'UMI|handheld|DataClaw|Dobb|AetheRock|Vitamin|HuMI|genrobot|FreeTacMan|TAMEn|MuSe|DexWild', robot_type or '', re.I))
+        hand = bool(re.search(r'UMI|handheld|DataClaw|Dobb|AetheRock|Vitamin|HuMI|genrobot|FreeTacMan|TAMEn|MuSe|DexWild|LEGATO|ManipForce|hand-held', robot_type or '', re.I))
         ff = ('handheld (%s)' if hand else '%s (fixed base)') % ('bimanual' if setup == 'bimanual' else 'single-arm')
     return ff
 
@@ -570,7 +572,8 @@ def leaf_row(root, p, inv_rows):
     for k, v in feat.items():
         if v.get('dtype') != 'video': continue
         name = k.split('.')[-1]; base = name.replace('_rgb', '')
-        g = lambda suf: d.get(base + suf, d.get(name + suf))
+        # a stereo pair shares one set of keys (<pair>_model, <pair>_is_fisheye) for its _left / _right streams
+        g = lambda suf: d.get(base + suf, d.get(name + suf, d.get(re.sub(r'_(left|right)$', '', base) + suf)))
         shape = v.get('shape') or [None, None, None]
         cams.append({'name': name, 'h': shape[0], 'w': shape[1], 'model': g('_model'),
                      'fisheye': bool(g('_is_fisheye')), 'role': cam_role(name)})
