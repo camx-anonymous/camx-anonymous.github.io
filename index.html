@@ -198,8 +198,8 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 @media (max-width:640px){.rostats{gap:6px 18px}.rostats .v{font-size:20px}.rostats .k{font-size:13px}}
 #rollouts .tree .lvl1>div>button{margin-left:0}
 #rollouts .tree .lvl2>div{display:flex;flex-direction:column}
-#rollouts .tree .lvl3 .cs{display:block;font:400 10.5px/1.3 var(--mono);color:var(--ink4);margin-top:1px}
-#rollouts .tree .lvl3 button.on .cs{color:var(--accent)}
+#rollouts .tree .lvl2 .cs{display:block;font:400 10.5px/1.3 var(--mono);color:var(--ink4);margin-top:1px}
+#rollouts .tree .lvl2 button.on .cs{color:var(--accent)}
 /* outcome filter; as tall as the first tree row, so the two line up */
 .filters{margin:0 0 16px;min-height:37px}
 /* one group per task and policy / embodiment, in the paper's order: its success rate (and the mean completion time of
@@ -765,15 +765,17 @@ const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/
    one evaluated with the same five embodiments on one ARX5 arm: the task's own (in-distribution), a CamX embodiment that
    never performed the task (embodiment transfer), or an embodiment unseen in training. `src` = the embodiment the task's
    training data was collected with (the rig key of videos.json, or a name when it is not one of the rigs here),
-   `share` = the task's share of the training tokens in percent, `sub` = what the groups under a task are. */
+   `emb` = the name of that embodiment on the task's row of the tree (in-distribution setting, where the rows under a task are
+   policies and the embodiment would otherwise go unnamed), `share` = the task's share of the training tokens in percent,
+   `sub` = what the groups under a task are. */
 const CATS=[
   {id:'in-distribution',name:'In-distribution embodiment',sub:'policy',
    desc:'Robot and gripper match the task’s training data. Each benchmark is at most 1% of the training tokens, and CamUVA is compared with models optimized or trained on that benchmark alone.',
    tasks:[
-    {key:'cup arrangement',name:'Cup Arrangement',src:'UMI',share:0.4,reported:[['Multi-task UVA',65],['Multi-task DP',50]]},
-    {key:'towel fold',name:'Towel Folding',src:'UMI',share:0.4,reported:[['Multi-task UVA',70],['Multi-task DP',70]]},
-    {key:'dish in rack',name:'Dish in Rack',src:'YAM bimanual',share:1.0},
-    {key:'box on shelf',name:'Box Placement',src:'RB-Y1 humanoid',share:0.4,reported:[['ModPack DP, joint torque',60],['ModPack DP, torque-free',30]]}]},
+    {key:'cup arrangement',name:'Cup Arrangement',src:'UMI',emb:'Single UMI',share:0.4,reported:[['Multi-task UVA',65],['Multi-task DP',50]]},
+    {key:'towel fold',name:'Towel Folding',src:'UMI',emb:'Single UMI',share:0.4,reported:[['Multi-task UVA',70],['Multi-task DP',70]]},
+    {key:'dish in rack',name:'Dish in Rack',src:'YAM bimanual',emb:'Bimanual YAM',share:1.0},
+    {key:'box on shelf',name:'Box Placement',src:'RB-Y1 humanoid',emb:'RB-Y1',share:0.4,reported:[['ModPack DP, joint torque',60],['ModPack DP, torque-free',30]]}]},
   {id:'cross-embodiment',name:'Cross-embodiment',sub:'embodiment',
    desc:'Four tasks, each collected with one embodiment, all evaluated with the same checkpoint on five embodiments mounted on one ARX5 arm: the task’s own, two other CamX embodiments that never performed it, and two embodiments unseen in training.',
    tasks:[
@@ -858,7 +860,7 @@ function tree(){let h='';
     h+='<div>'+row(R.cat===c.id&&!R.task,{cat:c.id},'<span class="tick"></span><span>'+esc(c.name)+'</span>',plural(tasks.length,'task')+' · '+plural(rows.length,'rollout'),`${c.name} · ${plural(rows.length,'rollout')}`)+'<div class="lvl2">'
       +tasks.map(t=>{const tr=rows.filter(v=>v.t===t),ks=subs(t,tr),act=R.cat===c.id&&R.task===t.key;
         const cnt=c.sub==='policy'?rate(ours(tr)):plural(ks.length,'embodiment');
-        let o=row(act&&!R.sub,{cat:c.id,task:t.key},'<span class="tick"></span><span>'+esc(t.name)+'</span>',cnt,`${t.name} · ${plural(tr.length,'rollout')}`);
+        let o=row(act&&!R.sub,{cat:c.id,task:t.key},'<span class="tick"></span><span>'+esc(t.name)+(t.emb?`<span class="cs">${esc(t.emb)}</span>`:'')+'</span>',cnt,`${t.name}${t.emb?' · '+t.emb:''} · ${plural(tr.length,'rollout')}`);
         if(act&&ks.length>1)o+='<div class="lvl3">'+ks.map(k=>{const kr=tr.filter(v=>subOf(v)===k);
           return row(R.sub===k,{cat:c.id,task:t.key,sub:k},'<span class="tick"></span><span>'+esc(subName(t,k))+(c.sub==='embodiment'?caseTag(t,k,'cs'):'')+'</span>',rate(kr),`${subName(t,k)} · ${plural(kr.length,'rollout')}`)}).join('')+'</div>';
         return '<div>'+o+'</div>'}).join('')+'</div></div>'});
@@ -899,7 +901,7 @@ function card(v){const oc=OUTCOME[v.outcome];
 
 // the line under a group's heading: where the task's training data comes from and its share of the training tokens,
 // then the success rates the paper quotes for the baselines of that benchmark that were not run here
-function srcLine(t){const src=t.srcNote||(t.src?embName(t.src):null);
+function srcLine(t){const src=t.srcNote||t.emb||(t.src?embName(t.src):null);
   return `${src?`training data: <b>${esc(src)}</b>`:''}${t.share!=null?`${src?' · ':''}<b>${t.share.toFixed(1)}%</b> of the training tokens`:''}`
     +(t.reported?` · reported: ${t.reported.map(([n,p])=>`${esc(n)} <b>${p}%</b>`).join(', ')}`:'')}
 function render(){const scope=V.filter(inScope);
