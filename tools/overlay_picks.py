@@ -128,7 +128,7 @@ SPECS = {
                                 'equidistant lens from the image circle, tool-centre pose = a candidate picked on the video'),
     'umi/data_scaling_laws': MV(calib={'main': GOPRO}),
     'umi/exumi': MV(calib={'main': GOPRO}),
-    'umi/humi': MV(calib={'main': GOPRO}),
+    'umi/humi': MV(calib={'main': 'gopro_hero9_maxlens_2_7k_humi_g1_masked.json:crop'}),
     'umi/maniwav': MV(calib={'main': GOPRO}),
     'umi/openneo_umi': NEO('openneo_umi.json', {'left': NEO_UMI_EEF, 'right': NEO_UMI_EEF}),
     'umi/openneo_umi_single': NEO('openneo_umi_single.json', {'right': '0,0.006180,0.093105,0.333054,0.623759,-0.623759,0.333054'}),
@@ -136,13 +136,13 @@ SPECS = {
     'umi/umi': MV(calib={'main': GOPRO}),
     # UMI-3D: its own URDF at the fisheye lens; the release's KB4 model (f 395.6 @1280x1024) scaled to the 224 crop; the
     # body meshes sit on the lens and would blanket the own view, so only the finger holders / soft fingers are drawn there
-    'umi/umi3d': MV(calib={'main': 'umi3d_fisheye_kb4_scaled.json:stretch'}, profile='registry:umi3d',
+    'umi/umi3d': MV(calib={'main': 'umi3d_fisheye_kb4_release_crop_masked.json:stretch'}, profile='registry:umi3d',
                     extra=['--own-exclude-visuals', 'top_cover,fisheye_lens,bottom_plate,handle,battery,grip,gear_left,gear_right,linkage_left,linkage_right']),
     'umi/umi_benchmark': MV(calib={'main': 'umi_benchmark_fastumi_pro_seucm.json:crop'}, profile='umi_benchmark',
                             overlay='primitive stand-in (swing gripper, no CAD): bar spanning the recorded tip gap at the jaw midpoint, '
                                     'tool-centre axes; EUCM fisheye calibration'),
     'umi/umi_on_legs': MV(calib={'main': GOPRO}),
-    'umi/vitamin': MV(calib={'main': GOPRO}, profile='umi'),
+    'umi/vitamin': MV(calib={'main': 'gopro_hero9_maxlens_2_7k_umi_gripper_masked.json:crop'}, profile='umi'),
     # ViTaMIn-B: GoPro (webcam mode) masked to a circle; the 2.7k Max-Lens calibration centre-cropped to the square frame gives
     # f 88 px at 224 (the same focal the 1080p->224 resize implies), UMI paper-figure URDF hung from the GoPro lens
     'umi/vitamin_b': MV(calib={'main': GOPRO}, profile='umi'),

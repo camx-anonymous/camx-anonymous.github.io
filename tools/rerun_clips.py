@@ -25,7 +25,7 @@ Env:
   CAMX_CURATION   the curation tree's mv_urdf/videos           CAMX_PY    python for the renderers (default: this one)
   CAMX_CLIPS_OUT  the clip tree written here                   MV_SITE_MESA  lavapipe env for the headless viewer
 """
-import argparse, datetime, hashlib, json, os, queue, shutil, subprocess, sys, time
+import argparse, datetime, hashlib, json, os, queue, shutil, subprocess, sys, tempfile, time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -60,6 +60,10 @@ STANDIN = {'aloha/openneo_aloha': 'piper', 'aloha/openneo_arx5': 'arx x5', 'aloh
 GOPRO = dict(profile='umi', calib='gopro_hero9_maxlens_2_7k_umi.json', fit='crop')   # GoPro Hero 9/10 + Max Lens Mod, centre crop
 FISHEYE = {p: GOPRO for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm', 'umi/data_scaling_laws', 'umi/exumi', 'umi/humi',
                                'umi/maniwav', 'umi/mvumi', 'umi/touch_in_the_wild', 'umi/umi', 'umi/umi_on_legs', 'umi/vitamin', 'umi/vitamin_b')}
+# These releases remove fixed lower gripper polygons before image export. Keep
+# CAD inside the same support; HuMI uses its distinct G1 preprocessing polygon.
+FISHEYE['umi/humi'] = dict(GOPRO, calib='gopro_hero9_maxlens_2_7k_humi_g1_masked.json')
+FISHEYE['umi/vitamin'] = dict(GOPRO, calib='gopro_hero9_maxlens_2_7k_umi_gripper_masked.json')
 for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm', 'fastumi/fastumi_100k_dual_arm'): FISHEYE[p] = dict(GOPRO, profile='fastumi')   # UMI mesh at the rig's own TCP (camera-to-tip 145 mm, not UMI's 220)
 FISHEYE['umi/exumi'] = dict(GOPRO, profile='exumi')   # grippers/exumi: the exUMI 9DTact fingertips fitted to the wrist frames (2026-10-03)
 # grippers/vitamin_b: DuoTact fingers fitted to the wrist frames; the release's GoPro lens through the 2028-square crop -> 224 (crop chain assumed);
@@ -216,11 +220,40 @@ def render_provenance(o):
 
 
 def current_cache(d, provenance):
-    if provenance is None or not is_done(d):
+    if provenance is None or not is_done(d) or Path(d, '_RENDERING').exists():
         return False
     try:
         m = json.load(open(os.path.join(d, 'meta.json')))
-        return m.get('render_provenance', {}).get('fingerprint') == provenance['fingerprint']
+        outputs = render_outputs(d)
+        return (m.get('render_provenance', {}).get('fingerprint') == provenance['fingerprint']
+                and m.get('render_outputs') == outputs)
+    except (OSError, ValueError):
+        return False
+
+
+def file_signature(path):
+    path = Path(path)
+    st = path.stat()
+    if not path.is_file() or st.st_size == 0:
+        raise ValueError(f'Missing or empty output: {path}')
+    return [str(path.resolve()), st.st_size, st.st_mtime_ns]
+
+
+def render_outputs(d):
+    return {name: file_signature(Path(d, name)) for name in ('stitched.mp4', 'poster.jpg')}
+
+
+def encoded_receipt(d, mp4, jpg, provenance):
+    return {'schema': 1, 'render_fingerprint': provenance['fingerprint'],
+            'source': file_signature(Path(d, 'stitched.mp4')),
+            'video': file_signature(mp4), 'poster': file_signature(jpg)}
+
+
+def current_encoded(d, mp4, jpg, provenance):
+    if not current_cache(d, provenance):
+        return False
+    try:
+        return json.loads(Path(mp4).with_suffix('.json').read_text()) == encoded_receipt(d, mp4, jpg, provenance)
     except (OSError, ValueError):
         return False
 
@@ -451,6 +484,7 @@ def render(rows, a):
             meta_path = Path(d, 'meta.json')
             meta = json.loads(meta_path.read_text())
             meta['render_provenance'] = provenance
+            meta['render_outputs'] = render_outputs(d)
             meta_path.write_text(json.dumps(meta, indent=1))
             log(f'{r:8s} {name}: {msg}')
         except KeyboardInterrupt: raise
@@ -480,13 +514,29 @@ def encode(rows):
             log(f"skip encode {o['key']}/{o['slug']}: source unavailable: {e!r}")
             continue
         if not current_cache(d, provenance): continue
-        mp4 = os.path.join(vdir, name + '.mp4'); src = os.path.join(d, 'stitched.mp4')
-        if os.path.isfile(mp4) and os.path.getmtime(mp4) >= os.path.getmtime(src) and os.path.isfile(os.path.join(pdir, name + '.jpg')): continue
-        subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', os.path.join(d, 'stitched.mp4'), '-vf', 'scale=-2:360', '-c:v', 'libx264',
-                        '-preset', 'slow', '-crf', '28', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', mp4], check=True)
-        _, _, rate, n = probe(mp4)
-        subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-ss', f'{n / rate / 2:.3f}', '-i', mp4, '-frames:v', '1', '-vf', 'scale=-2:180', '-q:v', '6',
-                        os.path.join(pdir, name + '.jpg')], check=True)
+        mp4 = os.path.join(vdir, name + '.mp4'); jpg = os.path.join(pdir, name + '.jpg')
+        src = os.path.join(d, 'stitched.mp4'); receipt = Path(mp4).with_suffix('.json')
+        if current_encoded(d, mp4, jpg, provenance): continue
+        receipt.unlink(missing_ok=True)
+        source_signature = file_signature(src)
+        with tempfile.TemporaryDirectory(prefix='.encode-', dir=vdir) as staging:
+            staged_mp4, staged_jpg = Path(staging, 'clip.mp4'), Path(staging, 'poster.jpg')
+            subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-vf', 'scale=-2:360', '-c:v', 'libx264',
+                            '-preset', 'slow', '-crf', '28', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', str(staged_mp4)], check=True)
+            _, _, rate, n = probe(str(staged_mp4))
+            _, _, source_rate, source_n = probe(src)
+            if n != source_n or abs(rate - source_rate) > 1e-5:
+                raise RuntimeError(f'{name}: encoded frame count/rate differs from rendered clip')
+            subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-ss', f'{n / rate / 2:.3f}', '-i', str(staged_mp4), '-frames:v', '1', '-vf', 'scale=-2:180', '-q:v', '6',
+                            str(staged_jpg)], check=True)
+            file_signature(staged_jpg)
+            if (file_signature(src) != source_signature or not current_cache(d, provenance)
+                    or render_provenance(o)['fingerprint'] != provenance['fingerprint']):
+                raise RuntimeError(f'{name}: inputs changed during site encoding; rerun this clip')
+            os.replace(staged_mp4, mp4); os.replace(staged_jpg, jpg)
+            staged_receipt = Path(staging, 'receipt.json')
+            staged_receipt.write_text(json.dumps(encoded_receipt(d, mp4, jpg, provenance), indent=1))
+            os.replace(staged_receipt, receipt)
         log(f'{name}: {os.path.getsize(mp4) // 1024} KB, {n} frames')
 
 
@@ -504,6 +554,10 @@ def attach():
                 continue
             if not current_cache(d, provenance): continue
             m = json.load(open(os.path.join(d, 'meta.json'))); mp4 = os.path.join(REPO, 'overlays', 'videos', f"{o['key']}__{o['slug']}.mp4")
+            jpg = os.path.join(REPO, 'overlays', 'posters', f"{o['key']}__{o['slug']}.jpg")
+            if not current_encoded(d, mp4, jpg, provenance):
+                log(f"skip attach {o['key']}/{o['slug']}: site video is not a verified current encode")
+                continue
             grips = {s: {'model': g.get('model'), 'profile': g.get('profile'), 'urdf': bool(g.get('urdf_present'))} for s, g in (m.get('grippers') or {}).items() if g.get('model')}
             try: tasks = json.loads(m.get('tasks') or '[]')
             except ValueError: tasks = [m.get('tasks')]

@@ -15,7 +15,7 @@ Usage:
 Env:
   CAMX_ROOT  camx_480p tree (default /data/camx_480p)
 """
-import argparse, glob, hashlib, json, os, subprocess, sys
+import argparse, glob, hashlib, json, os, subprocess, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
 
@@ -65,6 +65,16 @@ def input_signature(o, overlay, info, videos):
     return {'fingerprint': hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest(), **payload}
 
 
+def output_signatures(video, poster):
+    result = {}
+    for name, path in [('video', video), ('poster', poster)]:
+        st = os.stat(path)
+        if not os.path.isfile(path) or st.st_size == 0:
+            raise ValueError(f'Missing or empty raw output: {path}')
+        result[name] = [os.path.realpath(path), st.st_size, st.st_mtime_ns]
+    return result
+
+
 def raw_one(o, force=False):
     name = f"{o['key']}__{o['slug']}"; src = os.path.join(VIDEOS, name + '.mp4'); dst = os.path.join(RAW, name + '.mp4')
     if not os.path.isfile(src): return f'{name}: no overlay clip, skipped'
@@ -72,10 +82,17 @@ def raw_one(o, force=False):
     info, vids = episode_videos(o['dataset'], int(o['episode']), keys)
     signature = input_signature(o, src, info, vids)
     sidecar = os.path.join(RAW, name + '.json')
+    jpg = os.path.join(RAW, name + '.jpg')
     if os.path.isfile(dst) and not force:
-        try: cached = json.load(open(sidecar))
-        except (OSError, ValueError): cached = {}
-        if cached.get('fingerprint') == signature['fingerprint']: return None
+        try:
+            cached = json.load(open(sidecar))
+            if (cached.get('fingerprint') == signature['fingerprint']
+                    and cached.get('outputs') == output_signatures(dst, jpg)): return None
+        except (OSError, ValueError): pass
+    # A failed forced refresh must not leave an old receipt blessing a partial
+    # output. Stage both files and write their receipt only after validation.
+    try: os.unlink(sidecar)
+    except FileNotFoundError: pass
     W, H, rate, n = probe(src)
     fps = Fraction(info['fps']).limit_denominator(100000); step = max(1, round(fps / rate))   # every step-th frame, like the overlay
     shapes = [info['features'][k]['shape'] for k in keys]; hc = max(int(s[0]) for s in shapes)
@@ -87,20 +104,29 @@ def raw_one(o, force=False):
     # setsar after the final scale: it would otherwise keep the strip's display aspect and the clip would show 1-4 px wider than the overlay
     cmd += ['-filter_complex', f'{tiles}{stack}scale={W}:{H},setsar=1,setpts=N/({rate.numerator}/{rate.denominator})/TB[o]', '-map', '[o]',
             '-frames:v', str(n), '-r', f'{rate.numerator}/{rate.denominator}', '-c:v', 'libx264', '-preset', 'slow', '-crf', '28',
-            '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', dst]
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    if r.returncode != 0: return f'{name}: ffmpeg failed: {r.stderr.strip()[-300:]}'
-    _, _, rate2, n2 = probe(dst)
-    subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-ss', f'{n2 / float(rate2) / 2:.3f}', '-i', dst, '-frames:v', '1',
-                    '-vf', 'scale=-2:180', '-q:v', '6', os.path.join(RAW, name + '.jpg')], check=True)
+            '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an']
     # the strip before the final scale: a different aspect than the overlay clip means the tiles do not line up
     strip = sum(int(s[1]) * hc / int(s[0]) for s in shapes) / hc
     note = '' if abs(strip / (W / H) - 1) < 0.02 else f'  <-- tile layout differs (strip {strip:.3f} vs clip {W / H:.3f})'
-    note += '' if n2 == n else f'  <-- {n2} frames, the overlay clip has {n}'
-    if not note:
-        if input_signature(o, src, info, vids)['fingerprint'] != signature['fingerprint']:
+    with tempfile.TemporaryDirectory(prefix='.raw-', dir=RAW) as staging:
+        staged_mp4, staged_jpg = os.path.join(staging, 'clip.mp4'), os.path.join(staging, 'poster.jpg')
+        r = subprocess.run(cmd + [staged_mp4], capture_output=True, text=True)
+        if r.returncode != 0: return f'{name}: ffmpeg failed: {r.stderr.strip()[-300:]}'
+        _, _, rate2, n2 = probe(staged_mp4)
+        note += '' if n2 == n else f'  <-- {n2} frames, the overlay clip has {n}'
+        note += '' if rate2 == rate else f'  <-- frame rate {rate2}, the overlay clip has {rate}'
+        if note: return f'{name}: raw export rejected{note}'
+        subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-ss', f'{n2 / float(rate2) / 2:.3f}', '-i', staged_mp4, '-frames:v', '1',
+                        '-vf', 'scale=-2:180', '-q:v', '6', staged_jpg], check=True)
+        output_signatures(staged_mp4, staged_jpg)
+        latest_info, latest_vids = episode_videos(o['dataset'], int(o['episode']), keys)
+        if input_signature(o, src, latest_info, latest_vids)['fingerprint'] != signature['fingerprint']:
             return f'{name}: failed: source changed during raw export; rerun this clip'
-        with open(sidecar, 'w') as f: json.dump(signature, f, indent=1)
+        os.replace(staged_mp4, dst); os.replace(staged_jpg, jpg)
+        signature['outputs'] = output_signatures(dst, jpg)
+        staged_sidecar = os.path.join(staging, 'receipt.json')
+        with open(staged_sidecar, 'w') as f: json.dump(signature, f, indent=1)
+        os.replace(staged_sidecar, sidecar)
     return f'{name}: {n2} frames, {len(keys)} view(s), every {step}. frame, {os.path.getsize(dst) // 1024} KB{note}'
 
 
