@@ -239,8 +239,13 @@ AGIBOT_G2 = MV(config='agibot_g2.json', extra=[a for side in ('left', 'right')
                        'per-episode intrinsics of the release')
 REPLACE_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
     ('agibot/agibot_world_2026', AGIBOT_G2, [('il_3400', 9), ('ri_4560', 4), ('rl_7093', 3)]),
-    # ABC: no gripper model string in the export; the YAM jaw type differs per task (i2rt flexible vs crank 4310), eef per episode
+    # ABC: no gripper model string in the export; the YAM jaw type differs per task (i2rt flexible vs crank vs linear 4310), eef per
+    # episode. One pick per jaw type and one for the ZED station, because the dataset page picks the clip of the dataset's own rig
+    # (station + majority variant, build_site_data.variants_pass) -- a clip of another jaw type draws a CAD that is not the rig's
+    # (2026-10-06: fold-and-stack t-shirts, crank, was showing the flexible carrot clip).
     ('aloha/abc', MV(config='abc_realsense.json', profile='registry:flexible'), [('assemble_a_carrot_with_lego_realsense', 11)]),
+    ('aloha/abc', MV(config='abc_realsense.json', profile='registry:linear'), [('install_the_large_spring_realsense', 0)]),
+    ('aloha/abc', MV(config='abc_zed.json', profile='registry:linear'), [('fold_and_stack_the_t_shirts_zed', 4)]),
     ('aloha/abc', MV(config='abc_realsense.json', profile='registry:crank'), [('place_the_shirt_on_the_hanger_realsense', 6),
                                                                               ('zip_up_the_jacket_realsense', 11)]),
     ('aloha/biplay', MV(config='biplay.json'), [('dough_cut', 10), ('pick_place', 3), ('sushi_cut_full', 8)]),

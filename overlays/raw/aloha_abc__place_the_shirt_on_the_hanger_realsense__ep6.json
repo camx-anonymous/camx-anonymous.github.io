@@ -1,0 +1,73 @@
+{
+ "fingerprint": "20a109c6c30bc4abc7f07ef84404758994e247f68f3cfc6c1c63b085377067b1",
+ "schema": 1,
+ "dataset": "aloha/abc/place_the_shirt_on_the_hanger_realsense",
+ "episode": 6,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__place_the_shirt_on_the_hanger_realsense__ep6.mp4",
+  2907075,
+  1791309372589054632
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/place_the_shirt_on_the_hanger_realsense/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    196196588,
+    1788424296747278013
+   ],
+   338.7
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/place_the_shirt_on_the_hanger_realsense/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    190884535,
+    1788424295185257179
+   ],
+   338.7
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/place_the_shirt_on_the_hanger_realsense/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    187122156,
+    1788424298107296146
+   ],
+   338.7
+  ]
+ },
+ "tool_sha256": "ca44ad2371fb88e08973cf241ea17ad811a016fdb185bc8786dba6f8eb85f4ea",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__place_the_shirt_on_the_hanger_realsense__ep6.mp4",
+   3129275,
+   1791309589345315915
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__place_the_shirt_on_the_hanger_realsense__ep6.jpg",
+   14384,
+   1791309590149320617
+  ]
+ }
+}

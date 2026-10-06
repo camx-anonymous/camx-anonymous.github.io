@@ -1,0 +1,73 @@
+{
+ "fingerprint": "f0551918f96197fb86d326dc1572a42bf35091e95eb5baf3dc656efe554795fc",
+ "schema": 1,
+ "dataset": "aloha/abc/install_the_large_spring_realsense",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__install_the_large_spring_realsense__ep0.mp4",
+  3711538,
+  1791309710131024014
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/install_the_large_spring_realsense/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    174229344,
+    1788361852878180335
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/install_the_large_spring_realsense/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    178696680,
+    1788361850914166225
+   ],
+   0.0
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/install_the_large_spring_realsense/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    205837117,
+    1788361854497191958
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "ca44ad2371fb88e08973cf241ea17ad811a016fdb185bc8786dba6f8eb85f4ea",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__install_the_large_spring_realsense__ep0.mp4",
+   4154338,
+   1791309733302160191
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__install_the_large_spring_realsense__ep0.jpg",
+   23416,
+   1791309733972164131
+  ]
+ }
+}

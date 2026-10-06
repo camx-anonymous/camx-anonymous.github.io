@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "e0f696f4467803b32a0b180dac45a6df3df2247a050327fccfc4a3e57bd5cd0d",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_abc/place_the_shirt_on_the_hanger_realsense__ep6/stitched.mp4",
+  8562317,
+  1791309309224688894
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__place_the_shirt_on_the_hanger_realsense__ep6.mp4",
+  2907075,
+  1791309372589054632
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_abc__place_the_shirt_on_the_hanger_realsense__ep6.jpg",
+  15048,
+  1791309374219064061
+ ]
+}

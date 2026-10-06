@@ -1,0 +1,73 @@
+{
+ "fingerprint": "8c53f354f629af043bbe960c3da679d3dbb6db3e91690defa616cb57f3c650e0",
+ "schema": 1,
+ "dataset": "aloha/abc/assemble_a_carrot_with_lego_realsense",
+ "episode": 11,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__assemble_a_carrot_with_lego_realsense__ep11.mp4",
+  2078573,
+  1791309368628031723
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/assemble_a_carrot_with_lego_realsense/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    192250075,
+    1788321376828550114
+   ],
+   1332.4
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/assemble_a_carrot_with_lego_realsense/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    168629720,
+    1788321368582489925
+   ],
+   1332.4
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/assemble_a_carrot_with_lego_realsense/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    169670527,
+    1788321385514613521
+   ],
+   1332.4
+  ]
+ },
+ "tool_sha256": "ca44ad2371fb88e08973cf241ea17ad811a016fdb185bc8786dba6f8eb85f4ea",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__assemble_a_carrot_with_lego_realsense__ep11.mp4",
+   2417183,
+   1791309589072314318
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__assemble_a_carrot_with_lego_realsense__ep11.jpg",
+   13650,
+   1791309589910319219
+  ]
+ }
+}

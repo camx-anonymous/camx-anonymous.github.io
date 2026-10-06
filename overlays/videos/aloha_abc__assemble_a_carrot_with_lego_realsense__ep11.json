@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "36fbe5923caa839958f7bb4f9eecc123ae381a04c7c7c1a20deb4e217529c692",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_abc/assemble_a_carrot_with_lego_realsense__ep11/stitched.mp4",
+  7176580,
+  1791309328434799610
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__assemble_a_carrot_with_lego_realsense__ep11.mp4",
+  2078573,
+  1791309368628031723
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_abc__assemble_a_carrot_with_lego_realsense__ep11.jpg",
+  13727,
+  1791309369974039508
+ ]
+}

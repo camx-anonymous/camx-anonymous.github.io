@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "97a590c382233405a0bdb2ceb9128a61908e5582fb443b07f21b88798988d25a",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_abc/zip_up_the_jacket_realsense__ep11/stitched.mp4",
+  8899047,
+  1791309309193688715
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__zip_up_the_jacket_realsense__ep11.mp4",
+  2936828,
+  1791309376838079212
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_abc__zip_up_the_jacket_realsense__ep11.jpg",
+  14406,
+  1791309378409088303
+ ]
+}

@@ -1,0 +1,73 @@
+{
+ "fingerprint": "058bc289a4186d73613f3fda902c14d6ab35ced5f207d6f861b98c0553ba9d45",
+ "schema": 1,
+ "dataset": "aloha/abc/zip_up_the_jacket_realsense",
+ "episode": 11,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__zip_up_the_jacket_realsense__ep11.mp4",
+  2936828,
+  1791309376838079212
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/zip_up_the_jacket_realsense/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    199721779,
+    1788498258363753923
+   ],
+   519.5
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/zip_up_the_jacket_realsense/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    205147697,
+    1788498254617731508
+   ],
+   519.5
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd2/chiling/ABC_data/processed_data/zip_up_the_jacket_realsense/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    176282445,
+    1788498262408778157
+   ],
+   519.5
+  ]
+ },
+ "tool_sha256": "ca44ad2371fb88e08973cf241ea17ad811a016fdb185bc8786dba6f8eb85f4ea",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__zip_up_the_jacket_realsense__ep11.mp4",
+   3253075,
+   1791309589705318020
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_abc__zip_up_the_jacket_realsense__ep11.jpg",
+   13499,
+   1791309590374321933
+  ]
+ }
+}

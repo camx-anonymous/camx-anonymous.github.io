@@ -409,11 +409,25 @@ function syncCards(){$('cards').querySelectorAll('.dcard').forEach(c=>{const on=
 function filtered(){return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source))}
 function pendFiltered(){return PEND.filter(p=>(S.cat==='all'||p.morph===S.cat)&&(!S.robot||p.embodiment===S.robot)&&(!S.source||p.source===S.source))}
 const noteText=p=>p.note&&D.pending_notes?D.pending_notes[p.note]||'':'';
-// the example clip of a dataset: its own, else the first of its project. Every clip has a raw companion with the same
-// frames, size and tiling (../overlays/raw/, tools/raw_clips.py); the cards show only the raw poster
+// the example clip of a dataset: its own, else a clip of its project from the same rig -- same station and the same
+// gripper jaws (r.station / r.variant, tools/build_site_data.py; the clip's jaws are its grippers[].model), then same
+// jaws, then same station, then the first clip. ABC's RealSense fleet mixes three i2rt jaw types, each with its own
+// wrist-camera mount, so a clip of another jaw type shows a CAD that does not belong to the dataset's rig. Every clip
+// has a raw companion with the same frames, size and tiling (../overlays/raw/, tools/raw_clips.py); the cards show only
+// the raw poster
 const RAW='../overlays/raw/';
 const clipName=o=>`${o.key}__${o.slug}`;
-const clipOf=r=>{const p=P[r.project];return p.overlays.find(o=>o.dataset===r.id)||p.overlays[0]||null};
+const clipJaws=o=>{const m=new Set(Object.values(o.grippers||{}).map(g=>g.model).filter(Boolean));return m.size===1?[...m][0]:null};
+const clipStation=o=>{const row=L.find(x=>x.id===o.dataset);return row?row.station||null:null};
+const clipOf=r=>{const p=P[r.project],ov=p.overlays;if(!ov.length)return null;
+  const own=ov.find(o=>o.dataset===r.id);if(own)return own;
+  const st=r.station||null,jaws=r.variant||null;
+  const sameSt=o=>!st||clipStation(o)===st,sameJaws=o=>!jaws||clipJaws(o)===jaws;
+  return ov.find(o=>sameSt(o)&&sameJaws(o))||(jaws&&ov.find(sameJaws))||(st&&ov.find(sameSt))||ov[0]};
+// the clip is borrowed from a sibling dataset: say so, and whether its rig matches
+const clipNote=(r,o)=>{if(!o||o.dataset===r.id)return '';const st=r.station&&clipStation(o)&&clipStation(o)!==r.station,
+  jaws=r.variant&&clipJaws(o)&&clipJaws(o)!==r.variant;
+  return st||jaws?` <span class="note">(sibling dataset${jaws?`, ${esc(clipJaws(o))} jaws, this dataset uses ${esc(r.variant)}`:''}${st?`, ${esc(clipStation(o))} station`:''}: overlay geometry differs)</span>`:' <span class="note">(sibling dataset, same rig)</span>'};
 function thumb(r){const o=clipOf(r);return o?{poster:RAW+clipName(o)+'.jpg'}:null}
 
 // the heading of a dataset: info.json's task name where the build found one (AgiBot World, whose ids are opaque numbers;
@@ -557,7 +571,7 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesO
   // the clip's captions over time, [[start second, caption], ...]: a track for an episode annotated per sub-task whose
   // caption changes while the clip plays (o.captions, tools/build_site_data.py), else the one caption of the clip
   const caps=o.captions||(o.task?[[0,o.task]]:[]);
-  el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}</span></div>
+  el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}${clipNote(r,o)}</span></div>
     <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane((o.mode==='primitive'?'Gripper overlay <span class="note">(no CAD: tip only)</span>':o.standin?`Gripper CAD overlay <span class="note">(stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper as stand-in)</span>`:'Gripper CAD overlay')+(o.own_only?' <span class="note">(own gripper per view: no shared frame)</span>':''),D.overlay_base+f+'.mp4')}</div>
     ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
     <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;

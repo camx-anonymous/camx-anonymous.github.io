@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "e066ce526ab8841bf8800cabb9c8aa3e2e222ddeae7a2e090a09479804f7f36a",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_abc/fold_and_stack_the_t_shirts_zed__ep4/stitched.mp4",
+  9752179,
+  1791309419882328584
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__fold_and_stack_the_t_shirts_zed__ep4.mp4",
+  3217290,
+  1791309568710195271
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_abc__fold_and_stack_the_t_shirts_zed__ep4.jpg",
+  11677,
+  1791309570266204364
+ ]
+}

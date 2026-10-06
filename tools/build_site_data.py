@@ -472,6 +472,42 @@ def tasks_pass(out, root, rows=None):
     return out
 
 
+def dataset_variant(root, rel):
+    """The majority gripper variant of a dataset over its arms and episodes (meta/episodes `<side>_gripper_variant`),
+    None when the dataset carries no such column. ABC's RealSense station is a mixed fleet (i2rt flexible / crank /
+    linear jaws, each with its own wrist-camera mount), so a dataset's example clip must come from a rig with the same
+    jaws or its gripper overlay is simply wrong (user, 2026-10-06: fold-and-stack t-shirts, a crank dataset, was showing
+    the flexible carrot-lego clip)."""
+    import glob as _glob
+    try: import pyarrow.parquet as pq
+    except ImportError: return None
+    files = sorted(_glob.glob(os.path.join(root, rel, 'meta', 'episodes', '**', '*.parquet'), recursive=True))
+    if not files: return None
+    cols = [c for c in pq.read_schema(files[0]).names if c.endswith('_gripper_variant')]
+    if not cols: return None
+    n = collections.Counter()
+    for f in files:
+        t = pq.read_table(f, columns=cols)
+        for c in cols: n.update(v for v in t.column(c).to_pylist() if v)
+    return n.most_common(1)[0][0] if n else None
+
+
+def variants_pass(out, root, rows=None):
+    """Writes each dataset row's `variant` (dataset_variant) for the projects whose clips name a gripper model that differs
+    between clips -- the only case where the page has to choose a clip by jaws (camx-dataset/index.html clipOf). Rows of
+    other projects are left alone. `rows`: only these rows (the --add path), default all."""
+    mixed = {p['key'] for p in out['projects']
+             if len({g.get('model') for o in p.get('overlays', []) for g in o.get('grippers', {}).values() if g.get('model')}) > 1}
+    back = {v: k for k, v in ID_RENAMES.items()}
+    todo = [r for r in (out['datasets'] if rows is None else rows) if r['project'] in mixed]
+    for r in todo:
+        v = dataset_variant(root, back.get(r['id'], r['id']))
+        if v: r['variant'] = v
+        else: r.pop('variant', None)
+    if todo: print(f'gripper variant on {sum(1 for r in todo if r.get("variant"))}/{len(todo)} rows of {sorted(mixed)}', file=sys.stderr)
+    return out
+
+
 def scan_leaves(root):
     out = []
     def walk(d, depth):
@@ -744,12 +780,15 @@ def main():
                          f'and {os.path.relpath(CAPTIONS, REPO)} for the dataset records')
     ap.add_argument('--tasks-only', action='store_true',
                     help='only re-read the task mix of every dataset (rows\' tm / title) from --root into --out')
+    ap.add_argument('--variants-only', action='store_true',
+                    help='only re-read the gripper variant (rows\' variant) of the datasets of mixed-jaw projects from --root into --out')
     a = ap.parse_args()
-    if a.scrub_only or a.attach_samples_only or a.captions_only or a.tasks_only:
+    if a.scrub_only or a.attach_samples_only or a.captions_only or a.tasks_only or a.variants_only:
         out = json.load(open(a.out))
         if a.attach_samples_only: out = attach_samples(out, SAMPLES)
         if a.captions_only: out = captions_pass(out, a.root); dataset_captions(out, a.root)
         if a.tasks_only: out = tasks_pass(out, a.root)
+        if a.variants_only: out = variants_pass(out, a.root)
         out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
@@ -759,7 +798,7 @@ def main():
 
     if a.add:
         out, new = add_leaves(json.load(open(a.out)), a.root, a.add.split(','), stats, inv_rows)
-        out = tasks_pass(out, a.root, rows=new)
+        out = variants_pass(tasks_pass(out, a.root, rows=new), a.root, rows=new)
         out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr)
@@ -789,7 +828,7 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(tasks_pass(captions_pass(out, a.root), a.root), SAMPLES))))))
+    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(variants_pass(tasks_pass(captions_pass(out, a.root), a.root), a.root), SAMPLES))))))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)

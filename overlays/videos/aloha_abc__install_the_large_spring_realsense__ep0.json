@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "c656170be850cf60abe63f81088535a166018192d9b9b9bb6dbda39fc9247862",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_abc/install_the_large_spring_realsense__ep0/stitched.mp4",
+  11393414,
+  1791309518460901942
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_abc__install_the_large_spring_realsense__ep0.mp4",
+  3711538,
+  1791309710131024014
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_abc__install_the_large_spring_realsense__ep0.jpg",
+  23011,
+  1791309711938034630
+ ]
+}
