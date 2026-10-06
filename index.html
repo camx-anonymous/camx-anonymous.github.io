@@ -15,8 +15,8 @@
   location.replace(m?'camuva-rollouts/'+(m[1]?'#'+m[1]:''):'camx-dataset/#'+h)})();
 </script>
 <style>
-/* the question and two doors; under each door the paper figures it leads to (dataset: composition; rollouts: the
-   two capability figures). The columns sit side by side and stack on a phone. */
+/* the question and two doors; under each door the paper figure it leads to (dataset: composition; rollouts: the
+   nine evaluation tasks). The columns sit side by side and stack on a phone. */
 body{padding:clamp(36px,7vh,88px) var(--pad-x) 64px}
 .home{display:flex;flex-direction:column;align-items:center;gap:44px;width:100%;max-width:var(--w-wide);margin:0 auto}
 .home h1{margin:0;font-size:clamp(28px,4.2vw,48px);line-height:1.1;letter-spacing:-.03em;font-weight:500;text-align:center;text-wrap:balance}
@@ -50,8 +50,7 @@ body{padding:clamp(36px,7vh,88px) var(--pad-x) 64px}
   <a class="door" href="camuva-rollouts/">
     <span class="button primary"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.5" r="1.5"/><path d="M12 5v3"/><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M1.5 13v3M22.5 13v3M9 13v2M15 13v2"/></svg>Click to Watch CamUVA Rollouts</span>
     <figure>
-      <img src="figures/camuva-in-distribution.webp" width="1700" height="852" alt="CamUVA in-distribution success rates on RoboLab, cup arrangement, towel folding, dish in rack and box placement against baselines">
-      <img src="figures/camuva-cross-embodiment.webp" width="1700" height="1167" alt="CamUVA cross-embodiment success rates on water pouring, cup flipping, cup in box and banana in pot across UMI, iPhUMI, GenRobot, a new gripper and a new camera">
+      <img src="figures/camuva-tasks.webp" width="1700" height="860" alt="The nine CamUVA evaluation tasks with their embodiment and its share of CamX: RoboLab, cup arrangement, towel folding, dish in rack and box placement; water pouring, cup flipping, cup in box and banana in pot">
     </figure>
   </a>
 </nav>
