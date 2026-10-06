@@ -1,0 +1,45 @@
+{
+ "fingerprint": "0a8f72ec225aa3792aeff327a998df3671bb146ee61eda8b9ef3d62eef138b05",
+ "schema": 1,
+ "dataset": "widowx/bridge_v2/bridge_v2",
+ "episode": 6,
+ "views": [
+  "right_main_camera_rgb"
+ ],
+ "fps": 5.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/widowx_bridge_v2__bridge_v2__ep6.mp4",
+  84957,
+  1791326324187884496
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/bridge_data/processed_data_side2/bridge_v2/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    207948022,
+    1791135560378248302
+   ],
+   39.8
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/widowx_bridge_v2__bridge_v2__ep6.mp4",
+   154464,
+   1791326345129012423
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/widowx_bridge_v2__bridge_v2__ep6.jpg",
+   3825,
+   1791326345317013573
+  ]
+ }
+}

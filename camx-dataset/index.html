@@ -324,7 +324,7 @@ const fmtH=h=>h==null?'–':h>=100?Math.round(h).toLocaleString():h>=10?h.toFixe
 const fmtB=b=>!b?'–':b>=1e12?(b/1e12).toFixed(2)+' TB':b>=1e9?(b/1e9).toFixed(1)+' GB':(b/1e6).toFixed(0)+' MB';
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const human=s=>{s=String(s).replace(/_+/g,' ').replace(/\s+/g,' ').trim();return s.charAt(0).toUpperCase()+s.slice(1)};
-const modeName=m=>m==='urdf'?'URDF projection':m==='camera-path'?'camera path + up axis':m;
+const modeName=m=>m==='urdf'?'URDF projection':m==='cad'?'CAD projection':m==='camera-path'?'camera path + up axis':m==='raw'?'none (raw video only)':m==='axes'?'coordinate frames (no CAD)':m;
 const $=id=>document.getElementById(id);
 let D,P={},L=[],PEND=[],sel=new Set(),SRC={},SRCP={},SRCD={},SRCOK=false;
 // D.pending: the sources of the paper's appendix tables with no converted data here yet (../data/pending.json), listed with the paper's counts
@@ -421,6 +421,8 @@ const clipJaws=o=>{const m=new Set(Object.values(o.grippers||{}).map(g=>g.model)
 const clipStation=o=>{const row=L.find(x=>x.id===o.dataset);return row?row.station||null:null};
 const clipOf=r=>{const p=P[r.project],ov=p.overlays;if(!ov.length)return null;
   const own=ov.find(o=>o.dataset===r.id);if(own)return own;
+  // Beta ids name distinct tasks: a supermarket clip cannot preview Fold shorts.
+  if(r.project==='agibot/agibot_world_beta')return null;
   const st=r.station||null,jaws=r.variant||null;
   const sameSt=o=>!st||clipStation(o)===st,sameJaws=o=>!jaws||clipJaws(o)===jaws;
   return ov.find(o=>sameSt(o)&&sameJaws(o))||(jaws&&ov.find(sameJaws))||(st&&ov.find(sameSt))||ov[0]};
@@ -571,11 +573,13 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesO
   // the clip's captions over time, [[start second, caption], ...]: a track for an episode annotated per sub-task whose
   // caption changes while the clip plays (o.captions, tools/build_site_data.py), else the one caption of the clip
   const caps=o.captions||(o.task?[[0,o.task]]:[]);
+  // a raw-only clip (o.mode 'raw', tools/raw_only_clips.py): the release gives nothing to project a gripper through, so one pane
+  const raw=o.mode==='raw';
   el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}${clipNote(r,o)}</span></div>
-    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane((o.mode==='primitive'?'Gripper overlay <span class="note">(no CAD: tip only)</span>':o.standin?`Gripper CAD overlay <span class="note">(stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper as stand-in)</span>`:'Gripper CAD overlay')+(o.own_only?' <span class="note">(own gripper per view: no shared frame)</span>':''),D.overlay_base+f+'.mp4')}</div>
+    <div class="panes">${pane('Raw video'+(raw?` <span class="note">(no gripper overlay: ${esc(o.no_overlay||'the release gives nothing to project a gripper through')})</span>`:''),RAW+f+'.mp4')}${raw?'':pane((o.mode==='axes'?'Coordinate frames <span class="note">(no CAD: flange and camera axes, x red / y green / z blue)</span>':o.mode==='primitive'?'Gripper overlay <span class="note">(no CAD: tip only)</span>':o.standin?`Gripper CAD overlay <span class="note">(stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper as stand-in)</span>`:o.overlay_scope==='wrist_fingers'?'Fitted finger CAD overlay <span class="note">(wrist views; fingers and short links only)</span>':'Gripper CAD overlay')+(o.own_only?' <span class="note">(own gripper per view: no shared frame)</span>':''),D.overlay_base+f+'.mp4')}</div>
     ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
     <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
-  const [a,b]=el.querySelectorAll('video'),pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
+  const vids=el.querySelectorAll('video'),a=vids[0],b=vids[1]||a,pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
   // the caption of the frame on screen
   const cap=el.querySelector('.cap'),capUI=cap&&capBox(cap);let seg=-1;
   const capAt=t=>{if(!cap)return;let i=0;caps.forEach((c,k)=>{if(c[0]<=t+.05)i=k});if(i!==seg){seg=i;capUI.set(caps[i][1])}};
@@ -592,12 +596,12 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesO
   el.querySelectorAll('.win').forEach(w=>{w.onclick=toggle;
     w.firstChild.addEventListener('error',()=>w.insertAdjacentHTML('beforeend','<div class="err">Clip failed to load.</div>'))});
   // the window takes the aspect of what is shown; its height is capped so both windows, the caption and the controls fit the stage
-  const side=A<1.9;el.querySelector('.panes').classList.toggle('side',side);
-  el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=A;w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(A/(side?1:2)).toFixed(4)}))`});
+  const side=!raw&&A<1.9;el.querySelector('.panes').classList.toggle('side',side);
+  el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=A;w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(A/(side||raw?1:2)).toFixed(4)}))`});
   placeCmp();
   // start both together once each has a frame; if one fails to load, the other still plays
-  let n=0;const go=()=>{if(++n===2&&CMP===el)toggle()};
-  [a,b].forEach(v=>{if(v.readyState>=2)go();else{v.addEventListener('loadeddata',go,{once:true});v.addEventListener('error',go,{once:true})}})}
+  let n=0;const need=raw?1:2,go=()=>{if(++n===need&&CMP===el)toggle()};
+  (raw?[a]:[a,b]).forEach(v=>{if(v.readyState>=2)go();else{v.addEventListener('loadeddata',go,{once:true});v.addEventListener('error',go,{once:true})}})}
 
 /* a caption and its wordings (the datasets' '||'-joined language annotations, the augmented captions): the text and,
    when there is more than one wording, an "augmented ‹ 1 / n ›" stepper through all of them. The host holds one <p>

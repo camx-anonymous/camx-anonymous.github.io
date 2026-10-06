@@ -1,0 +1,45 @@
+{
+ "fingerprint": "8cc29fd8d697a6e51dc770c2e43fb7a217d50f0ed7f088ae29bddf54d61c55d6",
+ "schema": 1,
+ "dataset": "dexumi/dexumi/xhand_tool_use",
+ "episode": 1,
+ "views": [
+  "right_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   400,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexumi_dexumi__xhand_tool_use__ep1.mp4",
+  221389,
+  1791320208145013753
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexumi_data/processed_data/xhand_tool_use/videos/observation.image.right_main_camera_rgb/chunk-000/file-001.mp4",
+    855295,
+    1791060336858622835
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__xhand_tool_use__ep1.mp4",
+   354918,
+   1791320588778720265
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__xhand_tool_use__ep1.jpg",
+   9207,
+   1791320588954721487
+  ]
+ }
+}

@@ -1,0 +1,87 @@
+{
+ "fingerprint": "cdb3142f1fc63c0e983067a57ff72d85dd4e4cb70d27d0bffc8ebeaec39205a5",
+ "schema": 1,
+ "dataset": "xhand/dexora/dexterous",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb",
+  "third_0_main_camera_rgb"
+ ],
+ "fps": 20.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/xhand_dexora__dexterous__ep0.mp4",
+  884417,
+  1791326342664997361
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/dexterous/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    199960802,
+    1791108156443946797
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/dexterous/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    157830028,
+    1791108121388639813
+   ],
+   0.0
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/dexterous/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    179840428,
+    1791108201898340449
+   ],
+   0.0
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/dexterous/videos/observation.image.third_0_main_camera_rgb/chunk-000/file-000.mp4",
+    202785645,
+    1791108234578620625
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/xhand_dexora__dexterous__ep0.mp4",
+   1083960,
+   1791326346745022303
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/xhand_dexora__dexterous__ep0.jpg",
+   16245,
+   1791326347097024455
+  ]
+ }
+}

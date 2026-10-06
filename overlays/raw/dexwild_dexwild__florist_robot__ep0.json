@@ -1,0 +1,87 @@
+{
+ "fingerprint": "bc89c965fb6baa1ebcb4d34fe2168ae68fe25984fb9867df461bafc56ccbe0ec",
+ "schema": 1,
+ "dataset": "dexwild/dexwild/florist_robot",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "left_pinky_camera_rgb",
+  "right_pinky_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.left_pinky_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.right_pinky_camera_rgb": [
+   240,
+   320,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexwild_dexwild__florist_robot__ep0.mp4",
+  1557980,
+  1791320197564936773
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/florist_robot/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    824835,
+    1791128002630294620
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/florist_robot/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    782597,
+    1791128001086285731
+   ],
+   0.0
+  ],
+  "observation.image.left_pinky_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/florist_robot/videos/observation.image.left_pinky_camera_rgb/chunk-000/file-000.mp4",
+    743215,
+    1791128004236303866
+   ],
+   0.0
+  ],
+  "observation.image.right_pinky_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/florist_robot/videos/observation.image.right_pinky_camera_rgb/chunk-000/file-000.mp4",
+    646844,
+    1791128005598311709
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__florist_robot__ep0.mp4",
+   2361059,
+   1791320591431738690
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__florist_robot__ep0.jpg",
+   22307,
+   1791320592049742982
+  ]
+ }
+}

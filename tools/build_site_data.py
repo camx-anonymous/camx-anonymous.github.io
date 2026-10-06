@@ -28,6 +28,8 @@ OVERLAYS = os.path.join(BROWSER, 'mv_urdf', 'videos')
 # Extra clip trees (colon-separated dirs laid out as <project_key>/<slug>/meta.json, e.g. the output of
 # tools/overlay_picks.py): a project present in an extra tree REPLACES that project's clips from OVERLAYS.
 OVERLAYS_EXTRA = [d for d in os.environ.get('CAMX_OVERLAYS_EXTRA', '').split(':') if d]
+sys.path.insert(0, HERE)
+from overlay_sources import dataset_root   # noqa: E402  (Bridge V2 side2 export, reviewed derivatives: the same map the renderers use)
 
 # --- anonymisation ---------------------------------------------------------------------------------------------
 # The site is published anonymously: no author names, no institutions. Every string that reaches datasets.json goes
@@ -285,7 +287,7 @@ def clip_captions(root, dataset, ep, seconds):
     clip, several for an episode annotated per sub-task. The clip plays the episode's first `seconds` in real time.
     Alternate wordings of one caption stay '||'-joined inside the string."""
     import pyarrow.parquet as pq
-    d = os.path.join(root, dataset); info = json.load(open(os.path.join(d, 'meta', 'info.json'))); want = [('episode_index', '=', ep)]
+    d = dataset_root(root, dataset); info = json.load(open(os.path.join(d, 'meta', 'info.json'))); want = [('episode_index', '=', ep)]
     for f in sorted(glob.glob(os.path.join(d, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
         rows = pq.read_table(f, columns=['data/chunk_index', 'data/file_index'], filters=want).to_pylist()
         if rows: break
@@ -727,8 +729,36 @@ def overlay_records(metas):
                'bytes': os.path.getsize(st) if os.path.exists(st) else 0}
         if any(g.get('standin') for g in (d.get('grippers') or {}).values()):
             rec['standin'] = sorted({g['profile'] for g in d['grippers'].values() if g.get('standin')})
+        for field in ('overlay_scope', 'calibration', 'no_overlay'):   # no_overlay: a raw-only clip's reason (tools/raw_only_clips.py)
+            if field in d: rec[field] = d[field]
         out.append((d.get('project'), rec))
     return out
+
+
+def clips_pass(out, root, projects):
+    """--clips-only: the example-clip records of `projects` (family/project keys) rebuilt from the clip trees, every other
+    project and every dataset row left as it is; captions from the dataset's own data as captions_pass. For a project that
+    gains its first clips without a row rebuild (--add needs the dataset under --root, and Bridge V2 is read through
+    overlay_sources.dataset_root), and for the raw-only clips of tools/raw_only_clips.py."""
+    recs = collections.defaultdict(list)
+    for proj, rec in overlay_records(overlay_metas()):
+        if proj in projects: recs[proj].append(rec)
+    back = {v: k for k, v in ID_RENAMES.items()}
+    have = {p['key'] for p in out['projects']}
+    for k in projects:
+        if k not in have: print(f'warning: --clips-only: {k} is not a project of --out', file=sys.stderr)
+    for p in out['projects']:
+        if p['key'] not in projects: continue
+        if not recs.get(p['key']): print(f"warning: --clips-only: {p['key']}: no clip in the clip trees, records kept", file=sys.stderr); continue
+        for rec in recs[p['key']]:
+            try: track = clip_captions(root, back.get(rec['dataset'], rec['dataset']), int(rec['episode']), rec['seconds'])
+            except (OSError, KeyError, ImportError, TypeError, ValueError) as e:
+                track = None; print(f"warning: {rec['dataset']}: clip captions kept from the render tree ({e!r})", file=sys.stderr)
+            if track: rec['task'] = track[0][1]
+            if track and len(track) > 1: rec['captions'] = track
+        p['overlays'] = sorted(recs[p['key']], key=lambda o: (o['key'], o['slug']))
+        print(f"--clips-only: {p['key']}: {len(p['overlays'])} clip records", file=sys.stderr)
+    return retotal(out)
 
 
 def retotal(out):
@@ -799,9 +829,17 @@ def main():
                          f'and {os.path.relpath(CAPTIONS, REPO)} for the dataset records')
     ap.add_argument('--tasks-only', action='store_true',
                     help='only re-read the task mix of every dataset (rows\' tm / title) from --root into --out')
+    ap.add_argument('--clips-only', default=None, metavar='PROJECTS',
+                    help='only rebuild the example-clip records of these comma-separated family/project keys from the clip trees '
+                         '($CAMX_OVERLAYS_EXTRA), with their captions; the dataset rows and every other project stay as they are')
     ap.add_argument('--variants-only', action='store_true',
                     help='only re-read the gripper variant (rows\' variant) of the datasets of mixed-jaw projects from --root into --out')
     a = ap.parse_args()
+    if a.clips_only:
+        out = clips_pass(json.load(open(a.out)), a.root, [x.strip().strip('/') for x in a.clips_only.split(',') if x.strip()])
+        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
+        json.dump(out, open(a.out, 'w'), separators=(',', ':'))
+        print(json.dumps(out['totals']), file=sys.stderr); return
     if a.scrub_only or a.attach_samples_only or a.captions_only or a.tasks_only or a.variants_only:
         out = json.load(open(a.out))
         if a.attach_samples_only: out = attach_samples(out, SAMPLES)

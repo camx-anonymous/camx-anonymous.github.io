@@ -92,7 +92,7 @@ FISHEYE['umi/vista_umi'] = dict(FISHEYE['umi/umi_benchmark'], model='lumos swing
 # UMI rigs, whose stock-CAD stand-in does not land on the fingers), fisheye rigs with their own lens file (UMI-3D, AetheRock,
 # HiFi-UMI, GenRobot V4), RoboMIND UR5 (no-mimic Robotiq URDF) and the 180p DROID twin (the viewer draws nothing at 320x180).
 # Their renderer, configs and lens files are on camera-cross-embodiment origin/main: CAMX_VIZ_MV names that checkout's visualization dir.
-MULTIVIEW = {'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
+MULTIVIEW = {'agibot/agibot_world_beta', 'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
              'umi/umi3d', 'umi/aetherock', 'hifi_umi/hifi_umi', 'genrobot/gripper_v4', 'aloha/openneo_arx5', 'aloha/openneo_arx5_single',
              'umi/openneo_umi', 'umi/openneo_umi_single', 'robotiq/droid_lowres'}
 VIZ_MV = os.path.expanduser(os.environ.get('CAMX_VIZ_MV', '/data/camx/visualization'))
@@ -162,7 +162,7 @@ def render_provenance(o):
         if not base.is_dir():
             continue
         for p in sorted(base.rglob('*')):
-            if not p.is_file() or p.suffix.lower() not in {'.py', '.json', '.urdf', '.stl', '.dae', '.obj', '.mtl'}:
+            if not p.is_file() or p.suffix.lower() not in {'.py', '.json', '.urdf', '.stl', '.dae', '.obj', '.mtl', '.npz'}:
                 continue
             if base == Path(HERE) and p.parent == base and p.name not in {'rerun_clips.py', 'white_overlay.py', 'white_multiview.py', 'overlay_picks.py', 'overlay_sources.py'}:
                 continue
@@ -436,7 +436,8 @@ def multiview_one(o, d, t0):
     spec = dict(spec, views=list(o['views'])) if spec['tool'] == OP.MULTIVIEW else dict(spec)
     stride = max(1, round(float(info_of(o['dataset'])['fps']) / OUT_FPS))   # overlay_picks samples every 3rd frame whatever the rate
     with _OP_LOCK: OP.STRIDE = stride; cmd = OP.render_cmd(proj, ds, ep, spec, OUT)
-    cmd[1] = os.path.join(HERE, 'white_multiview.py' if spec['tool'] == OP.MULTIVIEW else 'white_overlay.py')
+    if spec['tool'] != OP.AGIBOT_BETA:
+        cmd[1] = os.path.join(HERE, 'white_multiview.py' if spec['tool'] == OP.MULTIVIEW else 'white_overlay.py')
     while '--alpha' in cmd: i = cmd.index('--alpha'); del cmd[i:i + 2]
     cmd += ['--alpha', '1.0']
     if proj in OWN_ONLY and spec['tool'] == OP.MULTIVIEW: cmd += ['--own-only']
@@ -572,6 +573,8 @@ def attach():
                    'bytes': os.path.getsize(mp4) if os.path.isfile(mp4) else os.path.getsize(os.path.join(d, 'stitched.mp4'))}
             if any(g.get('standin') for g in (m.get('grippers') or {}).values()): rec['standin'] = sorted({g['profile'] for g in m['grippers'].values() if g.get('standin')})
             if proj_of(o) in OWN_ONLY: rec['own_only'] = True
+            for field in ('overlay_scope', 'calibration'):
+                if field in m: rec[field] = m[field]
             # the captions from the dataset's current data, as build_site_data.captions_pass: meta.json's `tasks` is a snapshot
             # from render time (stale once an annotation bank is re-expanded) and only stands in when the dataset cannot be read
             try: track = S.clip_captions(ROOT, rec['dataset'], int(rec['episode']), rec['seconds'])

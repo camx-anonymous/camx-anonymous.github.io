@@ -1,0 +1,87 @@
+{
+ "fingerprint": "4cdb170f511155e6c0047dd08b392e968cc9f8940b089bde7fab0ec856bff492",
+ "schema": 1,
+ "dataset": "xhand/dexora/assemble",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb",
+  "third_0_main_camera_rgb"
+ ],
+ "fps": 20.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/xhand_dexora__assemble__ep0.mp4",
+  1314349,
+  1791326341952993009
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/assemble/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    153963561,
+    1791106971651113524
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/assemble/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    120314128,
+    1791106928408825274
+   ],
+   0.0
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/assemble/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    173993529,
+    1791107002480319244
+   ],
+   0.0
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/assemble/videos/observation.image.third_0_main_camera_rgb/chunk-000/file-000.mp4",
+    188676889,
+    1791107032546520032
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/xhand_dexora__assemble__ep0.mp4",
+   1714403,
+   1791326347224025232
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/xhand_dexora__assemble__ep0.jpg",
+   20293,
+   1791326347622027665
+  ]
+ }
+}

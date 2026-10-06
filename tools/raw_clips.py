@@ -18,6 +18,7 @@ Env:
 import argparse, glob, hashlib, json, os, subprocess, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
+from overlay_sources import dataset_root
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
@@ -36,7 +37,7 @@ def probe(mp4):
 def episode_videos(dataset, ep, keys):
     """{video key: (packed file, start time of the episode in it)} from meta/episodes."""
     import pyarrow.parquet as pq
-    root = os.path.join(ROOT, dataset); info = json.load(open(os.path.join(root, 'meta', 'info.json')))
+    root = dataset_root(ROOT, dataset); info = json.load(open(os.path.join(root, 'meta', 'info.json')))
     for f in sorted(glob.glob(os.path.join(root, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
         cols = ['episode_index'] + [f'videos/{k}/{c}' for k in keys for c in ('chunk_index', 'file_index', 'from_timestamp')]
         for r in pq.read_table(f, columns=cols).to_pylist():

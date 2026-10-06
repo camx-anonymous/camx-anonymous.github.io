@@ -107,6 +107,14 @@ the DataClaw / GenRobot picks) for a pick table of three episodes per project, `
 `<project_key>/<slug>/{stitched.mp4,poster.jpg,meta.json}` in the tree's layout, `encode` makes the 360p release
 mp4 and the site poster. Point `CAMX_OVERLAYS_EXTRA` at that directory when building.
 
+Datasets whose release gives nothing to project a gripper through (DexWild: no camera intrinsics or camera-to-hand transform;
+ManipForce: no camera-to-tool translation, width or CAD; the DexUMI Inspire RH56 sets: no hand model or width) get a
+raw-only example clip from `tools/raw_only_clips.py`: the raw views tiled as every other clip, written into the same clip
+tree with `overlay_mode: raw` and the reason in `no_overlay`; the viewer shows the raw pane alone and says why. Clip
+records of a project are (re)built without touching its dataset rows with `tools/build_site_data.py --clips-only
+family/project[,...]` (the clip trees in `CAMX_OVERLAYS_EXTRA`); Bridge V2 is read from its side2 export through
+`tools/overlay_sources.py` (`CAMX_BRIDGE_V2_ROOT`) while its camx_480p link is on hold.
+
 `tools/rerun_clips.py` re-renders the clips of `data/datasets.json` in the curation look, on a machine with the
 camx_480p tree, the curation tree and the camera-cross-embodiment checkout (`plan` prints each clip's route: `reuse`
 a current headless-Rerun export of the curation tree, `rerun` headless Rerun through `lerobot_rerun_viz.py` +

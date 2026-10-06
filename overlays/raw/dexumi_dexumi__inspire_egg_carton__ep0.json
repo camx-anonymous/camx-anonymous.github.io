@@ -1,0 +1,45 @@
+{
+ "fingerprint": "6c8d78a69a64a1362671bdb264ad4c9a229e7382e8464fccd5a8bfee2b6f5966",
+ "schema": 1,
+ "dataset": "dexumi/dexumi/inspire_egg_carton",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb"
+ ],
+ "fps": 45.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   400,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexumi_dexumi__inspire_egg_carton__ep0.mp4",
+  181028,
+  1791320205459994217
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexumi_data/processed_data/inspire_egg_carton/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    824385,
+    1791059674227842223
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__inspire_egg_carton__ep0.mp4",
+   298923,
+   1791320588752720085
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__inspire_egg_carton__ep0.jpg",
+   9246,
+   1791320588917721230
+  ]
+ }
+}

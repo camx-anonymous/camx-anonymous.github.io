@@ -1,0 +1,59 @@
+{
+ "fingerprint": "64fa785da81bb20af155bbdc26e8f08c659bdefcc6b1054fc26f1cedd8b18efa",
+ "schema": 1,
+ "dataset": "manipforce/manipforce/gear_assembly",
+ "episode": 8,
+ "views": [
+  "right_main_camera_rgb",
+  "right_attached_camera_0_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   768,
+   3
+  ],
+  "observation.image.right_attached_camera_0_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/manipforce_manipforce__gear_assembly__ep8.mp4",
+  215380,
+  1791320203861982590
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/manipforce_data/processed_data/gear_assembly/videos/observation.image.right_main_camera_rgb/chunk-000/file-008.mp4",
+    517789,
+    1791108336938484462
+   ],
+   0.0
+  ],
+  "observation.image.right_attached_camera_0_rgb": [
+   [
+    "/storage/hdd4/yihuai/manipforce_data/processed_data/gear_assembly/videos/observation.image.right_attached_camera_0_rgb/chunk-000/file-008.mp4",
+    586100,
+    1791108338899500826
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/manipforce_manipforce__gear_assembly__ep8.mp4",
+   252605,
+   1791320592628747004
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/manipforce_manipforce__gear_assembly__ep8.jpg",
+   6541,
+   1791320592841748483
+  ]
+ }
+}

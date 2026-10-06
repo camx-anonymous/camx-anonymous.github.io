@@ -1,0 +1,73 @@
+{
+ "fingerprint": "5431aa737e86f0a4e4a87a8b545ea37ea258c83c315f08149dc4cc4d97f44830",
+ "schema": 1,
+ "dataset": "dexwild/dexwild/pour_human",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "third_0_main_camera_rgb",
+  "right_pinky_camera_rgb"
+ ],
+ "fps": 60.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.right_pinky_camera_rgb": [
+   240,
+   320,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexwild_dexwild__pour_human__ep0.mp4",
+  578818,
+  1791320198185941291
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data_full/pour_human/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    207095099,
+    1791134401895813369
+   ],
+   0.0
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data_full/pour_human/videos/observation.image.third_0_main_camera_rgb/chunk-000/file-000.mp4",
+    176920247,
+    1791134422526029875
+   ],
+   0.0
+  ],
+  "observation.image.right_pinky_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data_full/pour_human/videos/observation.image.right_pinky_camera_rgb/chunk-000/file-000.mp4",
+    200967913,
+    1791134410664905799
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__pour_human__ep0.mp4",
+   922274,
+   1791320590609732981
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__pour_human__ep0.jpg",
+   16229,
+   1791320590926735182
+  ]
+ }
+}

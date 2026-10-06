@@ -1,0 +1,87 @@
+{
+ "fingerprint": "24f3d1ab44e91a2f8577cf432c3673082c9d0ad231ea3bc2514bc0e1fb9e7aaf",
+ "schema": 1,
+ "dataset": "xhand/dexora/pick_and_place",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb",
+  "third_0_main_camera_rgb"
+ ],
+ "fps": 20.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/xhand_dexora__pick_and_place__ep0.mp4",
+  497204,
+  1791326343381001738
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/pick_and_place/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    183557792,
+    1791106017059921082
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/pick_and_place/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    155404925,
+    1791106001054822784
+   ],
+   0.0
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/pick_and_place/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    187664304,
+    1791106027036982514
+   ],
+   0.0
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexora_data/processed_data_full/pick_and_place/videos/observation.image.third_0_main_camera_rgb/chunk-000/file-000.mp4",
+    199795727,
+    1791106061207193781
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/xhand_dexora__pick_and_place__ep0.mp4",
+   577226,
+   1791326346091018305
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/xhand_dexora__pick_and_place__ep0.jpg",
+   16170,
+   1791326346435020408
+  ]
+ }
+}

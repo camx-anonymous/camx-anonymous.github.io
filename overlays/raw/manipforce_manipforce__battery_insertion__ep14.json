@@ -1,0 +1,59 @@
+{
+ "fingerprint": "45f089733f552855cdbc29c49d17505000de0ed4e04baf7a4a24e0239f57d644",
+ "schema": 1,
+ "dataset": "manipforce/manipforce/battery_insertion",
+ "episode": 14,
+ "views": [
+  "right_main_camera_rgb",
+  "right_attached_camera_0_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   768,
+   3
+  ],
+  "observation.image.right_attached_camera_0_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/manipforce_manipforce__battery_insertion__ep14.mp4",
+  221433,
+  1791320202426972149
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/manipforce_data/processed_data/battery_insertion/videos/observation.image.right_main_camera_rgb/chunk-000/file-014.mp4",
+    855065,
+    1791105806641657360
+   ],
+   0.0
+  ],
+  "observation.image.right_attached_camera_0_rgb": [
+   [
+    "/storage/hdd4/yihuai/manipforce_data/processed_data/battery_insertion/videos/observation.image.right_attached_camera_0_rgb/chunk-000/file-014.mp4",
+    415211,
+    1791105807919664823
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/manipforce_manipforce__battery_insertion__ep14.mp4",
+   248088,
+   1791320592158743739
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/manipforce_manipforce__battery_insertion__ep14.jpg",
+   5290,
+   1791320592363745163
+  ]
+ }
+}

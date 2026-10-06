@@ -1,0 +1,45 @@
+{
+ "fingerprint": "4c88fd4c793dd1a086867f3813af8f20e9e68b0b96deeec5b88b111a07b877e5",
+ "schema": 1,
+ "dataset": "dexumi/dexumi/inspire_cube_picking",
+ "episode": 1,
+ "views": [
+  "right_main_camera_rgb"
+ ],
+ "fps": 45.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   400,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexumi_dexumi__inspire_cube_picking__ep1.mp4",
+  154228,
+  1791320204563987698
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexumi_data/processed_data/inspire_cube_picking/videos/observation.image.right_main_camera_rgb/chunk-000/file-001.mp4",
+    733817,
+    1791059428212354556
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__inspire_cube_picking__ep1.mp4",
+   216992,
+   1791320588714719821
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__inspire_cube_picking__ep1.jpg",
+   5350,
+   1791320588880720974
+  ]
+ }
+}

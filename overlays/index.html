@@ -73,10 +73,10 @@ function render(){const projs=D.projects.filter(p=>p.overlays.length);
   let h='';
   projs.forEach(p=>{const ovs=p.overlays;const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];
     h+=`<section class="proj" id="${esc(p.key.replace('/','_'))}"><h2>${esc(p.key)}<small>${esc(emb)} · ${p.datasets} datasets · ${fmtH(p.hours)} h · ${p.overlays.length} clip${p.overlays.length>1?'s':''}</small></h2>`;
-    h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`;const src=D.overlay_base+file+'.mp4';
+    h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`,raw=o.mode==='raw';const src=raw?'raw/'+file+'.mp4':D.overlay_base+file+'.mp4';
       return `<div class="card"><div class="vid clip" data-src="${src}"><img src="posters/${file}.jpg" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
         <div class="title">${esc(o.dataset)} · ep ${o.episode}</div>
-        <div class="meta">${o.fisheye||o.own_only?'<div class="row">'+(o.fisheye?'<span class="chip">fisheye</span>':'')+(o.own_only?'<span class="chip" title="the two hands are not in a shared world frame: each view draws its own gripper only">own gripper only</span>':'')+'</div>':''}
+        <div class="meta">${o.fisheye||o.own_only||o.overlay_scope||raw?'<div class="row">'+(raw?`<span class="chip" title="${esc(o.no_overlay||'')}">raw video only, no overlay</span>`:'')+(o.overlay_scope==='wrist_fingers'?'<span class="chip" title="Wrist views; camera-facing fingers and short links only">fitted finger CAD</span>':'')+(o.fisheye?'<span class="chip">fisheye</span>':'')+(o.own_only?'<span class="chip" title="the two hands are not in a shared world frame: each view draws its own gripper only">own gripper only</span>':'')+'</div>':''}
         ${capsOf(o).length?`<div><span class="k">task</span>${esc(capsOf(o).slice(0,3).join(' · '))}${capsOf(o).length>3?' …':''}</div>`:''}
         <div><span class="k">views</span>${o.views.map(esc).join(' · ')}</div></div></div>`}).join('')+'</div></section>';});
   document.getElementById('content').innerHTML=h;

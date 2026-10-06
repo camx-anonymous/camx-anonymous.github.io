@@ -1,0 +1,45 @@
+{
+ "fingerprint": "700c03cb726d4f1a3cc0cc6c88928a10911f3fc6f5faa1604339996d035da7b3",
+ "schema": 1,
+ "dataset": "dexumi/dexumi/xhand_kitchen",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   400,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexumi_dexumi__xhand_kitchen__ep0.mp4",
+  509081,
+  1791320207386008230
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexumi_data/processed_data/xhand_kitchen/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    2053400,
+    1791060795865141885
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__xhand_kitchen__ep0.mp4",
+   900097,
+   1791320589105722536
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexumi_dexumi__xhand_kitchen__ep0.jpg",
+   5660,
+   1791320589325724064
+  ]
+ }
+}

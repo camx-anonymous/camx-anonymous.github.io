@@ -35,8 +35,9 @@ ROOT = os.environ.get('CAMX_ROOT', '/data/camx_480p')
 VIZ = os.path.expanduser(os.environ.get('CAMX_VIZ', '~/projects/camera-cross-embodiment/camx/visualization'))
 PY = os.environ.get('CAMX_PY', sys.executable)
 BIMANUAL, MULTIVIEW = 'render_bimanual_urdf_overlay_video.py', 'render_multiview_overlay_video.py'
+AGIBOT_BETA = 'render_agibot_beta_overlay_video.py'
 STRIDE, MAX_SEC, MAX_VIEWS = 3, 45, 4      # same clip budget as the shared tree: 10 fps, 45 s; at most 4 tiles per clip
-PRIMITIVE_KINDS = {'primitive', 'openneo', 'hifi_umi', 'dataclaw', 'umi_benchmark', 'freetacman', 'dataclaw_primitives',
+PRIMITIVE_KINDS = {'primitive', 'axes', 'openneo', 'hifi_umi', 'dataclaw', 'umi_benchmark', 'freetacman', 'dataclaw_primitives',
                    'hifi_umi_primitives', 'openneo_primitives', 'umi_benchmark_primitives', 'generic_primitives'}
 GOPRO = 'gopro_hero9_maxlens_2_7k_umi.json:crop'   # UMI GoPro Hero 9/10 + Max Lens Mod, 2.7k 4:3 basis, centre-cropped to the square video
 
@@ -94,7 +95,8 @@ NEO_UR_TCP = {'right': '0,0,0.105,0.5,0.5,-0.5,0.5'}         # approach = eef z,
 NEO_ALOHA_EEF = '0.008353,0.037243,0.106504,0.401352,0.604170,-0.592538,0.350419'
 NEO_UMI_EEF = '0,0.010179,0.092753,0.346392,0.616452,-0.616452,0.346392'
 SPECS = {
-    'agibot/agibot_world_beta': MV(config='agibot_g1_beta.json'),                     # agibot g1 URDF, per-episode K + eef
+    'agibot/agibot_world_beta': dict(tool=AGIBOT_BETA, profile='ctag2f120_beta', mode='cad',
+        overlay='CTAG2F120 distal finger and short-link CAD only; fitted own-wrist projection and closing-stroke linkage; episode intrinsics'),
     'aloha/aist_bimanip': MV(config='aist_bimanip.json'),                            # aloha1 URDF, config FOVs
     'aloha/aloha_lerobot': MV(config='aloha.json'),
     'aloha/openneo_aloha': NEO('openneo_aloha.json', {'left': NEO_ALOHA_EEF, 'right': NEO_ALOHA_EEF},
@@ -238,6 +240,7 @@ AGIBOT_G2 = MV(config='agibot_g2.json', extra=[a for side in ('left', 'right')
                overlay='AgiBot G2 90 mm gripper URDF (GenieSimAssets) anchored at its hand-eye-calibrated wrist-camera optical frame; '
                        'per-episode intrinsics of the release')
 REPLACE_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
+    ('agibot/agibot_world_beta', SPECS['agibot/agibot_world_beta'], [('beta_362', 0)]),
     ('agibot/agibot_world_2026', AGIBOT_G2, [('il_3400', 9), ('ri_4560', 4), ('rl_7093', 3)]),
     # ABC: no gripper model string in the export; the YAM jaw type differs per task (i2rt flexible vs crank vs linear 4310), eef per
     # episode. One pick per jaw type and one for the ZED station, because the dataset page picks the clip of the dataset's own rig
@@ -277,8 +280,30 @@ REPLACE_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
 ] for ds, ep in picks] + [('genrobot/10kh', ds, 0, G10K(ds)) for ds in ('clean_bowl', 'drawer_to_place_items', 'drawer_to_take_items')]
 
 
+# ── 2026-10-06: the projects whose dataset pages showed "no example clip" (one pick per dataset, so no page borrows a sibling's) ──
+# Dexora (AIRBOT MMK2 + XHAND1): the registry's XHAND1 URDF (grippers/xhand, per side) at the arms' flange pose of info.json,
+# posed from the recorded thumb-index width (the 12 hand joints per frame are not driven by the renderer); 70 deg hfov PRIOR
+# of config/dexora.json on all four unnamed 640x480 streams.
+# FRAMES ONLY (2026-10-06, user: no URDF needed, show the 3 axes): the release names no camera (70 deg hfov prior everywhere) and
+# the constant wrist-camera-in-flange pose is a prior, so no CAD is drawn. Each view shows the flange (TCP) frame of both arms from
+# eef_pose_in_main and the frames of the other three cameras through the world trajectories (x red / y green / z blue).
+AXES = dict(profile='axes', mode='axes', extra=['--alpha', '0.9'])
+DEXORA = MV(config='dexora.json', **dict(AXES, extra=['--camera-frames', '--alpha', '0.9']),
+            overlay='coordinate frames only (no CAD): the flange frame of each arm from eef_pose_in_main and every other camera '
+                    'frame through the world trajectories, x red / y green / z blue; 70 deg hfov prior (the release names no camera)')
+# Tried and WITHHELD 2026-10-06 (raw-only clips instead, tools/raw_only_clips.py):
+#  * Bridge V2 side2 (config/bridge.json, single wrist stream): the WidowX CAD at the prior eef_pose_in_main landed at the bottom of the
+#    frame while the real fingers are at the top; the flange frame itself (axes profile) sits 1.8 cm in front of the lens and 6 cm below
+#    its axis, i.e. at the bottom edge of the image (2 of 24 axis vertices in frame), so an axes clip shows nothing either.
+#  * DexUMI XHAND1 sets (registry:xhand at the UR5 flange pose of the DexUMI calibration through the nominal 150 deg equidistant OAK-1 W
+#    lens, calib/dexumi_oak1w_640x400_equidistant.json): the CAD lands right of the replayed hand; the flange frame is ~9 cm behind the lens.
+NEW_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
+    ('xhand/dexora', DEXORA, [('articulation', 0), ('assemble', 0), ('dexterous', 0), ('pick_and_place', 0)]),
+] for ds, ep in picks]
+
+
 def all_picks():
-    return EXPLICIT_PICKS + REPLACE_PICKS + auto_picks()
+    return EXPLICIT_PICKS + REPLACE_PICKS + NEW_PICKS + auto_picks()
 
 
 def views_for(info, spec):
@@ -292,6 +317,9 @@ def render_cmd(project, dataset, ep, spec, out):
     info = info_of(project, dataset)
     d = clip_dir(out, project, dataset, ep)
     root = dataset_root(ROOT, project + '/' + dataset)
+    if spec['tool'] == AGIBOT_BETA:
+        return [PY, os.path.join(VIZ, AGIBOT_BETA), '--dataset-root', root, '--episode', str(ep),
+                '--stride', str(STRIDE), '--max-seconds', str(MAX_SEC), '--output', os.path.join(d, 'stitched.mp4')]
     if spec['tool'] == BIMANUAL:
         cmd = [PY, os.path.join(VIZ, BIMANUAL), '--dataset-root', root, '--episode', str(ep), '--profile', spec['profile'],
                '--calib-fit', spec['calib_fit'], '--cross', spec['cross'],
@@ -410,6 +438,10 @@ def pack_one(project, dataset, ep, spec, out, **_):
                     'profile': kind, 'urdf': None if prim else spec.get('urdf') or kind,
                     'urdf_present': not prim, 'primitive': prim}
     mode = spec.get('mode') or ('primitive' if all(g['primitive'] for g in grips.values()) else 'urdf')
+    if mode == 'cad':
+        for g in grips.values():
+            # Preserve the dataset's hardware label; this is a fitted CAD substitute.
+            g.update(urdf=None, urdf_present=False, cad_model='CTAG2F120')
     tasks = flat_tasks(row['tasks'])
     cmd = render_cmd(project, dataset, ep, spec, out)
     meta = {'dataset': f'{project}/{dataset}', 'robot_type': info.get('robot_type'), 'fps': fps, 'config': spec['tool'],
@@ -417,8 +449,10 @@ def pack_one(project, dataset, ep, spec, out, **_):
             'tasks': json.dumps(tasks), 'views': views, 'grippers': grips, 'slug': slug_of(dataset, ep), 'project': project,
             'fisheye': any(v['fisheye'] for v in views), 'overlay_mode': mode, 'tool': spec['tool'],
             'args': [os.path.relpath(a, VIZ) if a.startswith(VIZ) else a for a in cmd[2:]],
-            'source_export_id': None, 'source_success_mtime': None,
+            'source_export_id': (info.get('camx_export') or {}).get('export_id'), 'source_success_mtime': None,
             'built': datetime.datetime.now().astimezone().strftime('%Y-%m-%dT%H:%M:%S%z')}
+    for field in ('overlay_scope', 'calibration'):
+        if field in summary: meta[field] = summary[field]
     json.dump(meta, open(os.path.join(d, 'meta.json'), 'w'), indent=1)
     json.dump({'views': view_names, 'n_frames': n, 'out_fps': meta['out_fps'], 'fisheye': meta['fisheye'], 'tool': spec['tool'],
                'overlay_mode': mode}, open(os.path.join(d, 'DONE.json'), 'w'))

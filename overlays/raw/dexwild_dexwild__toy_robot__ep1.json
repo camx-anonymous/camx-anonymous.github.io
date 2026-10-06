@@ -1,0 +1,59 @@
+{
+ "fingerprint": "c4a83bc9cdbafa6a8e22d2cd77e634c5d24b1e4b6fbdb65d337a5d710cbac6f5",
+ "schema": 1,
+ "dataset": "dexwild/dexwild/toy_robot",
+ "episode": 1,
+ "views": [
+  "right_main_camera_rgb",
+  "right_pinky_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.right_pinky_camera_rgb": [
+   240,
+   320,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexwild_dexwild__toy_robot__ep1.mp4",
+  922235,
+  1791320201726967056
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data_full/toy_robot/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    188268384,
+    1791136223164134831
+   ],
+   14.933333333333334
+  ],
+  "observation.image.right_pinky_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data_full/toy_robot/videos/observation.image.right_pinky_camera_rgb/chunk-000/file-000.mp4",
+    209153842,
+    1791136223821143785
+   ],
+   14.933333333333334
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__toy_robot__ep1.mp4",
+   1638266,
+   1791320592346745045
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__toy_robot__ep1.jpg",
+   11606,
+   1791320592725747678
+  ]
+ }
+}

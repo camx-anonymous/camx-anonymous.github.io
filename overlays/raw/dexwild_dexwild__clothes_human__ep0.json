@@ -1,0 +1,87 @@
+{
+ "fingerprint": "065478afc2fe39a80f4f927053ce9452b24fbb5e05221bfca59a33aaab17d6d6",
+ "schema": 1,
+ "dataset": "dexwild/dexwild/clothes_human",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "third_0_main_camera_rgb",
+  "left_pinky_camera_rgb"
+ ],
+ "fps": 60.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   240,
+   320,
+   3
+  ],
+  "observation.image.left_pinky_camera_rgb": [
+   240,
+   320,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/dexwild_dexwild__clothes_human__ep0.mp4",
+  719302,
+  1791320195308920359
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/clothes_human/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    576223,
+    1791125960854819173
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/clothes_human/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    652827,
+    1791125959579813323
+   ],
+   0.0
+  ],
+  "observation.image.third_0_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/clothes_human/videos/observation.image.third_0_main_camera_rgb/chunk-000/file-000.mp4",
+    638241,
+    1791125965435840232
+   ],
+   0.0
+  ],
+  "observation.image.left_pinky_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/dexwild_data/processed_data/clothes_human/videos/observation.image.left_pinky_camera_rgb/chunk-000/file-000.mp4",
+    603252,
+    1791125962363826104
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__clothes_human__ep0.mp4",
+   1208608,
+   1791320589536725529
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/dexwild_dexwild__clothes_human__ep0.jpg",
+   26713,
+   1791320589862727793
+  ]
+ }
+}
