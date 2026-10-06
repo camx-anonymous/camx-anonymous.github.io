@@ -34,22 +34,22 @@ footer p{margin:0 0 6px}
 <body>
 <header class="topbar">
   <div class="wrap">
-    <a class="brand" href="../"><span class="mark"></span><span class="name">CAMX</span></a>
+    <a class="brand" href="../camx-dataset/"><span class="mark"></span><span class="name">CAMX</span></a>
     <nav aria-label="Sections">
-      <a href="../#browse">Browse</a>
-      <a href="../#download">Download</a>
+      <a href="../camx-dataset/#browse">Browse</a>
+      <a href="../camx-dataset/#download">Download</a>
       <a href="./" aria-current="page">Example clips</a>
     </nav>
-    <a class="button primary cta" href="../#rollouts">CAMUVA Rollouts</a>
+    <a class="button primary cta" href="../camuva-rollouts/">CAMUVA Rollouts</a>
   </div>
 </header>
 <main class="wide">
 <header>
-  <p class="crumbs"><a href="../">CAMX Dataset</a> / example clips</p>
+  <p class="crumbs"><a href="../camx-dataset/">CAMX Dataset</a> / example clips</p>
   <h1>Gripper Projection</h1>
   <p class="sub">A few episodes per project with the gripper projected through the dataset's own camera poses and intrinsics. If the drawn gripper sits on the real one, the calibration is consistent.</p>
   <nav class="links">
-    <a href="../#browser">Browse the datasets</a>
+    <a href="../camx-dataset/#browser">Browse the datasets</a>
   </nav>
 </header>
   <div id="content"></div>
@@ -84,7 +84,7 @@ function render(){const projs=D.projects.filter(p=>p.overlays.length);
   document.getElementById('pending').style.display=D.projects.some(p=>!p.overlays.length)?'':'none';
   document.getElementById('pendingBody').innerHTML=D.projects.filter(p=>!p.overlays.length).map(p=>{const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];const n=p.notes||'';let why='no clip in this release';
     if(/conversion tree/i.test(n))why='converted after the last render pass';else if(/rolled into the UMI|handheld/i.test(n)&&/single/.test(Object.keys(p.forms).join()))why='single fisheye / GoPro camera: needs the rig\'s lens fit before drawing';
-    return `<tr><td><a href="../#browser">${esc(p.key)}</a></td><td>${esc(emb)}</td><td class="num">${p.datasets}</td><td class="num">${fmtH(p.hours)}</td><td class="why">${why}</td></tr>`}).join('');}
+    return `<tr><td><a href="../camx-dataset/#browser">${esc(p.key)}</a></td><td>${esc(emb)}</td><td class="num">${p.datasets}</td><td class="num">${fmtH(p.hours)}</td><td class="why">${why}</td></tr>`}).join('');}
 </script>
 </body>
 </html>

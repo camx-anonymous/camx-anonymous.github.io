@@ -6,7 +6,10 @@ This repository is anonymized for review.
 
 ## Pages
 
-- `index.html` — the landing page and dataset browser: hero stats, a morphology → platform tree
+- `index.html` — the landing page: two buttons, CamX Dataset (`camx-dataset/`) and CamUVA Rollouts
+  (`/camuva-rollouts/`, its own repository). Old section links into the page this used to be are forwarded
+  (`#rollouts…` to the rollouts site, every other hash to the dataset page).
+- `camx-dataset/index.html` — the dataset browser: hero stats, a morphology → platform tree
   over every dataset (each row shows its project count and hours, "13 projects · 434 h"; a project row shows its
   task count, "34 tasks · 209 h", where each of its datasets holds one task, and its dataset count, "26 datasets · 209 h",
   where any holds several; cards open a record drawer with the dataset's sample archive and its one-line fetch
@@ -31,7 +34,7 @@ This repository is anonymized for review.
   (GitHub Pages); there is no rendering backend.
 - `overlays/raw/` — the raw companion of every example clip (`<key>__<slug>.mp4` + `.jpg` poster): the same episode,
   camera views, tile order, frame sampling and frame size, with nothing drawn on it (`tools/raw_clips.py`). The
-  dataset cards of the landing page show only the raw poster. Clicking a card opens the dataset record and, beside
+  dataset cards of the dataset page show only the raw poster. Clicking a card opens the dataset record and, beside
   it (above it on a phone), a comparison viewer that plays the raw clip next to the overlay clip in step; picking one
   camera view crops both clips to that tile and shows them side by side. Under the clips the viewer shows the caption
   of the frame on screen: each clip's `task` in `data/datasets.json`, or, for an episode annotated per sub-task whose
