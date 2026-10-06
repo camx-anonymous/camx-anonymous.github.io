@@ -25,7 +25,7 @@ Env:
   CAMX_CURATION   the curation tree's mv_urdf/videos           CAMX_PY    python for the renderers (default: this one)
   CAMX_CLIPS_OUT  the clip tree written here                   MV_SITE_MESA  lavapipe env for the headless viewer
 """
-import argparse, datetime, json, os, queue, shutil, subprocess, sys, time
+import argparse, datetime, hashlib, json, os, queue, shutil, subprocess, sys, time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -108,6 +108,123 @@ def stamp(rel):
     return time.strftime('%Y-%m-%dT%H:%M:%S%z', time.localtime(os.stat(m).st_mtime)) if os.path.isfile(m) else None
 
 
+def render_provenance(o):
+    """Invalidate old videos when source files, calibration, CAD or render code change.
+
+    _SUCCESS is an export marker, not a content version: in-place pose/video
+    backfills intentionally retain it. Old caches lacking this record must be
+    rendered once before they can be trusted again.
+    """
+    import pyarrow.parquet as pq
+    root = Path(ROOT, o['dataset']).resolve()
+    info = info_of(o['dataset'])
+    ep = int(o['episode'])
+    keys = [f'observation.image.{v}' for v in o['views']]
+    source = [root / 'meta' / 'info.json']
+    row = None
+    for f in sorted((root / 'meta' / 'episodes').rglob('*.parquet')):
+        source.append(f)
+        cols = ['episode_index'] + [f'videos/{k}/{c}' for k in keys
+                                   for c in ('chunk_index', 'file_index', 'from_timestamp')]
+        for candidate in pq.read_table(f, columns=cols).to_pylist():
+            if int(candidate['episode_index']) == ep:
+                row = candidate
+                break
+        if row is not None:
+            break
+    if row is None:
+        raise ValueError(f'{root}: episode {ep} not in meta/episodes')
+    for key in keys:
+        source.append(root / info['video_path'].format(video_key=key,
+            chunk_index=row[f'videos/{key}/chunk_index'], file_index=row[f'videos/{key}/file_index']))
+    # A pose backfill can replace any shard without touching info/_SUCCESS.
+    source.extend(sorted((root / 'data').rglob('*.parquet')))
+    # Per-episode EEF/camera calibration may live in metadata sidecars.
+    source.extend(sorted((root / 'meta').glob('*.parquet')))
+
+    def signature(path, content=False):
+        st = path.stat()
+        rec = [str(path.resolve()), st.st_size, st.st_mtime_ns]
+        if content:
+            rec.append(hashlib.sha256(path.read_bytes()).hexdigest())
+        return rec
+
+    renderer = []
+    seen = set()
+    for base in (Path(VIZ), Path(VIZ_MV), Path(HERE)):
+        if not base.is_dir():
+            continue
+        for p in sorted(base.rglob('*')):
+            if not p.is_file() or p.suffix.lower() not in {'.py', '.json', '.urdf', '.stl', '.dae', '.obj', '.mtl'}:
+                continue
+            if base == Path(HERE) and p.parent == base and p.name not in {'rerun_clips.py', 'white_overlay.py', 'white_multiview.py', 'overlay_picks.py'}:
+                continue
+            if '__pycache__' in p.parts or p.resolve() in seen:
+                continue
+            seen.add(p.resolve())
+            renderer.append(signature(p, content=True))
+    # Path.rglob does not traverse symlinked gripper directories. Follow the
+    # selected profiles and every mesh/texture referenced by their URDFs, even
+    # when assets live under data_processing or another external directory.
+    import xml.etree.ElementTree as ET
+    urdfs = {Path(rec[0]) for rec in renderer if Path(rec[0]).suffix.lower() == '.urdf'}
+    models = {info.get(f'{side}_gripper_model') for side in ('left', 'right')}
+    models.update(g.get('model') for g in o.get('grippers', {}).values())
+    proj = proj_of(o)
+    models.update((STANDIN.get(proj), MODEL_OVERRIDE.get(proj), FISHEYE.get(proj, {}).get('profile')))
+    if any(models):
+        import gripper_registry
+        for model in filter(None, models):
+            profile = gripper_registry.lookup(model)
+            if profile is None:
+                continue
+            for side in ('left', 'right'):
+                relative = profile.urdf_path(side).relative_to(gripper_registry.GRIPPERS_ROOT)
+                for base in (Path(VIZ), Path(VIZ_MV)):
+                    if base.is_dir(): urdfs.add(base / 'grippers' / relative)
+
+    def dependency(path):
+        path = path.resolve()
+        if path not in seen:
+            seen.add(path)
+            renderer.append(signature(path, content=True) if path.is_file() else [str(path), 'missing'])
+
+    for urdf in sorted(urdfs):
+        dependency(urdf)
+        if not urdf.is_file():
+            continue
+        for node in ET.parse(urdf).getroot().iter():
+            raw = node.get('filename')
+            if not raw:
+                continue
+            if raw.startswith('package://'):
+                body = raw[len('package://'):]
+                rel = body.split('/', 1)[1] if '/' in body else ''
+                candidate = urdf.parent.parent / rel
+                beside = urdf.parent / body
+                path = candidate if candidate.is_file() or not beside.is_file() else beside
+            else:
+                path = urdf.parent / raw.removeprefix('file://')
+            dependency(path)
+    renderer.sort(key=lambda rec: rec[0])
+    payload = {'schema': 1, 'renderer_python': os.path.realpath(PY), 'dataset': str(root), 'episode': ep, 'views': list(o['views']),
+               'max_seconds': MAX_SEC, 'output_fps': OUT_FPS,
+               'source': [signature(p, content=p.suffix == '.json') for p in source],
+               'renderer': renderer}
+    digest = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    return {'fingerprint': digest, **payload}
+
+
+def current_cache(d, provenance):
+    if provenance is None or not is_done(d):
+        return False
+    try:
+        m = json.load(open(os.path.join(d, 'meta.json')))
+        return m.get('render_provenance', {}).get('fingerprint') == provenance['fingerprint']
+    except (OSError, ValueError):
+        return False
+
+
 def probe(mp4):
     out = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=width,height,r_frame_rate,nb_read_frames',
                           '-of', 'json', mp4], capture_output=True, text=True, check=True).stdout
@@ -152,6 +269,7 @@ def finish(d, meta, views, mode, tool, t0):
 # ── plan ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 def route_of(o):
     proj = proj_of(o)
+    if not os.path.isfile(os.path.join(ROOT, o['dataset'], 'meta', 'info.json')): return 'keep', 'dataset not in this tree'
     if proj in FISHEYE: return 'fisheye', None
     if proj in MULTIVIEW: return 'multiview', None
     if proj in KEEP: return 'keep', None
@@ -159,10 +277,9 @@ def route_of(o):
     if os.path.isfile(os.path.join(cd, 'DONE.json')):
         m = json.load(open(os.path.join(cd, 'meta.json')))
         have = [feat(v['video_key']) for v in m['views']]
-        if m.get('source_success_mtime') == stamp(o['dataset']) and all(v in have for v in o['views']) \
+        if m.get('render_provenance', {}).get('fingerprint') == render_provenance(o)['fingerprint'] and all(v in have for v in o['views']) \
                 and all(os.path.isfile(os.path.join(cd, v['name'] + '.mp4')) for v in m['views']): return 'reuse', cd
     import build_mv_site as B
-    if not os.path.isfile(os.path.join(ROOT, o['dataset'], 'meta', 'info.json')): return 'keep', 'dataset not in this tree'
     info = info_of(o['dataset']); keys = [k for k, f in info['features'].items() if f.get('dtype') == 'video']
     cfg = B.config_for(proj, str(info.get('robot_type')), len(keys), keys, o['dataset'])
     if cfg is None and proj in EXTRA_CONFIG: cfg = EXTRA_CONFIG[proj] if os.path.isabs(EXTRA_CONFIG[proj]) else os.path.join(VIZ, EXTRA_CONFIG[proj])
@@ -310,7 +427,11 @@ def render(rows, a):
 
     def run(o, r, x):
         d = os.path.join(OUT, o['key'], o['slug']); name = f"{o['key']}/{o['slug']}"
-        if is_done(d) and not a.force: return
+        try: provenance = render_provenance(o)
+        except (OSError, ValueError, KeyError) as e:
+            log(f'{r:8s} {name}: FAILED source provenance: {e!r}')
+            return
+        if current_cache(d, provenance) and not a.force: return
         os.makedirs(d, exist_ok=True)
         try: os.close(os.open(os.path.join(d, '_RENDERING'), os.O_CREAT | os.O_EXCL | os.O_WRONLY))   # another render process has it
         except FileExistsError: return
@@ -323,24 +444,42 @@ def render(rows, a):
                 slot = slots.get()
                 try: msg = rerun_one(o, x, d, slot, t0)
                 finally: slots.put(slot)
+            # Do not bless a clip if another process changed an input mid-render.
+            if render_provenance(o)['fingerprint'] != provenance['fingerprint']:
+                Path(d, 'DONE.json').unlink(missing_ok=True)
+                raise RuntimeError('render inputs changed during export; rerun this clip')
+            meta_path = Path(d, 'meta.json')
+            meta = json.loads(meta_path.read_text())
+            meta['render_provenance'] = provenance
+            meta_path.write_text(json.dumps(meta, indent=1))
             log(f'{r:8s} {name}: {msg}')
         except KeyboardInterrupt: raise
         except BaseException as e:  # noqa: BLE001 -- one failed clip must not stop the batch; the log names it (the viz helpers raise SystemExit)
+            Path(d, 'DONE.json').unlink(missing_ok=True)
             log(f'{r:8s} {name}: FAILED {e!r}  (see {d}/_render.log)')
         finally: Path(d, '_RENDERING').unlink(missing_ok=True)
 
     todo = [(o, r, x) for o, r, x in rows if r != 'keep' and r in a.routes.split(',')]
     with ThreadPoolExecutor(a.jobs_rerun) as ex_r, ThreadPoolExecutor(a.jobs_fisheye) as ex_f:
         for o, r, x in todo: (ex_f if r in ('fisheye', 'multiview') else ex_r).submit(run, o, r, x)
-    done = sum(is_done(os.path.join(OUT, o['key'], o['slug'])) for o, _, _ in todo)
-    log(f'{done}/{len(todo)} clips in {OUT}')
+    done = 0
+    for o, _, _ in todo:
+        try: done += current_cache(os.path.join(OUT, o['key'], o['slug']), render_provenance(o))
+        except (OSError, ValueError, KeyError): pass
+    log(f'{done}/{len(todo)} current clips in {OUT}')
+    if done != len(todo): raise SystemExit(1)
 
 
 def encode(rows):
     vdir, pdir = os.path.join(REPO, 'overlays', 'videos'), os.path.join(REPO, 'overlays', 'posters')
     for o, r, _ in rows:
         d = os.path.join(OUT, o['key'], o['slug']); name = f"{o['key']}__{o['slug']}"
-        if r == 'keep' or not is_done(d): continue
+        if r == 'keep': continue
+        try: provenance = render_provenance(o)
+        except (OSError, ValueError, KeyError) as e:
+            log(f"skip encode {o['key']}/{o['slug']}: source unavailable: {e!r}")
+            continue
+        if not current_cache(d, provenance): continue
         mp4 = os.path.join(vdir, name + '.mp4'); src = os.path.join(d, 'stitched.mp4')
         if os.path.isfile(mp4) and os.path.getmtime(mp4) >= os.path.getmtime(src) and os.path.isfile(os.path.join(pdir, name + '.jpg')): continue
         subprocess.run(['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', os.path.join(d, 'stitched.mp4'), '-vf', 'scale=-2:360', '-c:v', 'libx264',
@@ -358,7 +497,12 @@ def attach():
     for p in site['projects']:
         for i, o in enumerate(p['overlays']):
             d = os.path.join(OUT, o['key'], o['slug'])
-            if proj_of(o) in KEEP or not is_done(d): continue
+            if proj_of(o) in KEEP: continue
+            try: provenance = render_provenance(o)
+            except (OSError, ValueError, KeyError) as e:
+                log(f"skip attach {o['key']}/{o['slug']}: source unavailable: {e!r}")
+                continue
+            if not current_cache(d, provenance): continue
             m = json.load(open(os.path.join(d, 'meta.json'))); mp4 = os.path.join(REPO, 'overlays', 'videos', f"{o['key']}__{o['slug']}.mp4")
             grips = {s: {'model': g.get('model'), 'profile': g.get('profile'), 'urdf': bool(g.get('urdf_present'))} for s, g in (m.get('grippers') or {}).items() if g.get('model')}
             try: tasks = json.loads(m.get('tasks') or '[]')
@@ -366,6 +510,7 @@ def attach():
             rec = {'key': o['key'], 'slug': o['slug'], 'dataset': m['dataset'], 'episode': m['episode_index'], 'task': (tasks or [''])[0],
                    'views': [v['name'] for v in m['views']], 'grippers': grips, 'mode': m.get('overlay_mode') or 'urdf', 'fisheye': bool(m.get('fisheye')),
                    'accept': m.get('accept') or 'unmeasured', 'export_id': m.get('source_export_id'), 'rendered_from': m.get('source_success_mtime'),
+                   'render_fingerprint': m['render_provenance']['fingerprint'], 'render_built': m.get('built'),
                    'seconds': round((m.get('n_frames') or 0) / (m.get('out_fps') or OUT_FPS), 1),
                    'bytes': os.path.getsize(mp4) if os.path.isfile(mp4) else os.path.getsize(os.path.join(d, 'stitched.mp4'))}
             if any(g.get('standin') for g in (m.get('grippers') or {}).values()): rec['standin'] = sorted({g['profile'] for g in m['grippers'].values() if g.get('standin')})

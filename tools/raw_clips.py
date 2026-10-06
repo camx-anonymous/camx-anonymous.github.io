@@ -15,7 +15,7 @@ Usage:
 Env:
   CAMX_ROOT  camx_480p tree (default /data/camx_480p)
 """
-import argparse, glob, json, os, subprocess, sys
+import argparse, glob, hashlib, json, os, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
 
@@ -47,13 +47,36 @@ def episode_videos(dataset, ep, keys):
     raise SystemExit(f'{dataset}: episode {ep} not in meta/episodes')
 
 
+def input_signature(o, overlay, info, videos):
+    """A raw companion is current only for the same source files and sampling.
+
+    Dataset backfills can replace packed video files without changing the
+    published overlay or the dataset's _SUCCESS export marker.
+    """
+    def stat(path):
+        st = os.stat(path)
+        return [os.path.realpath(path), st.st_size, st.st_mtime_ns]
+    payload = {'schema': 1, 'dataset': o['dataset'], 'episode': int(o['episode']),
+               'views': o['views'], 'fps': info['fps'],
+               'shapes': {k: info['features'][k]['shape'] for k in videos},
+               'overlay': stat(overlay),
+               'videos': {k: [stat(path), start] for k, (path, start) in videos.items()},
+               'tool_sha256': hashlib.sha256(open(__file__, 'rb').read()).hexdigest()}
+    return {'fingerprint': hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest(), **payload}
+
+
 def raw_one(o, force=False):
     name = f"{o['key']}__{o['slug']}"; src = os.path.join(VIDEOS, name + '.mp4'); dst = os.path.join(RAW, name + '.mp4')
     if not os.path.isfile(src): return f'{name}: no overlay clip, skipped'
-    if os.path.isfile(dst) and not force and os.path.getmtime(dst) >= os.path.getmtime(src): return None
-    W, H, rate, n = probe(src)
     keys = [f'observation.image.{v}' for v in o['views']]
     info, vids = episode_videos(o['dataset'], int(o['episode']), keys)
+    signature = input_signature(o, src, info, vids)
+    sidecar = os.path.join(RAW, name + '.json')
+    if os.path.isfile(dst) and not force:
+        try: cached = json.load(open(sidecar))
+        except (OSError, ValueError): cached = {}
+        if cached.get('fingerprint') == signature['fingerprint']: return None
+    W, H, rate, n = probe(src)
     fps = Fraction(info['fps']).limit_denominator(100000); step = max(1, round(fps / rate))   # every step-th frame, like the overlay
     shapes = [info['features'][k]['shape'] for k in keys]; hc = max(int(s[0]) for s in shapes)
     cmd = ['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y']
@@ -74,6 +97,10 @@ def raw_one(o, force=False):
     strip = sum(int(s[1]) * hc / int(s[0]) for s in shapes) / hc
     note = '' if abs(strip / (W / H) - 1) < 0.02 else f'  <-- tile layout differs (strip {strip:.3f} vs clip {W / H:.3f})'
     note += '' if n2 == n else f'  <-- {n2} frames, the overlay clip has {n}'
+    if not note:
+        if input_signature(o, src, info, vids)['fingerprint'] != signature['fingerprint']:
+            return f'{name}: failed: source changed during raw export; rerun this clip'
+        with open(sidecar, 'w') as f: json.dump(signature, f, indent=1)
     return f'{name}: {n2} frames, {len(keys)} view(s), every {step}. frame, {os.path.getsize(dst) // 1024} KB{note}'
 
 
