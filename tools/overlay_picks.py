@@ -18,6 +18,8 @@ Usage:
   python3 tools/overlay_picks.py pack   --out <clips dir> [--only KEY]                          # meta.json + poster.jpg
   python3 tools/overlay_picks.py encode --out <clips dir> [--only KEY]                          # 360p mp4 (overlays/videos) + site poster
 Env:
+  CAMX_UMI_TOSSING_CORRECTED_ROOT  reviewed tossing width derivative (see overlay_sources.py)
+  CAMX_DROID_TRI_CORRECTED_ROOT   reviewed TRI episode-0 calibration derivative (see overlay_sources.py)
   CAMX_ROOT  camx_480p tree                                   (default /data/camx_480p)
   CAMX_VIZ   camera-cross-embodiment/camx/visualization       (default ~/projects/camera-cross-embodiment/camx/visualization)
   CAMX_PY    python for the renderers: cv2 4.x (5.0 mis-spaces the frame label), pyarrow >= 20, trimesh, yourdfpy,
@@ -25,6 +27,7 @@ Env:
 """
 import argparse, datetime, json, os, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
+from overlay_sources import dataset_root
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
@@ -157,7 +160,7 @@ def clip_dir(out, project, dataset, ep): return os.path.join(out, key_of(project
 
 
 def info_of(project, dataset):
-    return json.load(open(os.path.join(ROOT, project, dataset, 'meta', 'info.json')))
+    return json.load(open(os.path.join(dataset_root(ROOT, project + '/' + dataset), 'meta', 'info.json')))
 
 
 def sides_of(info):  # renderer order: right main | left main
@@ -171,7 +174,7 @@ def episode_lengths(project, dataset):
     import glob
     import pyarrow.parquet as pq
     out = {}
-    for f in sorted(glob.glob(os.path.join(ROOT, project, dataset, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
+    for f in sorted(glob.glob(os.path.join(dataset_root(ROOT, project + '/' + dataset), 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
         for r in pq.read_table(f, columns=['episode_index', 'length']).to_pylist():
             out[int(r['episode_index'])] = int(r['length'])
     return out
@@ -192,7 +195,7 @@ def auto_picks(n=3):
         by_proj.setdefault(r['project'], []).append(r)
     out = []
     for proj, spec in SPECS.items():
-        rows = sorted((r for r in by_proj.get(proj, []) if os.path.isfile(os.path.join(ROOT, r['id'], 'meta', 'info.json'))), key=lambda r: r['id'])
+        rows = sorted((r for r in by_proj.get(proj, []) if os.path.isfile(os.path.join(dataset_root(ROOT, r['id']), 'meta', 'info.json'))), key=lambda r: r['id'])
         if not rows:
             print(f'[picks] {proj}: no dataset on disk', file=sys.stderr); continue
         idx = sorted({0, len(rows) // 2, len(rows) - 1})[:n]
@@ -280,7 +283,7 @@ def views_for(info, spec):
 def render_cmd(project, dataset, ep, spec, out):
     info = info_of(project, dataset)
     d = clip_dir(out, project, dataset, ep)
-    root = os.path.join(ROOT, project, dataset)
+    root = dataset_root(ROOT, project + '/' + dataset)
     if spec['tool'] == BIMANUAL:
         cmd = [PY, os.path.join(VIZ, BIMANUAL), '--dataset-root', root, '--episode', str(ep), '--profile', spec['profile'],
                '--calib-fit', spec['calib_fit'], '--cross', spec['cross'],
@@ -329,7 +332,7 @@ def n_frames_of(mp4):
 def episode_row(project, dataset, ep):
     import glob
     import pyarrow.parquet as pq
-    for f in sorted(glob.glob(os.path.join(ROOT, project, dataset, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
+    for f in sorted(glob.glob(os.path.join(dataset_root(ROOT, project + '/' + dataset), 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
         for r in pq.read_table(f, columns=['episode_index', 'length', 'tasks']).to_pylist():
             if int(r['episode_index']) == ep: return r
     raise SystemExit(f'episode {ep} not in meta/episodes of {project}/{dataset}')
@@ -342,7 +345,7 @@ def episode_eef(project, dataset, ep, side):
     col = f'{side}_eef_pose_in_main_xyz_wxyz'
     info = info_of(project, dataset)
     if info.get(col): return [float(v) for v in info[col]]
-    for f in sorted(glob.glob(os.path.join(ROOT, project, dataset, 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
+    for f in sorted(glob.glob(os.path.join(dataset_root(ROOT, project + '/' + dataset), 'meta', 'episodes', '**', '*.parquet'), recursive=True)):
         t = pq.read_table(f)
         if col not in t.column_names: continue
         for r in t.select(['episode_index', col]).to_pylist():

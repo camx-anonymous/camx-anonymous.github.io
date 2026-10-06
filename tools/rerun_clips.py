@@ -23,11 +23,14 @@ Usage (python of the camera-cross-embodiment env: rerun, pyarrow, cv2):
 Env:
   CAMX_ROOT       camx_480p tree                              CAMX_VIZ   camera-cross-embodiment/camx/visualization
   CAMX_CURATION   the curation tree's mv_urdf/videos           CAMX_PY    python for the renderers (default: this one)
+  CAMX_UMI_TOSSING_CORRECTED_ROOT  reviewed tossing width derivative (see overlay_sources.py)
+  CAMX_DROID_TRI_CORRECTED_ROOT   reviewed TRI episode-0 calibration derivative (see overlay_sources.py)
   CAMX_CLIPS_OUT  the clip tree written here                   MV_SITE_MESA  lavapipe env for the headless viewer
 """
 import argparse, datetime, hashlib, json, os, queue, shutil, subprocess, sys, tempfile, time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from overlay_sources import dataset_root
 
 HERE = os.path.dirname(os.path.abspath(__file__)); REPO = os.path.dirname(HERE)
 ROOT = os.environ.get('CAMX_ROOT', '/data/camx_480p')
@@ -106,9 +109,9 @@ def is_done(d):
     except (OSError, ValueError): return False
 def proj_of(o): return '/'.join(o['dataset'].split('/')[:2])
 def feat(name): return name.split('observation.image.', 1)[1] if name.startswith('observation.image.') else name
-def info_of(rel): return json.load(open(os.path.join(ROOT, rel, 'meta', 'info.json')))
+def info_of(rel): return json.load(open(os.path.join(dataset_root(ROOT, rel), 'meta', 'info.json')))
 def stamp(rel):
-    m = os.path.join(ROOT, rel, 'meta', '_SUCCESS')
+    m = os.path.join(dataset_root(ROOT, rel), 'meta', '_SUCCESS')
     return time.strftime('%Y-%m-%dT%H:%M:%S%z', time.localtime(os.stat(m).st_mtime)) if os.path.isfile(m) else None
 
 
@@ -120,7 +123,7 @@ def render_provenance(o):
     rendered once before they can be trusted again.
     """
     import pyarrow.parquet as pq
-    root = Path(ROOT, o['dataset']).resolve()
+    root = Path(dataset_root(ROOT, o['dataset'])).resolve()
     info = info_of(o['dataset'])
     ep = int(o['episode'])
     keys = [f'observation.image.{v}' for v in o['views']]
@@ -161,7 +164,7 @@ def render_provenance(o):
         for p in sorted(base.rglob('*')):
             if not p.is_file() or p.suffix.lower() not in {'.py', '.json', '.urdf', '.stl', '.dae', '.obj', '.mtl'}:
                 continue
-            if base == Path(HERE) and p.parent == base and p.name not in {'rerun_clips.py', 'white_overlay.py', 'white_multiview.py', 'overlay_picks.py'}:
+            if base == Path(HERE) and p.parent == base and p.name not in {'rerun_clips.py', 'white_overlay.py', 'white_multiview.py', 'overlay_picks.py', 'overlay_sources.py'}:
                 continue
             if '__pycache__' in p.parts or p.resolve() in seen:
                 continue
@@ -302,7 +305,7 @@ def finish(d, meta, views, mode, tool, t0):
 # ── plan ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 def route_of(o):
     proj = proj_of(o)
-    if not os.path.isfile(os.path.join(ROOT, o['dataset'], 'meta', 'info.json')): return 'keep', 'dataset not in this tree'
+    if not os.path.isfile(os.path.join(dataset_root(ROOT, o['dataset']), 'meta', 'info.json')): return 'keep', 'dataset not in this tree'
     if proj in FISHEYE: return 'fisheye', None
     if proj in MULTIVIEW: return 'multiview', None
     if proj in KEEP: return 'keep', None
@@ -340,7 +343,7 @@ def reuse_one(o, cd, d, t0):
 
 def rerun_one(o, cfg, d, slot, t0):
     import build_mv_site as B, gripper_registry
-    proj, rel, ep = proj_of(o), o['dataset'], int(o['episode']); root = Path(ROOT) / rel
+    proj, rel, ep = proj_of(o), o['dataset'], int(o['episode']); root = Path(dataset_root(ROOT, rel))
     as_py = lambda v: v.as_py() if hasattr(v, 'as_py') else v  # noqa: E731
     row = next(r for r in B.episodes_table(root) if int(as_py(r['episode_index'])) == ep)
     # the clip's own copy of the viz config, without the camera streams this dataset lacks (rh20t.json lists every camera of
@@ -392,7 +395,7 @@ def fisheye_one(o, d, t0):
     proj, rel, ep = proj_of(o), o['dataset'], int(o['episode']); spec = FISHEYE[proj]; info = info_of(rel); fps = float(info['fps'])
     step = max(1, int(round(fps / OUT_FPS))); ds = rel.split('/')[-1]
     sides = [s for s in ('right', 'left') if f'observation.image.{s}_main_camera_rgb' in info['features']]   # the renderer's tile order
-    cmd = [PY, os.path.join(HERE, 'white_overlay.py'), '--dataset-root', os.path.join(ROOT, rel), '--episode', str(ep), '--profile', spec['profile'],
+    cmd = [PY, os.path.join(HERE, 'white_overlay.py'), '--dataset-root', dataset_root(ROOT, rel), '--episode', str(ep), '--profile', spec['profile'],
            '--calib-fit', spec['fit'], '--stride', str(step), '--max-seconds', str(MAX_SEC), '--alpha', '1.0', '--output', os.path.join(d, 'stitched.mp4')] + spec.get('extra', [])
     if proj in OWN_ONLY: cmd += ['--cross', 'off']
     if 'calib_episode' in spec:
@@ -413,13 +416,13 @@ def fisheye_one(o, d, t0):
         grip[s] = {'model': model or spec['profile'], 'profile': prof.name if prof else spec['profile'], 'urdf': str(prof.urdf_path(s)) if prof else None,
                    'urdf_present': bool(prof and prof.urdf_path(s).is_file()), 'primitive': prof is None}
     import glob, pyarrow.parquet as pq
-    row = next(r for f in sorted(glob.glob(os.path.join(ROOT, rel, 'meta', 'episodes', '**', '*.parquet'), recursive=True))
+    row = next(r for f in sorted(glob.glob(os.path.join(dataset_root(ROOT, rel), 'meta', 'episodes', '**', '*.parquet'), recursive=True))
                for r in pq.read_table(f, columns=['episode_index', 'length', 'tasks']).to_pylist() if int(r['episode_index']) == ep)
     tasks = row['tasks'] if isinstance(row['tasks'], list) else [row['tasks']]
     meta = {'dataset': rel, 'robot_type': info.get('robot_type'), 'fps': fps, 'config': 'render_bimanual_urdf_overlay_video.py', 'episode_index': ep, 'length': int(row['length']),
             'step': step, 'tasks': json.dumps(tasks), 'grippers': grip, 'slug': o['slug'], 'project': proj, 'fisheye': True,
             'args': [a.replace(VIZ + '/', '') for a in cmd[2:]], 'source_export_id': (info.get('camx_export') or {}).get('export_id'),
-            'source_success_mtime': stamp(rel), 'source_realpath': str(Path(ROOT, rel).resolve())}
+            'source_success_mtime': stamp(rel), 'source_realpath': str(Path(dataset_root(ROOT, rel)).resolve())}
     return finish(d, meta, views, spec.get('mode', 'urdf'), 'render_bimanual_urdf_overlay_video.py', t0)
 
 
