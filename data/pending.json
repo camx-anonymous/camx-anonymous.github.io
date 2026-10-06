@@ -2,10 +2,10 @@
  "updated": "2026-10-04",
  "_about": "Sources of the paper's appendix source tables that have no converted LeRobot-v3 data on the site yet (no sample archive, no example clip). One entry per embodiment and source with the counts the paper lists (datasets, episodes, frames, hours = frames / fps, camera views, fps); `note` is the bracketed letter of the appendix table ([A]-[D], text in `notes`), null for a source of the training mix whose remaining datasets are still unconverted. `entry` names the data/sources.json key when it differs from `source`. Hand-maintained; tools/build_site_data.py copies it into data/datasets.json as `pending` and checks every entry against data/sources.json.",
  "notes": {
-  "A": "not included when the training mix was frozen",
-  "B": "held out: camera calibration not fully validated",
-  "C": "actuator groups do not share one global frame: each hand is tracked in its own frame",
-  "D": "dexterous-hand data recorded with a wrist camera; the current model has no dexterous-hand action head, so it is listed for future training"
+  "A": "not in the frozen training mix",
+  "B": "held out: calibration not fully validated",
+  "C": "each hand tracked in its own frame",
+  "D": "dexterous-hand wrist-camera data; no dexterous action head yet"
  },
  "paper": {
   "_about": "Totals of the paper's two appendix source tables, quoted by the header and the footer of the site: the training mix (37 sources, 1,998 datasets, 1,738,358 episodes, 18,632.1 h) plus the sources outside it (33 sources, 2,471 datasets, 712,630 episodes, 7,218.6 h), over 24 embodiment groups. Copy them from the generated table bodies when the paper's tables change; tools/build_site_data.py writes them to `totals.paper` and warns when the site's own sums differ.",
@@ -27,7 +27,7 @@
    "views": "2",
    "fps": "30",
    "note": "A",
-   "remark": "the remaining 3 of the 6 tasks (open lid, battery disassembly, LAN plug insertion); the other 3 are converted and browsable"
+   "remark": "3 of 6 tasks (open lid, battery disassembly, LAN plug insertion); the other 3 are converted"
   },
   {
    "morph": "Handheld, robot-free",
@@ -40,7 +40,7 @@
    "views": "1–2",
    "fps": "30",
    "note": "C",
-   "remark": "of the 582-dataset release, 486 are fully converted and 41 more are listed with their complete metadata only (their videos failed to transcode or await a re-export); still to come: 19 datasets whose names collide across USB-backup folders (re-export pending), 21 datasets that ship without any videos (not convertible), and 12 bimanual pair exports (each hand in its own frame)"
+   "remark": "486 of 582 converted, 41 metadata-only; pending: 19 with colliding names, 21 without videos, 12 bimanual pairs"
   },
   {
    "morph": "Bimanual robot",
@@ -53,7 +53,7 @@
    "views": "2–4",
    "fps": "10–50",
    "note": "A",
-   "remark": "the remaining 19 of the 27 community uploads; 8 are converted and browsable"
+   "remark": "19 of 27 uploads; 8 are converted"
   }
  ]
 }

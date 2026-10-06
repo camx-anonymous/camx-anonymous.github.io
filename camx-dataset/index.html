@@ -16,14 +16,12 @@
 .stats .k{font-size:15px;color:var(--ink3)}
 .stats .rl{font-size:15px;font-weight:500;color:var(--ink2,var(--ink3))}
 @media (max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.stats .rl{grid-column:1/-1}.stats .rl~.rl{margin-top:8px}}
-/* the Home link and the link to the rollouts site stay in the upper right corner while the page scrolls (this page has no top bar), its right
+/* the link to the rollouts site stays in the upper right corner while the page scrolls (this page has no top bar), its right
    edge on the right edge of the .wrap content column; it sits under the drawer and its scrim. On a phone it is
    smaller and the hero starts below it. */
-.pins{position:fixed;top:16px;right:max(var(--pad-x),calc((100% - var(--w-wide))/2 + var(--pad-x)));z-index:20;display:flex;gap:10px}
-.button.pin{box-shadow:var(--shadow-md);font-size:18px;padding:16px 26px;gap:10px;border-radius:8px}
-.button.pin.home{background:var(--bg)}
+.button.pin{position:fixed;top:16px;right:max(var(--pad-x),calc((100% - var(--w-wide))/2 + var(--pad-x)));z-index:20;box-shadow:var(--shadow-md);font-size:18px;padding:16px 26px;gap:10px;border-radius:8px}
 .button.pin svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k,.stats .rl{font-size:13px}.pins{top:10px;gap:8px}.button.pin{font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
+@media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k,.stats .rl{font-size:13px}.button.pin{top:10px;font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
 
 /* ---------- browse ---------- */
 #browse{padding-top:20px;padding-bottom:32px}
@@ -265,7 +263,7 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 </head>
 <body>
 
-<nav class="pins" aria-label="Sites"><a class="button pin home" href="../"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Home</a><a class="button primary pin" href="../camuva-rollouts/"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.5" r="1.5"/><path d="M12 5v3"/><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M1.5 13v3M22.5 13v3M9 13v2M15 13v2"/></svg>CamUVA Rollouts</a></nav>
+<a class="button primary pin" href="../camuva-rollouts/"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.5" r="1.5"/><path d="M12 5v3"/><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M1.5 13v3M22.5 13v3M9 13v2M15 13v2"/></svg>CamUVA Rollouts</a>
 
 <main>
   <section class="hero wrap" id="overview">
@@ -288,7 +286,7 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
     <div class="wrap dl">
       <div class="dlhead">
         <h2>Download dataset samples</h2>
-        <p class="p">Episode 0 of every dataset as a LeRobot-v3 directory, fetched from this repository's GitHub releases with one command. Take a whole slice, or tick platforms, sources and datasets while browsing to build your own. <b>The full dataset will be available upon official release.</b></p>
+        <p class="p">Episode 0 of every dataset, LeRobot v3, from GitHub releases. Pick a slice or tick datasets while browsing. <b>Full dataset upon official release.</b></p>
       </div>
       <div class="slices" id="dlist"></div>
       <div class="codes">
@@ -433,11 +431,11 @@ function card(r){const t=thumb(r),on=sel.has(r.id);
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div></div></article>`}
 
 function render(){const rows=filtered(),listed=pendFiltered(),pend=SHOW_PEND?listed:[];const show=rows.slice(0,S.shown);
-  $('cards').innerHTML=show.length?show.map(card).join(''):pend.length?'':`<div class="empty">${listed.length?'Listed in the paper, not converted on this site yet.':'No datasets here. Pick a different platform.'}</div>`;
-  $('loadmore').innerHTML=rows.length>S.shown?`<button type="button" id="more">Load more datasets</button><span class="n">showing ${show.length} of ${rows.length.toLocaleString()}</span>`:(rows.length>PAGE?`<span class="n">all ${rows.length.toLocaleString()} shown</span>`:'');
+  $('cards').innerHTML=show.length?show.map(card).join(''):pend.length?'':`<div class="empty">${listed.length?'Not converted yet.':'No datasets here.'}</div>`;
+  $('loadmore').innerHTML=rows.length>S.shown?`<button type="button" id="more">Load more</button><span class="n">showing ${show.length} of ${rows.length.toLocaleString()}</span>`:(rows.length>PAGE?`<span class="n">all ${rows.length.toLocaleString()} shown</span>`:'');
   const m=$('more');if(m)m.onclick=()=>{S.shown+=PAGE;render()};
   const pe=$('pend');pe.hidden=!pend.length;pe.classList.toggle('solo',!show.length);
-  pe.innerHTML=pend.length?`<h3>Listed in the paper, not converted yet</h3><p class="p">${pend.length} source${pend.length===1?'':'s'} of the appendix source tables ${pend.length===1?'has':'have'} no LeRobot-v3 export on this site yet, so no sample archive and no example clip. Counts are the paper's; the bracketed letter is its note.</p><div class="cards">${pend.map(pcard).join('')}</div>`:''}
+  pe.innerHTML=pend.length?`<h3>Listed in the paper, not converted yet</h3><p class="p">${pend.length} source${pend.length===1?'':'s'} without a converted export. Counts from the paper.</p><div class="cards">${pend.map(pcard).join('')}</div>`:''}
 function pcard(p){const i=PEND.indexOf(p);
   return `<article class="dcard pcard" data-pid="${i}"><div class="thumb"><span class="tl">no sample yet</span>${p.note?`<span class="tag">[${esc(p.note)}]</span>`:''}<span class="dur">${fmtH(p.hours)} h</span></div><div class="body"><div class="ttl">${esc(p.source)}</div>
     <div class="meta"><span class="cat">${esc(ML[p.morph]||p.morph)}</span><span>›</span><span>${esc(p.embodiment)}</span></div>
@@ -463,9 +461,9 @@ function licChip(i){const l=i&&i.license;if(!l)return '<span class="chip none">l
 function licRow(si){const l=si.license||{},dim=(h,t)=>` <a class="dim" href="${esc(h)}" target="_blank" rel="noopener">${t}</a>`;
   return licChip(si)+(l.repo&&l.url?dim(l.url,'license text'):'')+(si.homepage&&!(l.repo&&licWhere(si.homepage)===licWhere(l.repo))?dim(si.homepage,'source page'):'')}
 // compact form for the gate: "Chi et al. 2024" linking to the paper
-function paperShort(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="au">no paper listed yet</span>';
+function paperShort(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="au">no paper listed</span>';
   return '<span class="au">'+ps.map(p=>`<a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(shortCite(p,fb))}</a>`).join(', ')+'</span>'}
-function paperLinks(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="paper none">no paper listed yet</span>';
+function paperLinks(i,fb){const ps=i&&i.papers||[];if(!ps.length)return '<span class="paper none">no paper listed</span>';
   return ps.map(p=>`<span class="paper"><span class="au">${esc(shortCite(p,fb))}</span><a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(p.title)}</a></span>`).join('')}
 /* the line under a source row of the tree: "(Chi et al. 2024)" linking to the paper (arXiv where there is one) and the license chip.
    x.rows = the datasets of that row; one row can span two sources.json entries (FastUMI and FastUMI-100K, the two ALOHA licenses), so both are deduplicated */
@@ -475,16 +473,16 @@ function srcMeta(x){const c={};x.rows.forEach(r=>{const k=srcName(r);c[k]=(c[k]|
     (i.papers||[]).forEach(p=>{if(!ps.has(p.key))ps.set(p.key,`<a class="au" href="${esc(p.url||'#')}" target="_blank" rel="noopener" title="${esc(p.title+(p.arxiv?' · arXiv:'+p.arxiv:''))}">(${esc(shortCite(p,k))})</a>`)});
     const n=licName(i)||'';if(!ls.has(n))ls.set(n,licChip(i))});
   return ls.size?`<div class="smeta">${[...ps.values(),...ls.values()].join('')}</div>`:''}
-function bibOf(ss,label){const seen=new Set(),out=[`% CAMX one-episode samples · ${label}`,`% ${ss.length} source dataset${ss.length===1?'':'s'}: ${ss.map(s=>s.name).join(', ')}`,'% Cite every source below; each source keeps its own license (see the record of each dataset on the site).'];
+function bibOf(ss,label){const seen=new Set(),out=[`% CAMX one-episode samples · ${label}`,`% ${ss.length} source dataset${ss.length===1?'':'s'}: ${ss.map(s=>s.name).join(', ')}`,'% Cite every source below; each keeps its own license.'];
   ss.forEach(s=>{(s.info.papers||[]).forEach(p=>{if(seen.has(p.key))return;seen.add(p.key);out.push('',`% ${s.name}${licName(s.info)?' · '+licName(s.info):''}`,p.bibtex.trim())})});
   return out.join('\n')+'\n'}
 /* gate(rows,label,then,verb): confirm license + citation for every source of `rows`, then run `then`. Asked before every copy / save. */
 function gate(rows,label,then,verb){const ss=srcOf(rows);if(!ss.length){then();return}
   const nd=sampled(rows).length,lics=new Set(ss.map(s=>licName(s.info)||'?')),np=new Set();ss.forEach(s=>(s.info.papers||[]).forEach(p=>np.add(p.key)));
   $('gateTitle').textContent=label;
-  $('gateLede').textContent=`${nd.toLocaleString()} sample${nd===1?'':'s'} from ${ss.length} source dataset${ss.length===1?'':'s'}. Each keeps its own license and must be cited alongside CAMX.`;
+  $('gateLede').textContent=`${nd.toLocaleString()} sample${nd===1?'':'s'} from ${ss.length} source${ss.length===1?'':'s'}. Each keeps its own license and citation.`;
   $('gateList').innerHTML=ss.map(s=>`<div class="src"><b>${esc(s.name)}</b>${licChip(s.info)}${paperShort(s.info,s.name)}</div>`).join('');
-  $('gateTerms').textContent=`Continuing means you will cite ${np.size===1?'this paper':'these '+np.size+' papers'} together with CAMX and follow the ${lics.size===1?'license':lics.size+' licenses'} above in any use of this data.`;
+  $('gateTerms').textContent=`By continuing you agree to cite ${np.size===1?'this paper':'these '+np.size+' papers'} with CAMX and follow the ${lics.size===1?'license':'licenses'} above.`;
   $('gateGo').textContent='Agree and '+(verb||'continue');
   const bib=()=>bibOf(ss,label);
   $('gateCopyBib').onclick=()=>navigator.clipboard.writeText(bib()).then(()=>{$('gateCopyBib').textContent='Copied';setTimeout(()=>$('gateCopyBib').textContent='Copy BibTeX',1200)});
@@ -497,7 +495,7 @@ function gate(rows,label,then,verb){const ss=srcOf(rows);if(!ss.length){then();r
 /* a slice is a set of datasets shown as a card; the command fetches the one-episode sample archive of each one from the GitHub releases */
 function sizeOf(rows){const sm=sampled(rows);return {n:sm.length,miss:rows.length-sm.length,b:sm.reduce((a,r)=>a+r.sample.bytes,0),s:sm.reduce((a,r)=>a+r.sample.seconds,0)}}
 function slices(){const out=[];
-  if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length.toLocaleString()} dataset${rows.length>1?'s':''} ticked while browsing`,rows,sel:true})}
+  if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length.toLocaleString()} dataset${rows.length>1?'s':''} ticked`,rows,sel:true})}
   out.push({id:'full',name:'All morphologies',desc:`${L.length.toLocaleString()} datasets · ${MORPHS.length} morphologies`,rows:L});
   MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const plats=new Set(rows.map(r=>r.embodiment)).size;
     out.push({id:m.id,name:m.label,desc:`${rows.length.toLocaleString()} datasets · ${plats} platform${plats>1?'s':''}`,rows})});
@@ -512,11 +510,11 @@ function downloads(){const ss=slices();if(!ss.some(s=>s.id===S.slice))S.slice='f
   const x=$('exportSel');if(x)x.onclick=()=>{const rows=L.filter(r=>sel.has(r.id));dl('camx_selection.json',JSON.stringify({samples:D.download.samples,exported:new Date().toISOString(),datasets:rows.map(r=>({id:r.id,project:r.project,embodiment:r.embodiment,source:r.source,episodes:r.episodes,hours:r.hours,fps:r.fps,views:r.n_views,sample:r.sample?r.sample.url:null}))},null,1),'application/json')};
   code(ss.find(s=>s.id===S.slice))}
 function cmdText(s){const sm=sampled(s.rows).sort((a,b)=>a.id.localeCompare(b.id));const z=sizeOf(s.rows);
-  if(!sm.length)return `# none of the ${s.rows.length.toLocaleString()} datasets in this slice has a published sample yet`;
+  if(!sm.length)return `# no published sample in this slice yet`;
   return `#!/bin/bash
-# CAMX samples · ${s.name} · ${sm.length.toLocaleString()} datasets, episode 0 of each · ${fmtDur(z.s)} · ${fmtB(z.b)}
-# each unpacks to camx_samples/<family>/<project>/<dataset>/ (LeRobot v3); datasets already on disk are skipped
-# cite CAMX and every source dataset, and follow each source license: ${D.download.citations||'https://camx-anonymous.github.io/data/citations.bib'}
+# CAMX samples · ${s.name} · ${sm.length.toLocaleString()} datasets · episode 0 · ${fmtDur(z.s)} · ${fmtB(z.b)}
+# unpacks to camx_samples/<family>/<project>/<dataset>/; skips datasets already present
+# cite CAMX and each source; licenses: ${D.download.citations||'https://camx-anonymous.github.io/data/citations.bib'}
 set -e
 mkdir -p camx_samples && cd camx_samples
 while read -r id url; do
@@ -565,7 +563,7 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesO
   // caption changes while the clip plays (o.captions, tools/build_site_data.py), else the one caption of the clip
   const caps=o.captions||(o.task?[[0,o.task]]:[]);
   el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}</span></div>
-    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane((o.mode==='primitive'?'Gripper stand-in overlay <span class="note">(No gripper CAD available. Only showing gripper tip.)</span>':o.standin?`Gripper CAD overlay <span class="note">(No gripper CAD published for this rig: the stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper stands in.)</span>`:'Gripper CAD overlay')+(o.own_only?' <span class="note">(Each view shows its own gripper only: the two hands are not in a shared frame.)</span>':''),D.overlay_base+f+'.mp4')}</div>
+    <div class="panes">${pane('Raw video',RAW+f+'.mp4')}${pane((o.mode==='primitive'?'Gripper overlay <span class="note">(no CAD: tip only)</span>':o.standin?`Gripper CAD overlay <span class="note">(stock ${esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))} gripper as stand-in)</span>`:'Gripper CAD overlay')+(o.own_only?' <span class="note">(own gripper per view: no shared frame)</span>':''),D.overlay_base+f+'.mp4')}</div>
     ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
     <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
   const [a,b]=el.querySelectorAll('video'),pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
@@ -616,8 +614,8 @@ const pct=(n,t)=>t?Math.round(100*n/t)+'%':'';
    taxonomy of the project histograms) as a bar with the six largest classes in accent shades and the rest in grey, then the
    most frequent captions with how many episodes (mixed) or sub-task captions (steps) carry each */
 function mixRow(m){const st=m.kind==='steps',tot=m.skills.reduce((s,[,n])=>s+n,0),top=m.skills.slice(0,6),rest=tot-top.reduce((s,[,n])=>s+n,0);
-  const line=st?`One task, annotated per sub-task: ${fmt(m.n_step)} distinct step captions, median ${m.per_ep} per episode, over ${fmt(m.eps)} episodes.`
-    :`${fmt(m.n_task)} distinct tasks over ${fmt(m.eps)} episodes, one caption each.`;
+  const line=st?`${fmt(m.n_step)} sub-task captions, median ${m.per_ep} per episode, ${fmt(m.eps)} episodes.`
+    :`${fmt(m.n_task)} tasks over ${fmt(m.eps)} episodes.`;
   const seg=(k,n,i,c)=>`<i${c?` class="${c}"`:''} style="flex:${n}${i==null?'':`;opacity:${(1-i*.13).toFixed(2)}`}" title="${esc(k)} · ${pct(n,tot)}"></i>`;
   return `<p>${line}</p><div class="skb" role="img" aria-label="skill classes of the ${st?'sub-task captions':'episodes'}">${top.map(([k,n],i)=>seg(k,n,i)).join('')}${rest>0?seg('remaining classes',rest,null,'rest'):''}</div>
     <div class="skl">${top.map(([k,n])=>`${esc(k)} <b>${pct(n,tot)}</b>`).join(' · ')}${rest>0&&pct(rest,tot)!=='0%'?` · remaining <b>${pct(rest,tot)}</b>`:''} <span class="dim">of ${st?'sub-task captions':'episodes'}</span></div>
@@ -625,9 +623,9 @@ function mixRow(m){const st=m.kind==='steps',tot=m.skills.reduce((s,[,n])=>s+n,0
 
 function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
-  const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))+(r.partial?' <span class="dim">'+(r.partial.source_totals?'in the source release; episode 0 is converted here as the sample':r.partial.episodes_kept===0?'metadata of the full conversion; the videos are still being transcoded':'sample conversion; the full dataset is still being converted')+'</span>':'')],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
+  const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))+(r.partial?' <span class="dim">'+(r.partial.source_totals?'in the source release; episode 0 converted':r.partial.episodes_kept===0?'full metadata; videos still transcoding':'sample only; full conversion pending')+'</span>':'')],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
-    r.world_frame&&r.world_frame.shared===false?['World frame','<b>Not shared between the hands.</b> <span class="dim">'+esc(r.world_frame.note)+'. Poses can be compared within one hand only; the example clips draw each view\'s own gripper.</span>']:null,
+    r.world_frame&&r.world_frame.shared===false?['World frame','<b>Not shared between the hands.</b> <span class="dim">'+esc(r.world_frame.note)+'</span>']:null,
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
     p.overlays.length?['Example clips',`<a href="../overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`]:null,
     ['License',licRow(si)],
@@ -644,12 +642,12 @@ function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.projec
 /* record of a source listed from the paper without converted data: the paper's counts, its note, license and paper */
 function drawerPend(i){const p=PEND[i];if(!p)return;const si=SRC[p.entry||p.source]||{};S.open=null;S.openPend=i;
   const kv=[['Datasets',p.datasets.toLocaleString()],['Episodes',esc(fmt(p.episodes))],['Duration',esc(fmtH(p.hours))+' h'],['Views',esc(p.views)],['FPS',esc(p.fps)],
-    ['Status','<span class="dim">not converted yet: no sample archive, no example clip</span>'+(p.note?`<br><b>[${esc(p.note)}]</b> ${esc(noteText(p))}`:'')+(p.remark?`<br>${esc(p.remark)}`:'')],
+    ['Status','<span class="dim">not converted yet</span>'+(p.note?`<br><b>[${esc(p.note)}]</b> ${esc(noteText(p))}`:'')+(p.remark?`<br>${esc(p.remark)}`:'')],
     ['License',licRow(si)],
     ['Cite',paperLinks(si,p.source)+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]];
   $('drawerBody').innerHTML=`<div class="kicker">Source listed in the paper</div><h3>${esc(p.source)}</h3>
     <div class="meta"><span class="cat">${esc(ML[p.morph]||p.morph)}</span><span>›</span><span>${esc(p.embodiment)}</span></div>
-    <p class="path">counts from the source release, as in the appendix table</p>
+    <p class="path">counts from the source release</p>
     <dl>${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   const bb=$('bibOne');if(bb)bb.onclick=()=>navigator.clipboard.writeText(bibOf([{name:p.entry||p.source,n:1,info:si}],p.source)).then(()=>{bb.textContent='Copied';setTimeout(()=>bb.textContent='Copy BibTeX',1200)});
   closeCmp();$('drawer').classList.add('open');$('scrim').classList.add('show')}
