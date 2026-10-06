@@ -160,11 +160,7 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .gate{width:min(560px,calc(100vw - 32px));max-height:min(88vh,800px);padding:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow-md);overflow:hidden}
 .gate::backdrop{background:rgba(20,15,5,.35)}
 .gate form{display:flex;flex-direction:column;max-height:min(88vh,800px);margin:0}
-.gate .head{padding:22px 24px 0}
-.gate .kicker{font:400 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.02em;color:var(--accent);margin:0 0 8px}
-.gate h3{margin:0 0 4px;font:500 19px/1.2 var(--sans);letter-spacing:-.02em;padding-right:40px}
-.gate .lede{margin:0 0 14px;color:var(--ink2);font-size:13.5px;line-height:1.5;text-wrap:pretty}
-.gate .srcs{overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:2px 24px;flex:1 1 auto;min-height:0}
+.gate .srcs{overflow:auto;border-bottom:1px solid var(--line);padding:12px 56px 2px 24px;flex:1 1 auto;min-height:0}
 .gate .src{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line2);font-size:13px;line-height:1.4}
 .gate .src:first-child{border-top:0}
 .gate .src b{font-weight:500;margin-right:auto}
@@ -179,7 +175,7 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .gate .acts .bib{display:flex;gap:6px;margin-right:auto}
 .gate .acts .bib button{font:500 12.5px/1 var(--mono);padding:8px 10px;color:var(--ink2)}
 .gate .close{position:absolute;top:12px;right:12px;width:32px;height:32px;padding:0;justify-content:center;border-radius:999px}
-@media (max-width:640px){.gate .head,.gate .srcs,.gate .foot{padding-left:16px;padding-right:16px}.gate .acts .bib{width:100%;margin:0 0 4px}}
+@media (max-width:640px){.gate .srcs,.gate .foot{padding-left:16px}.gate .foot{padding-right:16px}.gate .acts .bib{width:100%;margin:0 0 4px}}
 @media (max-width:480px){.slices{grid-template-columns:1fr 1fr;gap:8px}.slice{padding:14px}.slice .sz{font-size:22px}}
 
 
@@ -288,7 +284,7 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
     <div class="wrap dl">
       <div class="dlhead">
         <h2>Download dataset samples</h2>
-        <p class="p">Episode 0 of every dataset, LeRobot v3, from GitHub releases. Pick a slice or tick datasets while browsing. <b>Full dataset upon official release.</b></p>
+        <p class="p"><b>Full dataset upon official release.</b></p>
       </div>
       <div class="slices" id="dlist"></div>
       <div class="codes">
@@ -302,10 +298,9 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 </main>
 
 <div class="scrim" id="scrim"></div>
-<dialog class="gate" id="gate" aria-labelledby="gateTitle">
+<dialog class="gate" id="gate" aria-label="Licenses and citations">
   <form method="dialog">
     <button type="button" class="close" id="gateClose" aria-label="Close">âœ•</button>
-    <div class="head"><div class="kicker">Before you download</div><h3 id="gateTitle"></h3><p class="lede" id="gateLede"></p></div>
     <div class="srcs" id="gateList"></div>
     <div class="foot">
       <p class="terms" id="gateTerms"></p>
@@ -480,9 +475,7 @@ function bibOf(ss,label){const seen=new Set(),out=[`% CAMX one-episode samples Â
   return out.join('\n')+'\n'}
 /* gate(rows,label,then,verb): confirm license + citation for every source of `rows`, then run `then`. Asked before every copy / save. */
 function gate(rows,label,then,verb){const ss=srcOf(rows);if(!ss.length){then();return}
-  const nd=sampled(rows).length,lics=new Set(ss.map(s=>licName(s.info)||'?')),np=new Set();ss.forEach(s=>(s.info.papers||[]).forEach(p=>np.add(p.key)));
-  $('gateTitle').textContent=label;
-  $('gateLede').textContent=`${nd.toLocaleString()} sample${nd===1?'':'s'} from ${ss.length} source${ss.length===1?'':'s'}. Each keeps its own license and citation.`;
+  const lics=new Set(ss.map(s=>licName(s.info)||'?')),np=new Set();ss.forEach(s=>(s.info.papers||[]).forEach(p=>np.add(p.key)));
   $('gateList').innerHTML=ss.map(s=>`<div class="src"><b>${esc(s.name)}</b>${licChip(s.info)}${paperShort(s.info,s.name)}</div>`).join('');
   $('gateTerms').textContent=`By continuing you agree to cite ${np.size===1?'this paper':'these '+np.size+' papers'} with CAMX and follow the ${lics.size===1?'license':'licenses'} above.`;
   $('gateGo').textContent='Agree and '+(verb||'continue');
