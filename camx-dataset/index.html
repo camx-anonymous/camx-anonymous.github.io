@@ -16,12 +16,14 @@
 .stats .k{font-size:15px;color:var(--ink3)}
 .stats .rl{font-size:15px;font-weight:500;color:var(--ink2,var(--ink3))}
 @media (max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.stats .rl{grid-column:1/-1}.stats .rl~.rl{margin-top:8px}}
-/* the link to the rollouts site stays in the upper right corner while the page scrolls (this page has no top bar), its right
+/* the Home link and the link to the rollouts site stay in the upper right corner while the page scrolls (this page has no top bar), its right
    edge on the right edge of the .wrap content column; it sits under the drawer and its scrim. On a phone it is
    smaller and the hero starts below it. */
-.button.pin{position:fixed;top:16px;right:max(var(--pad-x),calc((100% - var(--w-wide))/2 + var(--pad-x)));z-index:20;box-shadow:var(--shadow-md);font-size:18px;padding:16px 26px;gap:10px;border-radius:8px}
+.pins{position:fixed;top:16px;right:max(var(--pad-x),calc((100% - var(--w-wide))/2 + var(--pad-x)));z-index:20;display:flex;gap:10px}
+.button.pin{box-shadow:var(--shadow-md);font-size:18px;padding:16px 26px;gap:10px;border-radius:8px}
+.button.pin.home{background:var(--bg)}
 .button.pin svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k,.stats .rl{font-size:13px}.button.pin{top:10px;font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
+@media (max-width:640px){.hero{padding-top:60px;padding-bottom:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px 16px}.stats .v{font-size:20px}.stats .k,.stats .rl{font-size:13px}.pins{top:10px;gap:8px}.button.pin{font-size:16px;padding:11px 16px;gap:8px}.button.pin svg{width:18px;height:18px}}
 
 /* ---------- browse ---------- */
 #browse{padding-top:20px;padding-bottom:32px}
@@ -263,7 +265,7 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 </head>
 <body>
 
-<a class="button primary pin" href="../camuva-rollouts/"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.5" r="1.5"/><path d="M12 5v3"/><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M1.5 13v3M22.5 13v3M9 13v2M15 13v2"/></svg>CamUVA Rollouts</a>
+<nav class="pins" aria-label="Sites"><a class="button pin home" href="../"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Home</a><a class="button primary pin" href="../camuva-rollouts/"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.5" r="1.5"/><path d="M12 5v3"/><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M1.5 13v3M22.5 13v3M9 13v2M15 13v2"/></svg>CamUVA Rollouts</a></nav>
 
 <main>
   <section class="hero wrap" id="overview">
