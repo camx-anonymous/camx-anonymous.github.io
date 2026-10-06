@@ -1,0 +1,87 @@
+{
+ "fingerprint": "d9cd41e07e52decdedb4f195d707fbb4f119a180f6d5e53f19acaec793cbcfaf",
+ "schema": 1,
+ "dataset": "robotiq/droid/PennPAL_success",
+ "episode": 1,
+ "views": [
+  "right_stereo_camera_left_rgb",
+  "right_stereo_camera_right_rgb",
+  "third_0_stereo_camera_left_rgb",
+  "third_1_stereo_camera_left_rgb"
+ ],
+ "fps": 14.925373134328359,
+ "shapes": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.right_stereo_camera_right_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid__PennPAL_success__ep1.mp4",
+  551611,
+  1791320178345796942
+ ],
+ "videos": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/PennPAL_success/videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    81003723,
+    1787510227402055352
+   ],
+   9.179
+  ],
+  "observation.image.right_stereo_camera_right_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/PennPAL_success/videos/observation.image.right_stereo_camera_right_rgb/chunk-000/file-000.mp4",
+    80174448,
+    1787510249770212164
+   ],
+   9.179
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/PennPAL_success/videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    70345541,
+    1787216627323895195
+   ],
+   9.179
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/PennPAL_success/videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    81342774,
+    1787215835607976359
+   ],
+   9.179
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid__PennPAL_success__ep1.mp4",
+   589184,
+   1791320206095998845
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid__PennPAL_success__ep1.jpg",
+   17193,
+   1791320206619002650
+  ]
+ }
+}

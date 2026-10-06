@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "11d3bdff40e1f11aa3d69865d4fd3c21f870a331f0d1942990a1b073930007e5",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/robotiq_droid/AUTOLab_failure__ep4/stitched.mp4",
+  3833922,
+  1791320172750756234
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid__AUTOLab_failure__ep4.mp4",
+  1310702,
+  1791320176572784042
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/robotiq_droid__AUTOLab_failure__ep4.jpg",
+  27790,
+  1791320177593791471
+ ]
+}

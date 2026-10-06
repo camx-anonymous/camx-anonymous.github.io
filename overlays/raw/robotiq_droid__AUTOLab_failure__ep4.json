@@ -1,0 +1,87 @@
+{
+ "fingerprint": "5729a3732116041c87afa9fdb2aa26a4598d762c051c1e24a4b4157d16ac3d73",
+ "schema": 1,
+ "dataset": "robotiq/droid/AUTOLab_failure",
+ "episode": 4,
+ "views": [
+  "right_stereo_camera_left_rgb",
+  "right_stereo_camera_right_rgb",
+  "third_0_stereo_camera_left_rgb",
+  "third_1_stereo_camera_left_rgb"
+ ],
+ "fps": 14.925373134328359,
+ "shapes": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.right_stereo_camera_right_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid__AUTOLab_failure__ep4.mp4",
+  1310702,
+  1791320176572784042
+ ],
+ "videos": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid/AUTOLab_failure/videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    73150802,
+    1787209616652574150
+   ],
+   95.40799999999999
+  ],
+  "observation.image.right_stereo_camera_right_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid/AUTOLab_failure/videos/observation.image.right_stereo_camera_right_rgb/chunk-000/file-000.mp4",
+    78740432,
+    1787206503721391224
+   ],
+   95.40799999999999
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid/AUTOLab_failure/videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    115467417,
+    1787209862822016956
+   ],
+   95.40799999999999
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid/AUTOLab_failure/videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    108554453,
+    1787211466767505322
+   ],
+   95.40799999999999
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid__AUTOLab_failure__ep4.mp4",
+   1427338,
+   1791320207710010588
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid__AUTOLab_failure__ep4.jpg",
+   26546,
+   1791320208276014706
+  ]
+ }
+}

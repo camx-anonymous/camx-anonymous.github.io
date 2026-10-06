@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "04a9445f56c249a879365196e6e08e93509519a180a36505384a88cfacb43562",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/robotiq_droid_lowres/TRI_success__ep0/stitched.mp4",
+  3361247,
+  1791320080460084782
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid_lowres__TRI_success__ep0.mp4",
+  709562,
+  1791320186135853620
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/robotiq_droid_lowres__TRI_success__ep0.jpg",
+  23601,
+  1791320186644857324
+ ]
+}

@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "d22fa59e9f12be687b0dd3d881873272fd1af6f08954314f2a6eea219a630acd",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/robotiq_droid/PennPAL_success__ep1/stitched.mp4",
+  1733627,
+  1791320106036270854
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid__PennPAL_success__ep1.mp4",
+  551611,
+  1791320178345796942
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/robotiq_droid__PennPAL_success__ep1.jpg",
+  19826,
+  1791320178868800747
+ ]
+}

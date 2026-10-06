@@ -1,0 +1,73 @@
+{
+ "fingerprint": "67d361b0d6e84c30ebd56bba2f337ba4fd05a99cb6d4a78ae630d7cf3bb269ee",
+ "schema": 1,
+ "dataset": "robotiq/droid_lowres/AUTOLab_success",
+ "episode": 0,
+ "views": [
+  "right_stereo_camera_left_rgb",
+  "third_0_stereo_camera_left_rgb",
+  "third_1_stereo_camera_left_rgb"
+ ],
+ "fps": 15.0,
+ "shapes": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid_lowres__AUTOLab_success__ep0.mp4",
+  582131,
+  1791320182810829428
+ ],
+ "videos": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/AUTOLab_success/videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    71170960,
+    1787465633535501680
+   ],
+   0.0
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/AUTOLab_success/videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    92878516,
+    1787465714843876139
+   ],
+   0.0
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/AUTOLab_success/videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    96363247,
+    1787465784083203043
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid_lowres__AUTOLab_success__ep0.mp4",
+   600201,
+   1791320205632995476
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid_lowres__AUTOLab_success__ep0.jpg",
+   21854,
+   1791320206055998553
+  ]
+ }
+}

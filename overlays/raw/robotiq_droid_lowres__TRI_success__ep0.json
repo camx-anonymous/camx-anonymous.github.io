@@ -1,0 +1,73 @@
+{
+ "fingerprint": "2cc93992fb0e538ac4e4c30c77a101a2aec9974ef339cebd37aedfe83b4c2608",
+ "schema": 1,
+ "dataset": "robotiq/droid_lowres/TRI_success",
+ "episode": 0,
+ "views": [
+  "right_stereo_camera_left_rgb",
+  "third_0_stereo_camera_left_rgb",
+  "third_1_stereo_camera_left_rgb"
+ ],
+ "fps": 15.0,
+ "shapes": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid_lowres__TRI_success__ep0.mp4",
+  709562,
+  1791320186135853620
+ ],
+ "videos": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/TRI_success/videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    90724463,
+    1787465637890521453
+   ],
+   0.0
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/TRI_success/videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    66491134,
+    1787465859011563988
+   ],
+   0.0
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/TRI_success/videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    73413589,
+    1787466167695110248
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid_lowres__TRI_success__ep0.mp4",
+   705906,
+   1791320205700995970
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid_lowres__TRI_success__ep0.jpg",
+   23469,
+   1791320206120999027
+  ]
+ }
+}

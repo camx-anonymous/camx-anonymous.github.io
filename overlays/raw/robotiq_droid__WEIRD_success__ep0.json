@@ -1,0 +1,87 @@
+{
+ "fingerprint": "bcff69fe99bf378780363795c965a24daf64facf6ed7abaa2307098953725a4b",
+ "schema": 1,
+ "dataset": "robotiq/droid/WEIRD_success",
+ "episode": 0,
+ "views": [
+  "right_stereo_camera_left_rgb",
+  "right_stereo_camera_right_rgb",
+  "third_0_stereo_camera_left_rgb",
+  "third_1_stereo_camera_left_rgb"
+ ],
+ "fps": 14.925373134328359,
+ "shapes": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.right_stereo_camera_right_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   480,
+   854,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid__WEIRD_success__ep0.mp4",
+  1878364,
+  1791320180777814637
+ ],
+ "videos": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/WEIRD_success/videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    72383031,
+    1787510666583123919
+   ],
+   0.0
+  ],
+  "observation.image.right_stereo_camera_right_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/WEIRD_success/videos/observation.image.right_stereo_camera_right_rgb/chunk-000/file-000.mp4",
+    69746106,
+    1787510685377315622
+   ],
+   0.0
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/WEIRD_success/videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    86672413,
+    1787208826450420422
+   ],
+   0.0
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd6/chiling/droid_data/droid/WEIRD_success/videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    85013942,
+    1787211077871927121
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid__WEIRD_success__ep0.mp4",
+   2020644,
+   1791320208329015092
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid__WEIRD_success__ep0.jpg",
+   26282,
+   1791320208908019304
+  ]
+ }
+}

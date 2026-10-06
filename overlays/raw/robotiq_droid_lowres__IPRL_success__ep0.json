@@ -1,0 +1,73 @@
+{
+ "fingerprint": "cc65f5721c6575cecbd9a421e68bc83981ec2700aca6672a3e73eecf738aba1a",
+ "schema": 1,
+ "dataset": "robotiq/droid_lowres/IPRL_success",
+ "episode": 0,
+ "views": [
+  "right_stereo_camera_left_rgb",
+  "third_0_stereo_camera_left_rgb",
+  "third_1_stereo_camera_left_rgb"
+ ],
+ "fps": 15.0,
+ "shapes": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   180,
+   320,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid_lowres__IPRL_success__ep0.mp4",
+  1500277,
+  1791320184449841353
+ ],
+ "videos": {
+  "observation.image.right_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/IPRL_success/videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    105620689,
+    1787465635711511556
+   ],
+   0.0
+  ],
+  "observation.image.third_0_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/IPRL_success/videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    88977222,
+    1787465799753277945
+   ],
+   0.0
+  ],
+  "observation.image.third_1_stereo_camera_left_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p_prefix/robotiq/droid_lowres/IPRL_success/videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4",
+    95216767,
+    1787465930346913654
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid_lowres__IPRL_success__ep0.mp4",
+   1477299,
+   1791320206817004091
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/robotiq_droid_lowres__IPRL_success__ep0.jpg",
+   21941,
+   1791320207395008296
+  ]
+ }
+}

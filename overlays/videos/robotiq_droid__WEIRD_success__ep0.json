@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "3f91dc5eb64cd9c72dcd0e79239f97986feb468c94e1163900f41dfd18c68918",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/robotiq_droid/WEIRD_success__ep0/stitched.mp4",
+  5578674,
+  1791319984633387656
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid__WEIRD_success__ep0.mp4",
+  1878364,
+  1791320180777814637
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/robotiq_droid__WEIRD_success__ep0.jpg",
+  27370,
+  1791320182177824823
+ ]
+}

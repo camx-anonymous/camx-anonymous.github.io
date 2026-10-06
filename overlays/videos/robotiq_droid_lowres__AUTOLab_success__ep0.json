@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "fdbfccb203a5ea07054d206029f4e1f5ad472c0e69c3c69ec1c9699c5acc8a89",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/robotiq_droid_lowres/AUTOLab_success__ep0/stitched.mp4",
+  2739500,
+  1791320082006096030
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/robotiq_droid_lowres__AUTOLab_success__ep0.mp4",
+  582131,
+  1791320182810829428
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/robotiq_droid_lowres__AUTOLab_success__ep0.jpg",
+  21583,
+  1791320183270832775
+ ]
+}
