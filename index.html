@@ -30,7 +30,9 @@ body{padding:clamp(36px,7vh,88px) var(--pad-x) 64px}
 .door:hover img{transform:scale(1.02);box-shadow:var(--shadow-md);outline-color:var(--accent)}
 .door:active img{transform:scale(1.01)}
 @media (prefers-reduced-motion:reduce){.door .button,.door img{transition:none}.door:hover .button.primary,.door:hover img{transform:none}}
-.door figure{margin:0;display:flex;flex-direction:column;gap:28px}
+/* the two figures share a horizontal centre line: the doors are equal height (grid stretch), the figure takes the
+   room under the button and centres its image in it */
+.door figure{margin:0;display:flex;flex-direction:column;justify-content:center;gap:28px;flex:1}
 .door img{display:block;width:100%;height:auto}
 :root[data-theme="dark"] .door img{background:#fff;border-radius:var(--r);padding:12px;box-sizing:border-box}
 @media (max-width:760px){.doors{grid-template-columns:1fr;gap:36px}}
