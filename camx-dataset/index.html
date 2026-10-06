@@ -427,7 +427,7 @@ const clipOf=r=>{const p=P[r.project],ov=p.overlays;if(!ov.length)return null;
 // the clip is borrowed from a sibling dataset: say so, and whether its rig matches
 const clipNote=(r,o)=>{if(!o||o.dataset===r.id)return '';const st=r.station&&clipStation(o)&&clipStation(o)!==r.station,
   jaws=r.variant&&clipJaws(o)&&clipJaws(o)!==r.variant;
-  return st||jaws?` <span class="note">(sibling dataset${jaws?`, ${esc(clipJaws(o))} jaws, this dataset uses ${esc(r.variant)}`:''}${st?`, ${esc(clipStation(o))} station`:''}: overlay geometry differs)</span>`:' <span class="note">(sibling dataset, same rig)</span>'};
+  return st||jaws?` <span class="note">(sibling dataset${jaws?`, ${esc(clipJaws(o))} jaws, this dataset uses ${esc(r.variant)}`:''}${st?`, ${esc(clipStation(o))} station`:''}: overlay geometry differs)</span>`:(r.station&&clipStation(o)&&r.variant&&clipJaws(o))?' <span class="note">(sibling dataset, same rig)</span>':' <span class="note">(sibling dataset)</span>'};
 function thumb(r){const o=clipOf(r);return o?{poster:RAW+clipName(o)+'.jpg'}:null}
 
 // the heading of a dataset: info.json's task name where the build found one (AgiBot World, whose ids are opaque numbers;

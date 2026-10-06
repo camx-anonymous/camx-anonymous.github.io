@@ -260,6 +260,9 @@ REPLACE_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
     # RoboMIND: the export carries no gripper model string, so the registry key is given (Cobot Magic v2 = ARX5 jaws), eef per episode
     ('aloha/robomind', MV(config='robomind.json', profile='registry:cobot magic v2'), [('arrange_blocks_and_place_orange_in_center_with_arms', 3),
                                                     ('pour_seasoning_into_cup_on_scale_with_both_arms', 7), ('write_number_9_on_whiteboard', 3)]),
+    # 12 RoboMIND datasets are Cobot Magic v1 by their per-episode variant column (2026-10-06 audit); one clip of that rig so their
+    # pages do not borrow a v2 clip
+    ('aloha/robomind', MV(config='robomind.json', profile='registry:cobot magic v1'), [('fold_clothes', 8)]),
     ('aloha/xvla_softfold', MV(config='xvla_softfold.json'), [('fold_the_cloth', 1)]),
     ('iphumi/behavior_prompting', IPHUMI, [('fold_up', 6), ('left_arm_across_error_correction', 2), ('right_arm_across_error_correction', 4)]),
     ('iphumi/gated_memory_policy', IPHUMI, [('pick_and_place_back_all', 9), ('pick_and_place_back_and_correction', 4),

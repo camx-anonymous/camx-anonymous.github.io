@@ -484,21 +484,40 @@ def dataset_variant(root, rel):
     files = sorted(_glob.glob(os.path.join(root, rel, 'meta', 'episodes', '**', '*.parquet'), recursive=True))
     if not files: return None
     cols = [c for c in pq.read_schema(files[0]).names if c.endswith('_gripper_variant')]
-    if not cols: return None
-    n = collections.Counter()
-    for f in files:
-        t = pq.read_table(f, columns=cols)
-        for c in cols: n.update(v for v in t.column(c).to_pylist() if v)
+    if cols:
+        n = collections.Counter()
+        for f in files:
+            t = pq.read_table(f, columns=cols)
+            for c in cols: n.update(v for v in t.column(c).to_pylist() if v)
+        if n: return n.most_common(1)[0][0]
+    return dataset_gripper_model(root, rel)
+
+
+def dataset_gripper_model(root, rel):
+    """The gripper model info.json declares for the dataset (`<side>_gripper_model`, the registry spelling the clip
+    records use in grippers[side].model), None when it declares none. The fallback of dataset_variant for projects whose
+    rigs differ by whole gripper rather than by jaw variant (2026-10-06 audit: RoboCOIN's 103 Cobot Magic pages showed
+    the Galaxea R1-Lite clip, RoboDojo's ARX X5 pages the PiPER-X clip, because their rows had no `variant`)."""
+    try: info = json.load(open(os.path.join(root, rel, 'meta', 'info.json')))
+    except (OSError, ValueError): return None
+    n = collections.Counter(str(info[k]).strip().lower() for k in ('left_gripper_model', 'right_gripper_model', 'gripper_model') if info.get(k))
     return n.most_common(1)[0][0] if n else None
 
 
 def variants_pass(out, root, rows=None):
-    """Writes each dataset row's `variant` (dataset_variant) for the projects whose clips name a gripper model that differs
-    between clips -- the only case where the page has to choose a clip by jaws (camx-dataset/index.html clipOf). Rows of
-    other projects are left alone. `rows`: only these rows (the --add path), default all."""
+    """Writes each dataset row's `variant` (dataset_variant) for the projects whose clips, or whose datasets, name more
+    than one gripper model -- the cases where the page has to choose a clip by jaws (camx-dataset/index.html clipOf).
+    Rows of other projects are left alone. `rows`: only these rows (the --add path), default all."""
     mixed = {p['key'] for p in out['projects']
              if len({g.get('model') for o in p.get('overlays', []) for g in o.get('grippers', {}).values() if g.get('model')}) > 1}
     back = {v: k for k, v in ID_RENAMES.items()}
+    # ... and the projects whose DATASETS span more than one gripper model even though their clips do not (RoboMIND:
+    # v1 and v2 Cobot Magic datasets, v2 clips only): the page must still know which rows the clips do not fit
+    with_clips = {p['key'] for p in out['projects'] if p.get('overlays')} - mixed
+    models = collections.defaultdict(set)
+    for r in out['datasets']:
+        if r['project'] in with_clips: models[r['project']].add(dataset_variant(root, back.get(r['id'], r['id'])))
+    mixed |= {k for k, v in models.items() if len(v - {None}) > 1}
     todo = [r for r in (out['datasets'] if rows is None else rows) if r['project'] in mixed]
     for r in todo:
         v = dataset_variant(root, back.get(r['id'], r['id']))
