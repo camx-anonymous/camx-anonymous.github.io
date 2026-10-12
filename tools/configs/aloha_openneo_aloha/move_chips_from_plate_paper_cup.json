@@ -1,0 +1,82 @@
+{
+  "_README": "OpenNeoData aloha (ALOHA-PiPER): wrist cameras + HEAD camera; hardware not published, PRIOR hfov 70 everywhere. SAMPLE COPY 2026-10-03: wrist hfov 92.6 (fx 306, calib/openneo_wrist_aloha_fx306_assumed.json). PER-DATASET COPY: head static_pose_xyz_wxyz = fitted pose of move_chips_from_plate_paper_cup source episodes 5383-5608 (placement 0, hand-picked wrist-camera / fingertip points -> PnP (pnp_head.py), rms 19.0 px, fair); the stored head trajectory is the unfitted prior. Wrist videos: retarget_camera_in_eef from the pass-12 hand prior to the 2026-10-06 fitted mount (aloha_wrist_camera_in_eef_fit_1006.json).",
+  "videos": [
+    {
+      "name": "left_main_camera_rgb",
+      "video_key": "observation.image.left_main_camera_rgb",
+      "camera_trajectory_key": "observation.state.left_main_camera_trajectory_xyz_wxyz",
+      "hfov_deg": 92.56,
+      "retarget_camera_in_eef": {
+        "old": [
+          -0.08,
+          0.0,
+          0.025,
+          0.70279,
+          -0.17943,
+          0.13519,
+          -0.675
+        ],
+        "new": [
+          -0.078838,
+          -0.006445,
+          0.105731,
+          0.718042,
+          -0.168654,
+          0.11538,
+          -0.665326
+        ]
+      }
+    },
+    {
+      "name": "right_main_camera_rgb",
+      "video_key": "observation.image.right_main_camera_rgb",
+      "camera_trajectory_key": "observation.state.right_main_camera_trajectory_xyz_wxyz",
+      "hfov_deg": 92.56,
+      "retarget_camera_in_eef": {
+        "old": [
+          -0.08,
+          0.0,
+          0.025,
+          0.70279,
+          -0.17943,
+          0.13519,
+          -0.675
+        ],
+        "new": [
+          -0.078838,
+          -0.006445,
+          0.105731,
+          0.718042,
+          -0.168654,
+          0.11538,
+          -0.665326
+        ]
+      }
+    },
+    {
+      "name": "head_main_camera_rgb",
+      "video_key": "observation.image.head_main_camera_rgb",
+      "camera_trajectory_key": "observation.state.head_main_camera_trajectory_xyz_wxyz",
+      "hfov_deg": 42.56,
+      "static_pose_xyz_wxyz": [
+        0.016925,
+        -0.402728,
+        1.012469,
+        0.162923,
+        -0.687539,
+        0.699892,
+        -0.104395
+      ]
+    }
+  ],
+  "scalars": [
+    {
+      "name": "left_gripper_width",
+      "data_key": "observation.state.left_gripper_width_m"
+    },
+    {
+      "name": "right_gripper_width",
+      "data_key": "observation.state.right_gripper_width_m"
+    }
+  ]
+}

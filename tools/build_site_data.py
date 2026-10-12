@@ -729,6 +729,8 @@ def overlay_records(metas):
                'bytes': os.path.getsize(st) if os.path.exists(st) else 0}
         if any(g.get('standin') for g in (d.get('grippers') or {}).values()):
             rec['standin'] = sorted({g['profile'] for g in d['grippers'].values() if g.get('standin')})
+            notes = sorted({g['standin_note'] for g in d['grippers'].values() if g.get('standin_note')})
+            if notes: rec['standin_note'] = '; '.join(notes)
         for field in ('overlay_scope', 'calibration', 'no_overlay'):   # no_overlay: a raw-only clip's reason (tools/raw_only_clips.py)
             if field in d: rec[field] = d[field]
         out.append((d.get('project'), rec))

@@ -1,0 +1,73 @@
+{
+ "fingerprint": "b717b8857beb8b721913924178f9cb7b556bc4a87d3e8a96ca28433d8abf4fdd",
+ "schema": 1,
+ "dataset": "aloha/robomind/pour_seasoning_into_cup_on_scale_with_both_arms",
+ "episode": 7,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb"
+ ],
+ "fps": 27.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_robomind__pour_seasoning_into_cup_on_scale_with_both_arms__ep7.mp4",
+  664425,
+  1791333875233158343
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p/aloha/robomind/pour_seasoning_into_cup_on_scale_with_both_arms/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    42848649,
+    1788491131379746829
+   ],
+   165.62962962962965
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p/aloha/robomind/pour_seasoning_into_cup_on_scale_with_both_arms/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    38054407,
+    1788491127470726065
+   ],
+   165.62962962962965
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p/aloha/robomind/pour_seasoning_into_cup_on_scale_with_both_arms/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    36087420,
+    1788491123405704474
+   ],
+   165.62962962962965
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_robomind__pour_seasoning_into_cup_on_scale_with_both_arms__ep7.mp4",
+   677289,
+   1791333956141806748
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_robomind__pour_seasoning_into_cup_on_scale_with_both_arms__ep7.jpg",
+   9041,
+   1791333956617810552
+  ]
+ }
+}

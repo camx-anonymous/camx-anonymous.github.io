@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "0325b5dcef7e45cac77f3e64eede78979bd89aa96635e453b0ac541ed8d99319",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_robomind/fold_clothes__ep8/stitched.mp4",
+  3997608,
+  1791407519527753396
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_robomind__fold_clothes__ep8.mp4",
+  1185684,
+  1791407563415057942
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_robomind__fold_clothes__ep8.jpg",
+  10324,
+  1791407564153063059
+ ]
+}

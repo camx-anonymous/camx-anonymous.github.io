@@ -1,0 +1,73 @@
+{
+ "fingerprint": "8cb21f7a1041603347a026ffca1249c142c9bd2f03200068de1cf523e1f3217c",
+ "schema": 1,
+ "dataset": "aloha/openneo_aloha/wipe_the_white_plastic_board",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_openneo_aloha__wipe_the_white_plastic_board__ep0.mp4",
+  535546,
+  1791342454421554187
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/chiling/openneo_data/processed_data/aloha/wipe_the_white_plastic_board/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    140321415,
+    1789160411804154315
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/chiling/openneo_data/processed_data/aloha/wipe_the_white_plastic_board/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    118287511,
+    1789160363052756985
+   ],
+   0.0
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd4/chiling/openneo_data/processed_data/aloha/wipe_the_white_plastic_board/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    208691866,
+    1789160461761560401
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_openneo_aloha__wipe_the_white_plastic_board__ep0.mp4",
+   540178,
+   1791342468172649672
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_openneo_aloha__wipe_the_white_plastic_board__ep0.jpg",
+   8182,
+   1791342468613652736
+  ]
+ }
+}

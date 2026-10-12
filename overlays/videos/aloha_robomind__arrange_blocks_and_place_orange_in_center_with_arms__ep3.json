@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "0bdcc06e9dfff9cb9f9f3280ad2df0d11ade1a502fe96ee01483097b413fccc1",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_robomind/arrange_blocks_and_place_orange_in_center_with_arms__ep3/stitched.mp4",
+  4725840,
+  1791333822499733650
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_robomind__arrange_blocks_and_place_orange_in_center_with_arms__ep3.mp4",
+  1066448,
+  1791333872297134743
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_robomind__arrange_blocks_and_place_orange_in_center_with_arms__ep3.jpg",
+  12173,
+  1791333873686145909
+ ]
+}

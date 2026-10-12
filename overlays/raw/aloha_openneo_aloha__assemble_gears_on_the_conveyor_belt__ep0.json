@@ -1,0 +1,73 @@
+{
+ "fingerprint": "8dcdc8b02406e202dbfe08f7c1ff84b05c49cb7636feceea5abca60d9c412370",
+ "schema": 1,
+ "dataset": "aloha/openneo_aloha/assemble_gears_on_the_conveyor_belt",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb",
+  "head_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.head_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_openneo_aloha__assemble_gears_on_the_conveyor_belt__ep0.mp4",
+  1270832,
+  1791342252752164601
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/chiling/openneo_data/processed_data/aloha/assemble_gears_on_the_conveyor_belt/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    135289220,
+    1789152331984686229
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/chiling/openneo_data/processed_data/aloha/assemble_gears_on_the_conveyor_belt/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    196290055,
+    1789152313931556977
+   ],
+   0.0
+  ],
+  "observation.image.head_main_camera_rgb": [
+   [
+    "/storage/hdd4/chiling/openneo_data/processed_data/aloha/assemble_gears_on_the_conveyor_belt/videos/observation.image.head_main_camera_rgb/chunk-000/file-000.mp4",
+    207240535,
+    1789152361402897184
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_openneo_aloha__assemble_gears_on_the_conveyor_belt__ep0.mp4",
+   1342928,
+   1791342469112656203
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/aloha_openneo_aloha__assemble_gears_on_the_conveyor_belt__ep0.jpg",
+   16961,
+   1791342469466658662
+  ]
+ }
+}

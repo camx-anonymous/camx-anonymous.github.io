@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "8b689768901577205893424aa3f231dbf3459b3c512f26845b0b11972639836b",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_openneo_aloha/assemble_gears_on_the_conveyor_belt__ep0/stitched.mp4",
+  4176012,
+  1791342249678143599
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_openneo_aloha__assemble_gears_on_the_conveyor_belt__ep0.mp4",
+  1270832,
+  1791342252752164601
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_openneo_aloha__assemble_gears_on_the_conveyor_belt__ep0.jpg",
+  17757,
+  1791342253653170758
+ ]
+}

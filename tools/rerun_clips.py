@@ -57,8 +57,17 @@ EXTRA_CONFIG = {'franka_hand/fmb': 'config/fmb.json', 'franka_hand/rh20t_cfg5': 
                 'umi/openneo_umi_single': 'config/openneo_umi_single.json'}
 # the dataset names another gripper than the rig carries: drawn with this registry profile instead (AIST: ALOHA 1 arms, ALOHA-2-style fingers)
 MODEL_OVERRIDE = {'aloha/aist_bimanip': 'aloha2'}
-STANDIN = {'aloha/openneo_aloha': 'piper', 'aloha/openneo_arx5': 'arx x5', 'aloha/openneo_arx5_single': 'arx x5',
+STANDIN = {'aloha/openneo_aloha': 'piper intac', 'aloha/openneo_arx5': 'arx x5', 'aloha/openneo_arx5_single': 'arx x5',
            'umi/openneo_umi': 'umi', 'umi/openneo_umi_single': 'umi'}   # the ARX X5 / UMI ones are in KEEP, see there
+# what the stand-in is, for the clip caption (default: "stock <profile> gripper as stand-in")
+STANDIN_NOTE = {'aloha/openneo_aloha': 'stock PiPER gripper drive with NeoteAI InTac visuotactile fins modelled from the datasheet envelope '
+                                       '(65 x 28 x 18 mm, no vendor CAD), grippers/piper_intac'}
+# per-DATASET viz config (configs/<project key>/<dataset>.json, written by tools/openneo_aloha_head_configs.py): the OpenNeo aloha
+# head camera is re-placed per recording session and the release stores one hand prior for every task, so each clip's config
+# carries the head pose fitted for its episode's session block (lerobot_rerun_viz ``static_pose_xyz_wxyz``)
+def dataset_config(o):
+    p = os.path.join(HERE, 'configs', key_of(proj_of(o)), Path(o['dataset']).name + '.json')
+    return p if os.path.isfile(p) else None
 # fisheye route: arguments of render_bimanual_urdf_overlay_video.py (tiles: right main | left main)
 GOPRO = dict(profile='umi', calib='gopro_hero9_maxlens_2_7k_umi.json', fit='crop')   # GoPro Hero 9/10 + Max Lens Mod, centre crop
 FISHEYE = {p: GOPRO for p in ('fastumi/fastumi', 'fastumi/fastumi_100k_single_arm', 'umi/data_scaling_laws', 'umi/exumi', 'umi/humi',
@@ -108,6 +117,7 @@ def is_done(d):
     try: return os.path.isfile(os.path.join(d, 'DONE.json')) and 'tool' in json.load(open(os.path.join(d, 'meta.json')))
     except (OSError, ValueError): return False
 def proj_of(o): return '/'.join(o['dataset'].split('/')[:2])
+def key_of(project): return project.replace('/', '_')
 def feat(name): return name.split('observation.image.', 1)[1] if name.startswith('observation.image.') else name
 def info_of(rel): return json.load(open(os.path.join(dataset_root(ROOT, rel), 'meta', 'info.json')))
 def stamp(rel):
@@ -317,7 +327,7 @@ def route_of(o):
                 and all(os.path.isfile(os.path.join(cd, v['name'] + '.mp4')) for v in m['views']): return 'reuse', cd
     import build_mv_site as B
     info = info_of(o['dataset']); keys = [k for k, f in info['features'].items() if f.get('dtype') == 'video']
-    cfg = B.config_for(proj, str(info.get('robot_type')), len(keys), keys, o['dataset'])
+    cfg = dataset_config(o) or B.config_for(proj, str(info.get('robot_type')), len(keys), keys, o['dataset'])
     if cfg is None and proj in EXTRA_CONFIG: cfg = EXTRA_CONFIG[proj] if os.path.isabs(EXTRA_CONFIG[proj]) else os.path.join(VIZ, EXTRA_CONFIG[proj])
     if cfg is None or not os.path.isfile(str(cfg)): return 'keep', f'no viz config ({cfg})'
     return 'rerun', str(cfg)
@@ -365,7 +375,8 @@ def rerun_one(o, cfg, d, slot, t0):
         prof = gripper_registry.lookup(STANDIN[proj])
         for side in grip:
             extra += ['--gripper-profile-override', f'{side}={STANDIN[proj]}']
-            grip[side] = dict(grip[side], profile=prof.name, urdf=str(prof.urdf_path(side)), urdf_present=prof.urdf_path(side).is_file(), standin=True)
+            grip[side] = dict(grip[side], profile=prof.name, urdf=str(prof.urdf_path(side)), urdf_present=prof.urdf_path(side).is_file(), standin=True,
+                              **({'standin_note': STANDIN_NOTE[proj]} if proj in STANDIN_NOTE else {}))
     if proj in MODEL_OVERRIDE:
         prof = gripper_registry.lookup(MODEL_OVERRIDE[proj])
         for side in grip:
@@ -571,7 +582,12 @@ def attach():
                    'render_fingerprint': m['render_provenance']['fingerprint'], 'render_built': m.get('built'),
                    'seconds': round((m.get('n_frames') or 0) / (m.get('out_fps') or OUT_FPS), 1),
                    'bytes': os.path.getsize(mp4) if os.path.isfile(mp4) else os.path.getsize(os.path.join(d, 'stitched.mp4'))}
-            if any(g.get('standin') for g in (m.get('grippers') or {}).values()): rec['standin'] = sorted({g['profile'] for g in m['grippers'].values() if g.get('standin')})
+            if any(g.get('standin') for g in (m.get('grippers') or {}).values()):
+                rec['standin'] = sorted({g['profile'] for g in m['grippers'].values() if g.get('standin')})
+                notes = sorted({g['standin_note'] for g in m['grippers'].values() if g.get('standin_note')})
+                if notes: rec['standin_note'] = '; '.join(notes)
+                else: rec.pop('standin_note', None)
+            else: rec.pop('standin_note', None)
             if proj_of(o) in OWN_ONLY: rec['own_only'] = True
             for field in ('overlay_scope', 'calibration'):
                 if field in m: rec[field] = m[field]

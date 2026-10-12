@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "ab7196c25d60674849d215e569ed42dc51526e5dde0772495dbcccc502e5322c",
+ "source": [
+  "/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/aloha_robomind/pour_seasoning_into_cup_on_scale_with_both_arms__ep7/stitched.mp4",
+  2328339,
+  1791333810687638272
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/aloha_robomind__pour_seasoning_into_cup_on_scale_with_both_arms__ep7.mp4",
+  664425,
+  1791333875233158343
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/aloha_robomind__pour_seasoning_into_cup_on_scale_with_both_arms__ep7.jpg",
+  10662,
+  1791333876021164676
+ ]
+}
