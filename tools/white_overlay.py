@@ -9,11 +9,16 @@ so every argument of the renderer applies unchanged:
 
   python tools/white_overlay.py --dataset-root <dataset> --episode 0 --profile umi --calib <lens.json> --alpha 1.0 --output clip.mp4
 Env:
-  CAMX_VIZ  camera-cross-embodiment/camx/visualization (default ~/video-gen/repositories/camera-cross-embodiment/camx/visualization)
+  CAMX_VIZ  directory holding render_bimanual_urdf_overlay_video.py. Default: this file's own directory when the renderer
+            sits beside it (the self-contained release layout, <release>/lib), else
+            ~/video-gen/repositories/camera-cross-embodiment/camx/visualization (the checkout)
 """
 import os, sys, types
 
-VIZ = os.path.expanduser(os.environ.get('CAMX_VIZ', '~/video-gen/repositories/camera-cross-embodiment/camx/visualization'))
+_HERE = os.path.dirname(os.path.abspath(__file__))
+VIZ = os.path.expanduser(os.environ.get('CAMX_VIZ') or (
+    _HERE if os.path.isfile(os.path.join(_HERE, 'render_bimanual_urdf_overlay_video.py'))
+    else '~/video-gen/repositories/camera-cross-embodiment/camx/visualization'))
 WHITE = (236, 220, 220)   # BGR: OVERLAY_COLOR 200/200/215 scaled so the lit faces reach it
 sys.path.insert(0, VIZ)
 path = os.path.join(VIZ, 'render_bimanual_urdf_overlay_video.py')

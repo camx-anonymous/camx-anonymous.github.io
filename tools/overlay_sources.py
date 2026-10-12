@@ -31,7 +31,7 @@ def dataset_root(root, relative):
         # The side2 re-conversion (4,681 episodes whose only stream is the real wrist camera): released 2026-10-04 10:40
         # with meta/_SUCCESS, but its camx_480p link is on the coordinator's hold (PLAN.md family map, LOG 2026-10-04 09:55),
         # so the site reads the export directly. The site's dataset row was built from the same tree.
-        side2 = os.path.expanduser(os.environ.get('CAMX_BRIDGE_V2_ROOT', '/storage/hdd4/yihuai/bridge_data/processed_data_side2/bridge_v2'))
+        side2 = os.path.expanduser(os.environ.get('CAMX_BRIDGE_V2_ROOT', '/data/bridge_v2_side2'))
         if not os.path.isfile(os.path.join(side2, 'meta', 'info.json')):
             raise FileNotFoundError('Bridge V2 clips need the side2 wrist-camera export. Set CAMX_BRIDGE_V2_ROOT to its dataset directory: ' + side2)
         return side2

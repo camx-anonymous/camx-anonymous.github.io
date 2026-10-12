@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build data/datasets.json for the CAMX data manager site.
 
-Sources (desktop001 only):
+Sources (the build host only):
   * every LeRobot-v3 leaf under the canonical camx_480p namespace (meta/info.json)
   * camera-cross-embodiment/camx/figures/dataset_inventory.json  (embodiment / source / form factor / notes / 480p bytes)
   * camx_480p_browser/stats/stats.json                            (skills, episode-duration histogram, #instructions)
@@ -774,7 +774,7 @@ def retotal(out):
 
 def add_leaves(out, root, prefixes, stats, inv_rows):
     """Incremental build: the rows of the leaves under the root-relative `prefixes` (family/project[/dataset]) replace or
-    join those of --out, the other rows stay as they were built (the live site is built from desktop001's tree, which
+    join those of --out, the other rows stay as they were built (the live site is built from the build host's tree, which
     this machine's tree does not match leaf for leaf: user, 2026-10-03). The touched projects are re-aggregated, keeping
     their clip records; new rows carry sample=None until their archives are published."""
     want = [x.strip().strip('/').split('/') for x in prefixes if x.strip()]

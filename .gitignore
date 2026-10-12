@@ -4,3 +4,5 @@ CLAUDE.local.md
 .DS_Store
 _build/
 __pycache__/
+overlays/videos/*.json
+overlays/raw/*.json
