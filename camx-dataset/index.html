@@ -421,7 +421,7 @@ const clipJaws=o=>{const m=new Set(Object.values(o.grippers||{}).map(g=>g.model)
 const clipStation=o=>{const row=L.find(x=>x.id===o.dataset);return row?row.station||null:null};
 const clipOf=r=>{const p=P[r.project],ov=p.overlays;if(!ov.length)return null;
   const own=ov.find(o=>o.dataset===r.id);if(own)return own;
-  // Beta ids name distinct tasks: a supermarket clip cannot preview Fold shorts.
+  // Beta ids name distinct tasks: a supermarket clip cannot preview Fold shorts. Every Beta dataset has its own clip since 2026-10-11.
   if(r.project==='agibot/agibot_world_beta')return null;
   const st=r.station||null,jaws=r.variant||null;
   const sameSt=o=>!st||clipStation(o)===st,sameJaws=o=>!jaws||clipJaws(o)===jaws;

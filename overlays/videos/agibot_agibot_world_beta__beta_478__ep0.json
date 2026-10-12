@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "render_fingerprint": "abead40e8ba9f3bd5675ae9b69217230457bb05c5192858eb1b5731fcd0ab988",
+ "source": [
+  "/storage/ssd1/yihuai/camx_clips_agibot_1011/agibot_agibot_world_beta/beta_478__ep0/stitched.mp4",
+  7188134,
+  1791786192653748459
+ ],
+ "video": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/agibot_agibot_world_beta__beta_478__ep0.mp4",
+  1627928,
+  1791786463758557821
+ ],
+ "poster": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/posters/agibot_agibot_world_beta__beta_478__ep0.jpg",
+  10513,
+  1791786464910565306
+ ]
+}

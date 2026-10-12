@@ -1,0 +1,59 @@
+{
+ "fingerprint": "5784b3d8bafbc7a83ac2b7522df5df8e7f50a49619babc22101fb1a5874539e4",
+ "schema": 1,
+ "dataset": "agibot/agibot_world_beta/beta_460",
+ "episode": 0,
+ "views": [
+  "right_main_camera_rgb",
+  "left_main_camera_rgb"
+ ],
+ "fps": 30.0,
+ "shapes": {
+  "observation.image.right_main_camera_rgb": [
+   480,
+   640,
+   3
+  ],
+  "observation.image.left_main_camera_rgb": [
+   480,
+   640,
+   3
+  ]
+ },
+ "overlay": [
+  "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/videos/agibot_agibot_world_beta__beta_460__ep0.mp4",
+  1304684,
+  1791786439145397536
+ ],
+ "videos": {
+  "observation.image.right_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p/agibot/agibot_world_beta/beta_460/videos/observation.image.right_main_camera_rgb/chunk-000/file-000.mp4",
+    176923121,
+    1789402409287134391
+   ],
+   0.0
+  ],
+  "observation.image.left_main_camera_rgb": [
+   [
+    "/storage/hdd4/yihuai/camx_480p/agibot/agibot_world_beta/beta_460/videos/observation.image.left_main_camera_rgb/chunk-000/file-000.mp4",
+    187976350,
+    1789402408484137029
+   ],
+   0.0
+  ]
+ },
+ "tool_sha256": "0dedd228b68821d37d3776f89e4210025b0204ecd6aaecfb236c32d1bd725814",
+ "outputs": {
+  "video": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/agibot_agibot_world_beta__beta_460__ep0.mp4",
+   1358772,
+   1791786558479168842
+  ],
+  "poster": [
+   "/home/yihuai/robotics/websites/camx-anonymous.github.io/overlays/raw/agibot_agibot_world_beta__beta_460__ep0.jpg",
+   11132,
+   1791786559056172538
+  ]
+ }
+}
