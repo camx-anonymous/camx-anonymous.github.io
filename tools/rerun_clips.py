@@ -325,7 +325,7 @@ def route_of(o):
         have = [feat(v['video_key']) for v in m['views']]
         if m.get('render_provenance', {}).get('fingerprint') == render_provenance(o)['fingerprint'] and all(v in have for v in o['views']) \
                 and all(os.path.isfile(os.path.join(cd, v['name'] + '.mp4')) for v in m['views']): return 'reuse', cd
-    import build_mv_site as B
+    import build_mv_site as B; B.CAMX_ROOT = Path(ROOT)   # build_mv_site hardcodes its tree: follow CAMX_ROOT (a shadow root for corrected datasets)
     info = info_of(o['dataset']); keys = [k for k, f in info['features'].items() if f.get('dtype') == 'video']
     cfg = dataset_config(o) or B.config_for(proj, str(info.get('robot_type')), len(keys), keys, o['dataset'])
     if cfg is None and proj in EXTRA_CONFIG: cfg = EXTRA_CONFIG[proj] if os.path.isabs(EXTRA_CONFIG[proj]) else os.path.join(VIZ, EXTRA_CONFIG[proj])
@@ -353,6 +353,7 @@ def reuse_one(o, cd, d, t0):
 
 def rerun_one(o, cfg, d, slot, t0):
     import build_mv_site as B, gripper_registry
+    B.CAMX_ROOT = Path(ROOT)   # resolve_videos keys RRD_EXTRA_ARGS by the dataset's path relative to build_mv_site.CAMX_ROOT
     proj, rel, ep = proj_of(o), o['dataset'], int(o['episode']); root = Path(dataset_root(ROOT, rel))
     as_py = lambda v: v.as_py() if hasattr(v, 'as_py') else v  # noqa: E731
     row = next(r for r in B.episodes_table(root) if int(as_py(r['episode_index'])) == ep)

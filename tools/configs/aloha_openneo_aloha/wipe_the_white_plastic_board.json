@@ -1,72 +1,23 @@
 {
-  "_README": "OpenNeoData aloha (ALOHA-PiPER): wrist cameras + HEAD camera; hardware not published, PRIOR hfov 70 everywhere. SAMPLE COPY 2026-10-03: wrist hfov 92.6 (fx 306, calib/openneo_wrist_aloha_fx306_assumed.json). PER-DATASET COPY: head static_pose_xyz_wxyz = fitted pose of wipe_the_white_plastic_board source episodes 11574-11618 (placement 0, hand-picked wrist-camera / fingertip points -> PnP (pnp_head.py), rms 11.9 px, good); the stored head trajectory is the unfitted prior. Wrist videos: retarget_camera_in_eef from the pass-12 hand prior to the 2026-10-06 fitted mount (aloha_wrist_camera_in_eef_fit_1006.json).",
+  "_README": "OpenNeoData aloha (ALOHA-PiPER): wrist cameras + HEAD camera; hardware not published, PRIOR hfov 70 everywhere. SAMPLE COPY 2026-10-03: wrist hfov 92.6 (fx 306, calib/openneo_wrist_aloha_fx306_assumed.json). PER-DATASET COPY (rewritten 2026-10-13): intrinsics only. The data of export openneo_7862eb2b_20261013 (camx/data_processing/openneo/scripts/backfill_aloha_head_wrist_joints.py, 2026-10-13) now CARRIES the fitted head pose per recording-session placement (episode 0: source episodes 11574-11618, placement 0, rms 11.9 px) in head_main_camera_trajectory and the 2026-10-06 fitted wrist mount (aloha_wrist_camera_in_eef_fit_1006.json) in the wrist camera trajectories, so this config no longer sets static_pose_xyz_wxyz or retarget_camera_in_eef (either would double-apply the fit). Kept: the head hfov fitted with that pose (70.0 deg, aloha_head_pose_by_source_episode.json row) and the wrist hfov 92.56 (fx 306 at 640 px).",
   "videos": [
     {
       "name": "left_main_camera_rgb",
       "video_key": "observation.image.left_main_camera_rgb",
       "camera_trajectory_key": "observation.state.left_main_camera_trajectory_xyz_wxyz",
-      "hfov_deg": 92.56,
-      "retarget_camera_in_eef": {
-        "old": [
-          -0.08,
-          0.0,
-          0.025,
-          0.70279,
-          -0.17943,
-          0.13519,
-          -0.675
-        ],
-        "new": [
-          -0.078838,
-          -0.006445,
-          0.105731,
-          0.718042,
-          -0.168654,
-          0.11538,
-          -0.665326
-        ]
-      }
+      "hfov_deg": 92.56
     },
     {
       "name": "right_main_camera_rgb",
       "video_key": "observation.image.right_main_camera_rgb",
       "camera_trajectory_key": "observation.state.right_main_camera_trajectory_xyz_wxyz",
-      "hfov_deg": 92.56,
-      "retarget_camera_in_eef": {
-        "old": [
-          -0.08,
-          0.0,
-          0.025,
-          0.70279,
-          -0.17943,
-          0.13519,
-          -0.675
-        ],
-        "new": [
-          -0.078838,
-          -0.006445,
-          0.105731,
-          0.718042,
-          -0.168654,
-          0.11538,
-          -0.665326
-        ]
-      }
+      "hfov_deg": 92.56
     },
     {
       "name": "head_main_camera_rgb",
       "video_key": "observation.image.head_main_camera_rgb",
       "camera_trajectory_key": "observation.state.head_main_camera_trajectory_xyz_wxyz",
-      "hfov_deg": 70.0,
-      "static_pose_xyz_wxyz": [
-        0.179922,
-        -0.017685,
-        0.820224,
-        -0.042676,
-        -0.623042,
-        0.741892,
-        -0.244119
-      ]
+      "hfov_deg": 70.0
     }
   ],
   "scalars": [

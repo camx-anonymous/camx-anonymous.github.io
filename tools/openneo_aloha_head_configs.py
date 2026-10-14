@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Per-dataset viz configs for the OpenNeo aloha clips: the fitted HEAD camera pose of each clip's recording-session block.
+"""SUPERSEDED 2026-10-13 by the data backfill (camx/data_processing/openneo/scripts/backfill_aloha_head_wrist_joints.py, exports
+openneo_<sha8>_20261013 under /storage/ssd4/yihuai/camx_480p/aloha/openneo_aloha): the fitted head pose per recording-session
+placement and the 2026-10-06 wrist mount are now IN the data, so a config written by this tool (static_pose_xyz_wxyz on the head
+video, retarget_camera_in_eef on the wrist videos) would double-apply both fits. The configs in configs/aloha_openneo_aloha/ were
+rewritten by hand on 2026-10-13 to carry the per-task hfov only; do not re-run this tool against them. It refuses to run unless
+called with --i-know-the-data-is-unpatched (for a render from an UNPATCHED export only). Kept for the record of how the fits
+were passed to the viewer before the backfill.
+
+Original purpose: per-dataset viz configs for the OpenNeo aloha clips: the fitted HEAD camera pose of each clip's recording-session block.
 
 The release stores ONE hand prior (fold_towels top-down) as head_main_camera_trajectory for every aloha task, while the head
 camera was re-placed per task / session. Until the data is backfilled, the site renders the head view through the pose fitted
@@ -25,6 +33,9 @@ def row_for(rows, task, ep):
 
 
 def main():
+    if '--i-know-the-data-is-unpatched' not in sys.argv[1:]:
+        raise SystemExit('openneo_aloha_head_configs.py is superseded by the 2026-10-13 data backfill (see the docstring): the fitted head pose and '
+                         'wrist mount are in the data, re-writing the configs would double-apply them. Pass --i-know-the-data-is-unpatched to run anyway.')
     table = json.load(open(TABLE)); rows = table['rows']
     base = json.load(open(BASE)); os.makedirs(OUT, exist_ok=True)
     clips = [o for o in json.load(open(os.path.join(REPO, 'data', 'datasets.json')))['overlays'] if o['dataset'].startswith(PROJECT + '/')] \
