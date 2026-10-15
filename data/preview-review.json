@@ -1,0 +1,296 @@
+{
+  "reviewed_at": "2026-10-15",
+  "clips_checked": 307,
+  "catalog_rows_checked": 3810,
+  "clips_after_update": 309,
+  "new_episode_candidates": 2,
+  "caption_records_updated": 2796,
+  "clip_captions_updated": 217,
+  "catalog_rows_retained_without_local_source": 526,
+  "metadata_rows_updated": 235,
+  "refreshed_clips": [
+    {
+      "dataset": "aloha/robomind/arrange_blocks_and_place_orange_in_center_with_arms",
+      "episode": 3,
+      "views": [
+        "right_main_camera_rgb",
+        "left_main_camera_rgb",
+        "head_main_camera_rgb"
+      ],
+      "export_id": "robomind_cobot_magic_c96aa642_20261006",
+      "frames": 245,
+      "fps": 10.0
+    },
+    {
+      "dataset": "aloha/robomind/pour_seasoning_into_cup_on_scale_with_both_arms",
+      "episode": 7,
+      "views": [
+        "right_main_camera_rgb",
+        "left_main_camera_rgb",
+        "head_main_camera_rgb"
+      ],
+      "export_id": "robomind_cobot_magic_ab3890e5_20261006",
+      "frames": 218,
+      "fps": 9.0
+    },
+    {
+      "dataset": "aloha/robomind/write_number_9_on_whiteboard",
+      "episode": 3,
+      "views": [
+        "right_main_camera_rgb",
+        "left_main_camera_rgb",
+        "head_main_camera_rgb"
+      ],
+      "export_id": "robomind_cobot_magic_15e8ad1d_20261006",
+      "frames": 181,
+      "fps": 10.25
+    },
+    {
+      "dataset": "flexiv/openneo_flexiv/align_the_ceramic_bowls",
+      "episode": 0,
+      "views": [
+        "right_main_camera_rgb"
+      ],
+      "export_id": "openneo_4e8e8ac7_20260928",
+      "frames": 404,
+      "fps": 10.0
+    },
+    {
+      "dataset": "flexiv/openneo_flexiv/press_the_button",
+      "episode": 0,
+      "views": [
+        "right_main_camera_rgb"
+      ],
+      "export_id": "openneo_4e8e8ac7_20260928",
+      "frames": 269,
+      "fps": 10.0
+    },
+    {
+      "dataset": "flexiv/openneo_flexiv/write_numbers_and_put_items",
+      "episode": 0,
+      "views": [
+        "right_main_camera_rgb"
+      ],
+      "export_id": "openneo_4e8e8ac7_20260928",
+      "frames": 450,
+      "fps": 10.0
+    },
+    {
+      "dataset": "iphumi/muse/big_white_vase",
+      "episode": 3,
+      "views": [
+        "left_main_camera_rgb",
+        "left_attached_camera_0_rgb"
+      ],
+      "export_id": "left_arm_iphumi_muse_big_white_vase_d51772f2_20261011",
+      "frames": 184,
+      "fps": 10.0
+    },
+    {
+      "dataset": "iphumi/muse/big_white_vase_strong",
+      "episode": 26,
+      "views": [
+        "left_main_camera_rgb",
+        "left_attached_camera_0_rgb"
+      ],
+      "export_id": "left_arm_iphumi_muse_big_white_vase_strong_9cdbc825_20261011",
+      "frames": 54,
+      "fps": 10.0
+    },
+    {
+      "dataset": "rby1/modpack/box_placing_together",
+      "episode": 0,
+      "views": [
+        "right_main_camera_rgb",
+        "left_main_camera_rgb",
+        "head_stereo_camera_left_rgb",
+        "head_stereo_camera_right_rgb"
+      ],
+      "export_id": "rby1_modpack_box_placing_together_64465d70_20261006",
+      "frames": 338,
+      "fps": 7.5
+    },
+    {
+      "dataset": "rby1/modpack/box_placing_together",
+      "episode": 101,
+      "views": [
+        "right_main_camera_rgb",
+        "left_main_camera_rgb",
+        "head_stereo_camera_left_rgb",
+        "head_stereo_camera_right_rgb"
+      ],
+      "export_id": "rby1_modpack_box_placing_together_64465d70_20261006",
+      "frames": 262,
+      "fps": 7.5
+    },
+    {
+      "dataset": "rby1/modpack/box_placing_together",
+      "episode": 50,
+      "views": [
+        "right_main_camera_rgb",
+        "left_main_camera_rgb",
+        "head_stereo_camera_left_rgb",
+        "head_stereo_camera_right_rgb"
+      ],
+      "export_id": "rby1_modpack_box_placing_together_64465d70_20261006",
+      "frames": 264,
+      "fps": 7.5
+    },
+    {
+      "dataset": "dexwild/dexwild/spray_human",
+      "episode": 0,
+      "views": [
+        "right_main_camera_rgb",
+        "third_0_main_camera_rgb",
+        "right_pinky_camera_rgb"
+      ],
+      "export_id": "dexwild_spray_human_6e2cf061_20261004",
+      "frames": 267,
+      "fps": 30
+    },
+    {
+      "dataset": "manipforce/manipforce/battery_insertion",
+      "episode": 0,
+      "views": [
+        "right_main_camera_rgb"
+      ],
+      "export_id": "manipforce_ed7caf16_20261004",
+      "frames": 177,
+      "fps": 30.0
+    },
+    {
+      "dataset": "widowx/bridge_v2/bridge_v2",
+      "episode": 0,
+      "views": [
+        "right_main_camera_rgb"
+      ],
+      "export_id": "bridge_side2_916f5402_20261004",
+      "frames": 33,
+      "fps": 5.0
+    }
+  ],
+  "review_notes": [
+    {
+      "dataset": "dexwild/dexwild/spray_human",
+      "episode": 0,
+      "mode": "axes",
+      "note": "30 fps, all 267 source frames. Exterior: estimated thumb-camera axes; palm views: fixed local XYZ conventions. The mount is unvalidated. Six horizontal tears already exist in the source recording; poses and timing are unchanged."
+    },
+    {
+      "dataset": "flexiv/openneo_flexiv/align_the_ceramic_bowls",
+      "episode": 0,
+      "mode": "primitive",
+      "note": "Session wrist pose restored. The jaw geometry is a stand-in; fingertip alignment and camera placement remain uncalibrated."
+    },
+    {
+      "dataset": "flexiv/openneo_flexiv/press_the_button",
+      "episode": 0,
+      "mode": "primitive",
+      "note": "Session wrist pose restored. The jaw geometry is a stand-in; fingertip alignment and camera placement remain uncalibrated."
+    },
+    {
+      "dataset": "flexiv/openneo_flexiv/write_numbers_and_put_items",
+      "episode": 0,
+      "mode": "primitive",
+      "note": "Session wrist pose restored. The jaw geometry is a stand-in; fingertip alignment and camera placement remain uncalibrated."
+    },
+    {
+      "dataset": "iphumi/muse/big_white_vase",
+      "episode": 3,
+      "mode": "urdf",
+      "note": "Updated from the October 11 raw-recording export, including camera calibration, full-resolution video and gripper geometry."
+    },
+    {
+      "dataset": "iphumi/muse/big_white_vase_strong",
+      "episode": 26,
+      "mode": "urdf",
+      "note": "Updated from the October 11 raw-recording export, including camera calibration, full-resolution video and gripper geometry."
+    },
+    {
+      "dataset": "manipforce/manipforce/battery_insertion",
+      "episode": 14,
+      "mode": "raw",
+      "note": "A nominal-lens CAD fit exists for battery_insertion episode 0 only. It is not transferred to this episode or its uncalibrated second camera."
+    },
+    {
+      "dataset": "manipforce/manipforce/box_flipping",
+      "episode": 0,
+      "mode": "raw",
+      "note": "A nominal-lens CAD fit exists for battery_insertion episode 0 only. It is not transferred to this episode or its uncalibrated second camera."
+    },
+    {
+      "dataset": "manipforce/manipforce/gear_assembly",
+      "episode": 8,
+      "mode": "raw",
+      "note": "A nominal-lens CAD fit exists for battery_insertion episode 0 only. It is not transferred to this episode or its uncalibrated second camera."
+    },
+    {
+      "dataset": "rby1/modpack/box_placing_together",
+      "episode": 0,
+      "mode": "urdf",
+      "note": "Updated stereo head streams, per-episode intrinsics and fisheye projection from the October 6 export. Alignment remains unmeasured."
+    },
+    {
+      "dataset": "rby1/modpack/box_placing_together",
+      "episode": 101,
+      "mode": "urdf",
+      "note": "Updated stereo head streams, per-episode intrinsics and fisheye projection from the October 6 export. Alignment remains unmeasured."
+    },
+    {
+      "dataset": "rby1/modpack/box_placing_together",
+      "episode": 50,
+      "mode": "urdf",
+      "note": "Updated stereo head streams, per-episode intrinsics and fisheye projection from the October 6 export. Alignment remains unmeasured."
+    },
+    {
+      "dataset": "widowx/bridge_v2/bridge_v2",
+      "episode": 6,
+      "mode": "raw",
+      "note": "Episode 0 has a wrist-only image-fit candidate. The released world-camera trajectory also requires correction, so it cannot validate this preview."
+    },
+    {
+      "dataset": "xhand/dexora/articulation",
+      "episode": 0,
+      "mode": "raw",
+      "note": "The October 14 review rejected the camera-frame overlay as a correction. All four raw views remain available; no calibrated replacement is claimed."
+    },
+    {
+      "dataset": "xhand/dexora/assemble",
+      "episode": 0,
+      "mode": "axes",
+      "note": "All camera poses and the lens are uncalibrated priors. The displayed axes are diagnostic; no validated camera-pose correction is available."
+    },
+    {
+      "dataset": "xhand/dexora/dexterous",
+      "episode": 0,
+      "mode": "axes",
+      "note": "All camera poses and the lens are uncalibrated priors. The displayed axes are diagnostic; no validated camera-pose correction is available."
+    },
+    {
+      "dataset": "xhand/dexora/pick_and_place",
+      "episode": 0,
+      "mode": "axes",
+      "note": "All camera poses and the lens are uncalibrated priors. The displayed axes are diagnostic; no validated camera-pose correction is available."
+    },
+    {
+      "dataset": "manipforce/manipforce/battery_insertion",
+      "episode": 0,
+      "mode": "urdf",
+      "note": "CAD/image fit with nominal intrinsics and a 12 mm white-label scale assumption. Fixed jaw opening is inferred from video. TCP state is preserved; the optical-camera trajectory differs from the old training export. The second camera remains uncalibrated."
+    },
+    {
+      "dataset": "widowx/bridge_v2/bridge_v2",
+      "episode": 0,
+      "mode": "urdf",
+      "note": "Candidate wrist-only projection: camera mount/lens fitted to this recording and width remapped to the controller limits. Held-out fingertip error is 9.7 px median / 21.2 px p90; opening/closing timing remains imperfect. The released world camera trajectory incorrectly treated Cartesian state as arm joints and is not used to validate this own-wrist overlay. Training data is unchanged."
+    }
+  ],
+  "unchanged_findings": [
+    "OpenNeo ALOHA previews already include the October 13 backfill.",
+    "GenRobot episode lens calibrations are current.",
+    "UR preview wrist streams are unchanged; catalog cameras now omit the retired third stream.",
+    "RH20T cfg5 retains its reviewed mount correction.",
+    "Bridge and ManipForce episode-0 candidates are added with explicit limits; existing raw episodes are retained."
+  ],
+  "scope": "Website preview clips, raw companions, posters, camera metadata and captions. Downloadable sample archives retain their existing versions."
+}

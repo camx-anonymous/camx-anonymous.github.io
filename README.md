@@ -96,6 +96,15 @@ This repository is anonymized for review.
 
 ## Rebuilding the data
 
+The October 15 preview review is recorded in `data/preview-review.json`. It refreshes the selected RoboMIND,
+Flexiv, MuSe and RB-Y1 episodes with the current portable reprojection recipes, and imports the reviewed
+DexWild 30 fps diagnostic. Bridge and ManipForce episode-0 CAD candidates have explicit calibration limits;
+their other episodes retain raw playback. Dexora articulation shows raw video after its proposed correction
+was rejected. `review_note` and `overlay_label` are displayed by both viewers; `render_fingerprint` versions
+media URLs so cached videos cannot conceal a refresh. Raw companions must match the exact source episode,
+view order, dimensions, frame count and rate of each overlay. The downloadable sample archives keep their
+existing versions; affected dataset records explain when their preview uses newer converted data.
+
 ```
 python3 tools/build_site_data.py            # scans camx_480p, joins the inventory + stats, writes data/datasets.json
 ```

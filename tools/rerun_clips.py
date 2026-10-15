@@ -590,7 +590,7 @@ def attach():
                 else: rec.pop('standin_note', None)
             else: rec.pop('standin_note', None)
             if proj_of(o) in OWN_ONLY: rec['own_only'] = True
-            for field in ('overlay_scope', 'calibration'):
+            for field in ('overlay_scope', 'calibration', 'review_note', 'overlay_label'):
                 if field in m: rec[field] = m[field]
             # the captions from the dataset's current data, as build_site_data.captions_pass: meta.json's `tasks` is a snapshot
             # from render time (stale once an annotation bank is re-expanded) and only stands in when the dataset cannot be read
