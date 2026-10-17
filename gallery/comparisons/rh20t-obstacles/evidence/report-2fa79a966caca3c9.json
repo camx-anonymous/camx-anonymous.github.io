@@ -1,0 +1,51 @@
+{
+  "dataset": "franka_hand/rh20t_cfg5/approach_and_touch_an_object_with_obstacles",
+  "root_cause": "Public sample labels released fingertip TCP as URDF mount/flange. Root must be shifted by inverse of Tz(0.1034m) Rz(135deg).",
+  "source_provenance": {
+    "sample_export_id": "rh20t_f00d6315_20260916",
+    "canonical_bundle_sha256": "f00d6315d06da6f852e67e43906d600535291f1b3f16f96d7c12d0e556fdbcbb",
+    "bundled_cfg5_eef_in_flange_xyz_wxyz": null,
+    "ep0_source": "task_0090_user_0007_scene_0005_cfg_0005",
+    "in_hand_extrinsics": "nominal",
+    "static_pose_correction": {},
+    "same_legacy_bundle_in_1013_v3_staging": true
+  },
+  "independent_checks": [
+    "Computed arm FK directly from XML joint origins/axes in vendored franka_fer_hand.urdf using all sample joint rows (187 approach, 230 soccer, 782 flag).",
+    "Derived corrected camera-to-mount anchor independently; matches recipe exactly to floating point precision.",
+    "Camera times old anchor reconstructs stored EEF to floating point accuracy. Rendering through corrected anchor is algebraically equivalent to repaired EEF poses.",
+    "All seven approach exterior trajectories are fixed to floating point precision; wrist translates up to 239.6 mm and rotates up to 74.44 degrees relative to frame 0.",
+    "Rendered all eight views at source frames 0,20,...180 with alpha 0.5. Inspected first three exterior views at all ten times and all eight views at 0,8,16 seconds.",
+    "Decoded all eight source AV1 videos through NVIDIA AV1 decoder: 187 valid frames each. Found near-identical frame holds at different times across cameras (mean absolute luma difference <0.05)."
+  ],
+  "visual_result": "Correction removes obvious forward displacement and wrong jaw orientation. Mesh body now follows real hand in all inspected exterior views throughout motion. No gross camera-axis or time offset found. This is visual inspection, not a measured fingertip acceptance pass.",
+  "camera_count": {
+    "sample_total": 8,
+    "wrist": 1,
+    "static": 7,
+    "current_gallery_render": 4,
+    "hidden_by_gallery_view_cap": 4
+  },
+  "residuals": [
+    "Source RGB is 320x180, displayed upscaled. Wrist hand is mostly outside the image; many views include cable/camera housing absent from the gripper-only URDF.",
+    "Approach FK versus published pose orientation has median 0.920 deg, p90 2.361 deg, max 2.956 deg residual after the constant correction. This is far smaller than the original 135 deg error; no independently justified additional constant correction found.",
+    "Metadata reports max_resample_dt_ms=831.0. This is a nearest-frame sampling bound, not proof of a constant global lag; no time shift should be applied from it.",
+    "Wrist extrinsics are nominal design calibration, not fitted hand-eye for this episode. Pixel-perfect calibration remains unmeasured.",
+    "Jaw width is recorded 0 m throughout approach, consistent with visibly closed fingers. No width-map defect found.",
+    "Confirmed temporal sampling holds: wrist up to 0.7 s, hidden third_4 up to 1.6 s and 1.5 s near the start. Displayed exterior cameras also have 0.5-0.6 s holds. These are source/export resampling artifacts and can cause local motion stepping or mismatch; no evidence supports one constant time-shift correction."
+  ],
+  "recommended_action": "Keep guarded episode-0 render correction. Any general cfg5 data repair must update both per-frame EEF and per-episode EEF anchor in a new versioned export; camera trajectories need no corresponding change.",
+  "canonical_inputs_modified": false,
+  "shared_source_files_modified": false,
+  "artifacts": [
+    "check.py",
+    "numerical-evidence.json",
+    "all-eight.mp4",
+    "all-views-00s.jpg",
+    "all-views-08s.jpg",
+    "all-views-16s.jpg",
+    "exterior-motion-0.jpg",
+    "exterior-motion-1.jpg",
+    "video-repeats.json"
+  ]
+}

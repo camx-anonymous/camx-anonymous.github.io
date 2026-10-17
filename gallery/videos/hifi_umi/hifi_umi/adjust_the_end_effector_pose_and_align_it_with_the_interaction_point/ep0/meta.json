@@ -1,0 +1,108 @@
+{
+  "dataset": "hifi_umi/hifi_umi/adjust_the_end_effector_pose_and_align_it_with_the_interaction_point",
+  "episode": 0,
+  "project": "hifi_umi/hifi_umi",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:04:15-07:00",
+  "robot_type": "SimpleAI UMI 4.0 bimanual glove grippers (HiFi-UMI-2K, robot-free)",
+  "fps": 25.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "hifi_umi",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "calib": {
+      "all": "calib/hifi_umi_hand_fisheye.json:stretch"
+    },
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "left_attached_camera_0_rgb",
+      "right_attached_camera_0_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "primitive",
+    "config_key": "config"
+  },
+  "note": "site: overlay_picks.py:116-118 via the rerun_clips MULTIVIEW set: primitive stand-in (no CAD): fingers hinged 124 mm behind the tip centre spanning the recorded tip gap, tool-centre axes, camera markers; lens = the hardware's generic hand-cam KB4 block on all four streams (up/down pairs), stretched to 600x480; config/hifi_umi.json is only the pinhole-prior twin",
+  "site_renderer": "opencv",
+  "episode_length": 1640,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 12.5,
+    "stride": 2,
+    "source_frames": 1125,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "left_attached_camera_0_rgb",
+    "right_attached_camera_0_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "left_attached_camera_0_rgb",
+      "right_attached_camera_0_rgb"
+    ],
+    "sides": {
+      "right": "hifi_umi",
+      "left": "hifi_umi"
+    },
+    "n_frames": 563,
+    "out_fps": 12.5,
+    "tile_w": [
+      600,
+      600,
+      600,
+      600
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "kb4",
+        "source": "[local path]",
+        "fx": 140.32,
+        "fy": 140.66
+      },
+      "left_main_camera_rgb": {
+        "model": "kb4",
+        "source": "[local path]",
+        "fx": 140.32,
+        "fy": 140.66
+      },
+      "left_attached_camera_0_rgb": {
+        "model": "kb4",
+        "source": "[local path]",
+        "fx": 140.32,
+        "fy": 140.66
+      },
+      "right_attached_camera_0_rgb": {
+        "model": "kb4",
+        "source": "[local path]",
+        "fx": 140.32,
+        "fy": 140.66
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "left_attached_camera_0_rgb.mp4",
+    "right_attached_camera_0_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "0d315dcba7e820126a20bbffa00a291c94a9ec0b53b0e81a15ec4813b62c37bc",
+  "input_manifest_sha256": "b55d457cbf77944644f3d8207741d71832c66aa30646e0270368c931f7432b99"
+}

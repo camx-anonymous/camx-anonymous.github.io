@@ -1,0 +1,83 @@
+{
+  "dataset": "agibot/agibot_world_beta/beta_452",
+  "episode": 0,
+  "project": "agibot/agibot_world_beta",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:31:48-07:00",
+  "robot_type": "AGIBOT G1",
+  "fps": 30.0,
+  "route": "agibot_beta",
+  "recipe": {
+    "route": "agibot_beta",
+    "profile": "ctag2f120_beta",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "cad",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py MULTIVIEW set -> overlay_picks.SPECS (overlay_picks.py:98) tool render_agibot_beta_overlay_video.py: CTAG2F120 distal finger + short-link CAD (grippers/ctag2f120_beta/{calibration.json,meshes.npz}) through the fitted own-wrist projection and the closing-stroke linkage; per-episode intrinsics and per-episode eef from meta/episodes; wrist views only, each draws its own gripper; the renderer refuses non-640x480 videos and non-G1 datasets. The Rerun-route alternative (config/agibot_g1_beta.json + registry profile agibot_g1) was replaced on the site",
+  "site_renderer": "opencv",
+  "episode_length": 1427,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 1350,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb"
+  ],
+  "notes": [
+    "--look white: --alpha 1.0 as the site clips (this renderer draws one CAD colour; its default is a translucent 0.65)"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "ctag2f120_beta",
+      "left": "ctag2f120_beta"
+    },
+    "n_frames": 450,
+    "out_fps": 10.0,
+    "overlay_scope": "wrist_fingers",
+    "start_frame": 0,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "fx": 328.2587585449219,
+        "source": "episode intrinsics; fitted CTAG2F120 wrist extrinsic"
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "fx": 327.8795166015625,
+        "source": "episode intrinsics; fitted CTAG2F120 wrist extrinsic"
+      }
+    },
+    "calibration": "agibot_beta_ctag2f120_wrist_20261006",
+    "source_export_id": "agibot_g1_beta_ec0ae839_20260914"
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "b2abe352320cd6f05cddcafcfb079f62653cb965c434eb134d9414082882a34f",
+  "input_manifest_sha256": "466f573a473e8df7cc3c35c23713b20044a1b5c226462571bec85f0ea84fad49"
+}

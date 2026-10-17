@@ -1,0 +1,101 @@
+{
+  "dataset": "aloha/openneo_arx5/add_water_to_the_test_tube_with_a_dropper_then_put_it_back_on_the_rack",
+  "episode": 0,
+  "project": "aloha/openneo_arx5",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:00:38-07:00",
+  "robot_type": "OpenNeoData ARX5 dual",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "openneo",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/openneo.json",
+    "calib": {
+      "main": "calib/openneo_wrist_d405_640x480_assumed.json:stretch"
+    },
+    "extra": [
+      "--parallel-jaw"
+    ],
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "third_0_main_camera_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "primitive",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py MULTIVIEW set -> overlay_picks.SPECS (overlay_picks.py:104 NEO(openneo.json, None)): primitive stand-in (OpenNeoData publishes no gripper CAD): parallel jaw bar + pads at the recorded width, tool-centre axes; the renderer TCP frame (x approach, y jaw, z camera side) is passed explicitly because the OpenNeo eef frames follow each arm (arx5 needs no remap: the info.json eef is used); the `main` calib table applies the ASSUMED D405 model (calib openneo_wrist_d405_640x480_assumed.json:stretch) to every *_main_camera_rgb stream, third_0_main_camera_rgb included, exactly as the site command did (overlay_picks.py:90,104; the config hfov 70 is only the fallback). A Rerun candidate (config/openneo.json + stock arx x5 CAD stand-in, rerun_clips.py:56/60) was tried and rejected: the stand-in does not land on the fingers",
+  "site_renderer": "opencv",
+  "episode_length": 1435,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 1350,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "third_0_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "third_0_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "openneo",
+      "left": "openneo"
+    },
+    "n_frames": 450,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "[local path]",
+        "fx": 391.9,
+        "fy": 391.9
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "[local path]",
+        "fx": 391.9,
+        "fy": 391.9
+      },
+      "third_0_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "[local path]",
+        "fx": 391.9,
+        "fy": 391.9
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "third_0_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "bbd6ccab9774050b68c4ced70be9e53f82f9c45915d202c31c6c39eaa074274a",
+  "input_manifest_sha256": "0da3c9e5e98008b6232d3c9752d6717529b38f825c2ed5af01b8d2a65c889e50"
+}

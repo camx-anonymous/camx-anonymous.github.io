@@ -1,0 +1,90 @@
+{
+  "dataset": "realman/realsource/arrange_the_cups",
+  "episode": 0,
+  "project": "realman/realsource",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:04:54-07:00",
+  "robot_type": "RealSource-World RS-02 (dual-arm humanoid: 2x 7-DOF arm + gripper, head pan/tilt, lift torso)",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/realsource.json",
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route (headless Rerun, lerobot_rerun_viz.py), viz config from build_mv_site.config_for (build_mv_site.py:124); per-episode intrinsics and per-episode eef in meta/episodes; profile auto -> ctag2f90d (closed-form four-bar)",
+  "site_renderer": "rerun",
+  "episode_length": 946,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 946,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "head_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "head_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "ctag2f90d",
+      "left": "ctag2f90d"
+    },
+    "n_frames": 316,
+    "out_fps": 10.0,
+    "tile_w": [
+      854,
+      854,
+      854
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 430.27,
+        "fy": 429.5
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 431.37,
+        "fy": 430.59
+      },
+      "head_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 432.71,
+        "fy": 431.86
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "head_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "c8afcfc04c135231348e228d1d9faac70fd8489267bc8b574f7566fae80e5079",
+  "input_manifest_sha256": "297f603d371f8c8482bda4d35c6b4b647b5ac58737004e0548882ed55d7a5b04"
+}

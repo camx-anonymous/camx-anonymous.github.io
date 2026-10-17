@@ -1,0 +1,89 @@
+{
+  "dataset": "aloha/openneo_arx5_single/build_a_pyramid_with_paper_cups",
+  "episode": 0,
+  "project": "aloha/openneo_arx5_single",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:00:38-07:00",
+  "robot_type": "OpenNeoData ARX5 single",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "openneo",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/openneo_single.json",
+    "calib": {
+      "main": "calib/openneo_wrist_d405_640x480_assumed.json:stretch"
+    },
+    "extra": [
+      "--parallel-jaw"
+    ],
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb",
+      "third_0_main_camera_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "primitive",
+    "config_key": "config"
+  },
+  "note": "site: overlay_picks.py:105 NEO(openneo_single.json, None) via the rerun_clips MULTIVIEW set: primitive stand-in (OpenNeoData publishes no gripper CAD): parallel jaw bar + pads at the recorded width, tool-centre axes; the renderer TCP frame (x approach, y jaw, z camera side) is passed explicitly because the OpenNeo eef frames follow each arm; the `main` calib table puts the assumed D405 lens on the wrist AND on third_0_main_camera_rgb, as the site did (the config hfov 70 is only the fallback)",
+  "site_renderer": "opencv",
+  "episode_length": 1630,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 1350,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "third_0_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "third_0_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "openneo"
+    },
+    "n_frames": 450,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "[local path]",
+        "fx": 391.9,
+        "fy": 391.9
+      },
+      "third_0_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "[local path]",
+        "fx": 391.9,
+        "fy": 391.9
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "third_0_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "9770dc585fd5380999ec1f2b63fd92db008af686180af5a467c4be64a17f3462",
+  "input_manifest_sha256": "94f25e42c99c58cb288aa945648d35bea23b77d46373849bdc9558da9b1ec8ed"
+}

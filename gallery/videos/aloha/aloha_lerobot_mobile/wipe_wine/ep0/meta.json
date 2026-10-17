@@ -1,0 +1,95 @@
+{
+  "dataset": "aloha/aloha_lerobot_mobile/wipe_wine",
+  "episode": 0,
+  "project": "aloha/aloha_lerobot_mobile",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:24:30-07:00",
+  "robot_type": "ALOHA 1 (lerobot/aloha_static_* and aloha_mobile_*)",
+  "fps": 50.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/aloha.json",
+    "own_only": false,
+    "views": [
+      "left_main_camera_rgb",
+      "right_main_camera_rgb",
+      "head_main_camera_rgb"
+    ],
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "RECOVERED from the source render log (convert_1003/mv_urdf/videos/aloha_aloha_lerobot_mobile/<ds>__ep6/_render.log + meta.json, rendered 2026-10-03 via convert_1003/mv_new.py): headless Rerun (lerobot_rerun_viz.py) with config/aloha.json, stride 5 on the 50 fps source, tiles left, right, head (the site copy of the clip dir carries no command: tools/add_clips.py strips `config` from meta.json). The mobile collection is in no site table (config_for, EXTRA_CONFIG, SPECS); same robot_type and cameras as aloha/aloha_lerobot (Logitech C922x x3), the site meta.json focal lengths match config/aloha.json; the sample tree carries no per-episode intrinsics: the lens is the viz config hfov_deg/vfov_deg (multiview builds the pinhole the Rerun route used)",
+  "site_renderer": "rerun",
+  "episode_length": 1300,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 5,
+    "source_frames": 1300,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "left_main_camera_rgb",
+    "right_main_camera_rgb",
+    "head_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "left_main_camera_rgb",
+      "right_main_camera_rgb",
+      "head_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "aloha1",
+      "left": "aloha1"
+    },
+    "n_frames": 260,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 55.4",
+        "fx": 609.51,
+        "fy": 610.84
+      },
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 55.4",
+        "fx": 609.51,
+        "fy": 610.84
+      },
+      "head_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 74.0",
+        "fx": 424.65,
+        "fy": 424.65
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "left_main_camera_rgb.mp4",
+    "right_main_camera_rgb.mp4",
+    "head_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "106cf9b7528d051e447b2a19a96deb12fb550979738324dc25772f763ace0610",
+  "input_manifest_sha256": "29e39343b98f6360f9eaf8c1fc95945148a92fa91f53a97d2b803a725cb3c1de"
+}

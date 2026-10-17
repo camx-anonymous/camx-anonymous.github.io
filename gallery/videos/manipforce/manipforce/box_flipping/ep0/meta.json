@@ -1,0 +1,51 @@
+{
+  "dataset": "manipforce/manipforce/box_flipping",
+  "episode": 0,
+  "project": "manipforce/manipforce",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:16:26-07:00",
+  "robot_type": "ManipForce handheld gripper",
+  "fps": 30.0,
+  "route": "raw",
+  "recipe": {
+    "route": "raw",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "own_only": false,
+    "site_renderer": "raw",
+    "no_overlay": "the release publishes no camera-to-tool translation (the fitted camera_in_eef has zero translation), no gripper width and no CAD",
+    "overlay_mode": "raw",
+    "config_key": "config"
+  },
+  "note": "site: tools/raw_only_clips.py REASONS; config/manipforce.json exists (nominal D455 pinhole) but nothing honest to draw",
+  "site_renderer": "raw",
+  "episode_length": 258,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 258,
+    "max_views": 4,
+    "frame": null
+  },
+  "no_overlay": "the release publishes no camera-to-tool translation (the fitted camera_in_eef has zero translation), no gripper width and no CAD",
+  "views": [
+    "right_main_camera_rgb",
+    "right_attached_camera_0_rgb"
+  ],
+  "notes": [
+    "route raw: --look white does not apply (no renderer runs)"
+  ],
+  "outputs": [
+    "right_main_camera_rgb.mp4",
+    "right_attached_camera_0_rgb.mp4",
+    "stitched.mp4",
+    "poster.png"
+  ],
+  "status": "raw",
+  "gallery_run_signature": "165dc5bf78848756c2fa437306f8c4a7e16b0208da16359ebefa02d6060e7041",
+  "input_manifest_sha256": "2255702f8a0a6285650f46c880e97c694d1056756d3b09aab1b00d7063e5ad11"
+}

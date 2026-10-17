@@ -1,0 +1,75 @@
+{
+  "dataset": "freetacman/freetacman/swipe_card",
+  "episode": 0,
+  "project": "freetacman/freetacman",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:25:04-07:00",
+  "robot_type": "FreeTacMan",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "freetacman",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/freetacman.json",
+    "calib": {
+      "main": "calib/freetacman_camera3_equidistant.json:stretch"
+    },
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "primitive",
+    "config_key": "config"
+  },
+  "note": "RECOVERED from the source render log (convert_1003/mv_urdf/videos/freetacman_freetacman/<ds>__ep0/_render.log, 2026-10-03; white_mv.py = the multiview renderer in the site look): --views right_main_camera_rgb --profile freetacman --viz-config config/freetacman.json --calib main=calib/freetacman_camera3_equidistant.json:stretch --stride 3 --max-seconds 45 --alpha 1.0; not in any site table (clip record: primitive, profile null, fisheye true, no render stamp). The `freetacman` kind = parallel jaw bar + pads at the mocap TCP (info.json right_eef_pose_in_main, camera3 marker); the lens file is the HBVCAM 180-deg equidistant model (f 200.69 at the native 640x480, so crop and stretch coincide); config/freetacman.json (hfov 115.8 / vfov 100.2) is only the pinhole-prior fallback",
+  "site_renderer": "opencv",
+  "episode_length": 240,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 240,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "freetacman"
+    },
+    "n_frames": 80,
+    "out_fps": 10.0,
+    "tile_w": [
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "kb4",
+        "source": "[local path]",
+        "fx": 200.69,
+        "fy": 200.69
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "e619519451aa2f6b0e1e18732dc90f0edf0780dedc3bc22b4d68658430818499",
+  "input_manifest_sha256": "09d2c443c56de62808b4a2ff988906bc49cbcd2698fb3174c33c7790b3a24272"
+}

@@ -1,0 +1,89 @@
+{
+  "dataset": "iphumi/muse/big_white_vase_strong",
+  "episode": 0,
+  "project": "iphumi/muse",
+  "project_inferred_from": "--project",
+  "lib_version": "lib-sha256:d2302f979c61",
+  "timestamp": "2026-10-15T08:51:45-07:00",
+  "robot_type": "iPhUMI",
+  "fps": 60.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "umift",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/muse.json",
+    "own_only": false,
+    "views": [
+      "left_main_camera_rgb",
+      "left_attached_camera_0_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "RECOVERED from the source render log (convert_1003/mv_urdf/videos/iphumi_muse/<ds>__ep<N>/_render.log, 2026-10-03; render5_white.py = the multiview renderer in the site look): --views left_main_camera_rgb,left_attached_camera_0_rgb --profile umift --viz-config config/muse.json --stride 6 --max-seconds 45 --alpha 1.0. `umift` here is the bimanual-renderer KIND (UMI-FT CAD at the stored TCP, base links hidden in its own view), not registry:umift (which draws the base). The site table (config_for) would give mv_site/configs/iphumi_left.json and no profile override, but the clips were rendered with config/muse.json (CCE 2026-10-03: the MuSe export as UMI-FT); per-episode intrinsics exist (the config FOVs are the ASSUMED iPhone 15 Pro ARKit values pushed through the 224x168 letterbox chain); export left_arm_umift_muse_f989ee66_20261003, clips ep3 / ep26 / ep28",
+  "site_renderer": "opencv",
+  "episode_length": 423,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 6,
+    "source_frames": 423,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "left_main_camera_rgb",
+    "left_attached_camera_0_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "left_main_camera_rgb",
+      "left_attached_camera_0_rgb"
+    ],
+    "sides": {
+      "left": "umift"
+    },
+    "n_frames": 71,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 464.98,
+        "fy": 464.98
+      },
+      "left_attached_camera_0_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 257.51,
+        "fy": 257.51
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "left_main_camera_rgb.mp4",
+    "left_attached_camera_0_rgb.mp4"
+  ],
+  "status": "ok",
+  "input_manifest_sha256": "a4f2380f6bfd01e11ee1ce70231f106d7baa3a296273b755d2eb0da94692fdd6",
+  "gallery_run_signature": "704bb26b472a37f07e3e377a49d78a2d36a5ec480fcc53d6b2d95256b6b9d81a",
+  "preview_refresh": {
+    "source_export_id": "left_arm_iphumi_muse_big_white_vase_strong_9cdbc825_20261011",
+    "source_release_check": "FAIL",
+    "video_encoder": "h264_nvenc",
+    "gpu": 1
+  }
+}

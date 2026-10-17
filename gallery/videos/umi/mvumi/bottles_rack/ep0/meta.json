@@ -1,0 +1,48 @@
+{
+  "dataset": "umi/mvumi/bottles_rack",
+  "episode": 0,
+  "project": "umi/mvumi",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:06:24-07:00",
+  "robot_type": "MV-UMI",
+  "fps": 30.0,
+  "route": "bimanual_fisheye",
+  "recipe": {
+    "route": "bimanual_fisheye",
+    "profile": "umi",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "calib": {
+      "main": "calib/gopro_hero9_maxlens_2_7k_umi.json:crop"
+    },
+    "own_only": false,
+    "site_renderer": "opencv",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py FISHEYE (rerun_clips.py:72-74 GOPRO): paper-figure UMI URDF hung off the measured GoPro optical centre (registry umi, mount anchor), lens = GoPro Hero 9/10 + Max Lens Mod 2.7k calibration centre-cropped to the square video; the bimanual tool draws the gripper GoPro only: the second GoPro (right_third_camera_rgb) has a constant identity-rotation placeholder pose, not a calibration, and is left out (overlay_picks.py:231-234 MVUMI views=[right_main_camera_rgb]; mv_site/configs/mvumi.json is the Rerun config)",
+  "site_renderer": "opencv",
+  "episode_length": 452,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 452,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb"
+  ],
+  "outputs": [
+    "stitched.mp4",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "6b5c42eee7fdebd79260e59113ad3f98b8f8292c7beb8056982d34f75404e811",
+  "input_manifest_sha256": "4032f7abacca9a4777ff5c986f4ef58641d054b10e638e3b2ef4309470b40b50"
+}

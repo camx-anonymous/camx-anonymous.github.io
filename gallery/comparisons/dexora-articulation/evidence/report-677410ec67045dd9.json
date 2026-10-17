@@ -1,0 +1,131 @@
+{
+  "request": "Dexora articulation camera coordinate frames still very wrong",
+  "decision": "Reject existing camera-frame overlay as a corrected result; no validated replacement camera-frame video produced.",
+  "cause": [
+    "The external camera world pose and lens are geometric priors rather than measured calibration; this moves the camera-frame display far away from physical wrists.",
+    "The wrist optical mount translation and rotation are independently uncalibrated. Refitting the external reference to visible rigid palm landmarks does not identify true optical camera origins or basis.",
+    "The hand adapter is recovered from simulation, but articulated fingertip correspondences fail held-out real-video motion; do not use that fit as camera calibration."
+  ],
+  "verified_not_causes": [
+    "All four original and exported videos retain 640x480@20fps, no crop/flip.",
+    "Projection inverse(T_world_reference) @ T_world_camera and axis-column convention are algebraically correct.",
+    "Arm source FK agrees with SDK to 1–2mm; changing arm joint signs is unsupported."
+  ],
+  "rigid_palm_diagnostic": {
+    "purpose": "Show that external reference calibration, not a plotting sign, is responsible for much of the error; not a calibrated camera-frame replacement.",
+    "provenance": "Agent visual estimates, approximate palm centers modeled 90 mm along flange X; target uncertainty 5–15px. No human annotation claim.",
+    "annotations": "[local path]",
+    "fit": "[local path]",
+    "train_frames": [
+      40,
+      80,
+      120,
+      180,
+      260
+    ],
+    "heldout_frames": [
+      0,
+      20,
+      100,
+      140,
+      200,
+      280
+    ],
+    "train_points": 10,
+    "heldout_points": 11,
+    "prior_median_px": 291.52181651345995,
+    "prior_p90_px": 391.05788201111585,
+    "fitted_train_median_px": 3.9985960017690543,
+    "fitted_train_p90_px": 9.236115353177983,
+    "fitted_heldout_median_px": 3.755729916069686,
+    "fitted_heldout_p90_px": 10.335906633870502,
+    "candidate_focal_px": 407.92864433404037,
+    "candidate_state_shift_frames": -3,
+    "state_shift_warning": "Chosen within this diagnostic fit; not independently validated synchronization correction.",
+    "candidate_T_world_external": [
+      [
+        0.8519248056768945,
+        -0.358064058202332,
+        0.38211811746639496,
+        -0.13375619364685568
+      ],
+      [
+        -0.5211056658436929,
+        -0.651714825158566,
+        0.5511049552436817,
+        -0.8507205053994936
+      ],
+      [
+        0.051701165344564676,
+        -0.6686238979368118,
+        -0.7418012352441838,
+        1.3083245696519872
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "prior_T_world_external": [
+      [
+        0.0,
+        0.7071020452010051,
+        -0.7071115171403699,
+        1.2000000476837158
+      ],
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        -0.7071115171403699,
+        -0.7071020452010051,
+        1.600000023841858
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "external_rotation_difference_deg": 121.57312858846106,
+    "external_translation_difference_m": 1.6086347193108481,
+    "independent_sensitivity": {
+      "audit": "[local path]",
+      "result": "Changing the assumed palm point from 90 mm to 70 mm keeps held-out errors low (median 3.75 vs 4.10 px; p90 10.33 vs 8.70 px) while moving the fitted external camera center by 80.7 mm and changing focal length from 408 to 334 px. Therefore even the external fit is not identified physically."
+    }
+  },
+  "rejected_fingertip_fit": {
+    "artifacts": [
+      "fit_external.py",
+      "fit_hand_roll.py",
+      "external_fit.json",
+      "hand_roll_fit.json"
+    ],
+    "reason": "Fitting 25 agent-estimated fingertip points on frames 0, 40, 80 requires +84 / -131 degree extra adapter rolls to reach training median about 6 px; held-out opening motion misses fingers by tens of pixels. Extra DOF are unsupported and the fit is rejected."
+  },
+  "missing_for_true_optical_frames": [
+    "Measured external-camera intrinsics/distortion and pose in the robot FK world, or identifiable calibrated 3D target correspondences.",
+    "Per-wrist flange-to-RGB-optical transform and intrinsics/distortion; physical optical center must be identified, not substituted with flange or palm center.",
+    "For head view, repair body/optical basis then fit head optical mount; stored basis currently points both wrists behind the lens.",
+    "Independent synchronization validation on moving-frame correspondences."
+  ],
+  "publishable_scope": "Evidence and rejection explanation only. Do not publish palm proxies or fitted hand-roll model as true camera coordinate frames.",
+  "evidence_image": "[local path]",
+  "source_parquet_sha256": "b7d931bfc2a19e765b1f185c38ea88820181f7c7fd0d9d158b5f442eaf7fde48",
+  "source_files_written": false,
+  "canonical_or_training_data_written": false,
+  "site_files_written": false,
+  "candidate_video": null,
+  "mount_config_provenance": "Clean repository config camera_in_eef priors, previously matched raw-to-export FK recomputation to <1e-7 m. Bundled camx_export_config.json not retained in gallery sample and unavailable at canonical symlink target during this audit.",
+  "wrist_mount_observability": {
+    "finding": "The palm fit objective contains flange poses and the external camera only. No wrist camera image correspondences or camera optical-center landmarks enter it. The six wrist mount pose parameters do not affect the objective; arbitrary wrist mounts have exactly the same fit error.",
+    "visible_hardware_limitation": "The exterior view shows a dark wrist housing and mounting structure; the RGB optical lens center and its orientation cannot be unambiguously identified at this resolution. A housing center or palm center is not a measured optical center."
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "dataset": "umi/tamen/dish_washing",
+  "episode": 0,
+  "project": "umi/tamen",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:16:22-07:00",
+  "robot_type": "JAKA K1 dual 7-DoF arms + TAMEn visuo-tactile grippers (OpenDriveLab TAMEn)",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "primitive",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/tamen.json",
+    "eef": {
+      "right": "0.0015,0.0519,0.0571,0.5,0.5,-0.5,0.5",
+      "left": "0.0024,0.0449,0.0523,0.5,0.5,-0.5,0.5"
+    },
+    "extra": [
+      "--exclude-visuals",
+      "axis_x,axis_y,axis_z,cam_main,cam_main_lens"
+    ],
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "primitive",
+    "config_key": "config"
+  },
+  "note": "RECOVERED from the source render log (convert_1003/mv_urdf/videos/umi_tamen/<ds>__ep<N>/_render.log, 2026-10-03): --views right_main_camera_rgb,left_main_camera_rgb --profile primitive --viz-config config/tamen.json --eef-pose-in-main right=0.0015,0.0519,0.0571,0.5,0.5,-0.5,0.5 --eef-pose-in-main left=0.0024,0.0449,0.0523,0.5,0.5,-0.5,0.5 --exclude-visuals axis_x,axis_y,axis_z,cam_main,cam_main_lens --stride 3 --max-seconds 45 --alpha 1.0; not in any site table (clip: primitive, fisheye, export tamen_aa86b85e_20261003). The eef constants are the FITTED tool-centre poses in the wrist camera (the info.json eef sits about 17 cm further back and is NOT what the site drew); the excluded visuals drop the tool-centre axes and the camera marker, leaving the jaw bar + pads at the recorded width. config/tamen.json (CCE 2026-10-03) gives the 180-deg equidistant wrist lenses as hfov 183.35 / vfov 137.51 with the fitted circle centres (cx_rel/cy_rel per camera, f 200 px); info.json says is_fisheye so multiview builds that equidistant model (D = 0); gripper model tamen_tactile has no registry entry -> generic primitive; JAKA K1 FK trajectories, both arms in one base frame",
+  "site_renderer": "opencv",
+  "episode_length": 295,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 295,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "primitive",
+      "left": "primitive"
+    },
+    "n_frames": 99,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "kb4",
+        "source": "viz config hfov 183.35 (equidistant, D=0)",
+        "fx": 200.0,
+        "fy": 200.0
+      },
+      "left_main_camera_rgb": {
+        "model": "kb4",
+        "source": "viz config hfov 183.35 (equidistant, D=0)",
+        "fx": 200.0,
+        "fy": 200.0
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "22c36eaae98cbcbd0777b868af570d1f44e3215c0823175fa7d155d495f07240",
+  "input_manifest_sha256": "45c187d43ebff7c3da0cf9692594dbee13be0efced8d9b5c6b3164a49e436842"
+}

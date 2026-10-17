@@ -1,0 +1,13 @@
+{
+  "desktop": true,
+  "mobile_no_horizontal_overflow": true,
+  "search": true,
+  "filters": true,
+  "pagination": true,
+  "mp4_playback": true,
+  "seeking": true,
+  "per_view_playback": true,
+  "range_206": true,
+  "deep_link": true,
+  "console_errors": []
+}

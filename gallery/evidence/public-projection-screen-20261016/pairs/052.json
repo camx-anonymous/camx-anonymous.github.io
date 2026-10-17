@@ -1,0 +1,24 @@
+[
+  {
+    "kind": "raw",
+    "frame": 21,
+    "probe": {
+      "width": 636,
+      "height": 360,
+      "r_frame_rate": "5/1",
+      "nb_frames": "42"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/raw/robotiq_roboset_teleop__baking_pick_bowl_scene_2__ep0.mp4"
+  },
+  {
+    "kind": "overlay",
+    "frame": 21,
+    "probe": {
+      "width": 636,
+      "height": 360,
+      "r_frame_rate": "5/1",
+      "nb_frames": "42"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/videos/robotiq_roboset_teleop__baking_pick_bowl_scene_2__ep0.mp4"
+  }
+]

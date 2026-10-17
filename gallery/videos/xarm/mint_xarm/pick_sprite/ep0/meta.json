@@ -1,0 +1,79 @@
+{
+  "dataset": "xarm/mint_xarm/pick_sprite",
+  "episode": 0,
+  "project": "xarm/mint_xarm",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:24:44-07:00",
+  "robot_type": "xArm6 + xArm Gripper (MINT-SJTU)",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/mint_xarm.json",
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "RECOVERED from the source render log (convert_1003/mv_urdf/videos/xarm_mint_xarm/<ds>__ep<N>/_render.log + meta.json, rendered 2026-10-03 via convert_1003/mv_new.py): headless Rerun (lerobot_rerun_viz.py) with config/mint_xarm.json (the site meta.json focal lengths match), stride 3, tiles right_main, third_0_main; not in any site table (clip: urdf xarm_gripper). config/mint_xarm.json = hfov 56.1 wrist / 60 exterior PRIORS (unknown cameras); the sample tree carries no per-episode intrinsics: the lens is the viz config hfov_deg/vfov_deg (multiview builds the pinhole the Rerun route used); profile auto -> xarm_gripper",
+  "site_renderer": "rerun",
+  "episode_length": 212,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 212,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "third_0_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "third_0_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "xarm_gripper"
+    },
+    "n_frames": 71,
+    "out_fps": 10.0,
+    "tile_w": [
+      480,
+      480
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 56.1",
+        "fx": 420.4,
+        "fy": 420.4
+      },
+      "third_0_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 60.0",
+        "fx": 387.98,
+        "fy": 387.98
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "third_0_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "e22154477285531932590454c668623b0c4bbbc46197d9bdd97666ab84ffa83f",
+  "input_manifest_sha256": "0bfbe5dcb6a9b7d957b8bc743a000b51b67d99409c1e275cdc807b7d0172d0df"
+}

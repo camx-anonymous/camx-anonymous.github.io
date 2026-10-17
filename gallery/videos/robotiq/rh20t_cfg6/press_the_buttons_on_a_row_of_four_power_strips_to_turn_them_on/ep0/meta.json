@@ -1,0 +1,105 @@
+{
+  "dataset": "robotiq/rh20t_cfg6/press_the_buttons_on_a_row_of_four_power_strips_to_turn_them_on",
+  "episode": 0,
+  "project": "robotiq/rh20t_cfg6",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:13:59-07:00",
+  "robot_type": "KUKA LBR iiwa + Robotiq 2F-85 (RH20T cfg6)",
+  "fps": 10.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/rh20t.json",
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb",
+      "third_0_main_camera_rgb",
+      "third_1_main_camera_rgb",
+      "third_2_main_camera_rgb"
+    ],
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route, EXTRA_CONFIG (rerun_clips.py:47-51) -> config/rh20t.json; per-episode intrinsics and per-episode right_eef_pose_in_main in meta/episodes (rh20t.json hfov is only the fallback); the config lists every RH20T camera, the multiview tool skips streams the dataset lacks; the site clip shows the wrist + third_0..2 (first 4 views)",
+  "site_renderer": "rerun",
+  "episode_length": 307,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 1,
+    "source_frames": 307,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "third_0_main_camera_rgb",
+    "third_1_main_camera_rgb",
+    "third_2_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "third_0_main_camera_rgb",
+      "third_1_main_camera_rgb",
+      "third_2_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "robotiq_2f85"
+    },
+    "n_frames": 307,
+    "out_fps": 10.0,
+    "tile_w": [
+      852,
+      852,
+      852,
+      852
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 226.97,
+        "fy": 226.46
+      },
+      "third_0_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 229.08,
+        "fy": 229.02
+      },
+      "third_1_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 228.89,
+        "fy": 228.69
+      },
+      "third_2_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 227.62,
+        "fy": 227.38
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "third_0_main_camera_rgb.mp4",
+    "third_1_main_camera_rgb.mp4",
+    "third_2_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "04708ede594e93400b7a8aa3a0a6c4c1269794d784d0ad1d07e5ca69f488095d",
+  "input_manifest_sha256": "4e3b940454385938e54f42a34b16eb81653d21c0931fae1883cc6beb7628bf14"
+}

@@ -1,0 +1,24 @@
+[
+  {
+    "kind": "raw",
+    "frame": 123,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "25/2",
+      "nb_frames": "247"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/raw/aloha_robodojo__cap_pen__ep0.mp4"
+  },
+  {
+    "kind": "overlay",
+    "frame": 123,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "25/2",
+      "nb_frames": "247"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/videos/aloha_robodojo__cap_pen__ep0.mp4"
+  }
+]

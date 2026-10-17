@@ -1,0 +1,89 @@
+{
+  "dataset": "franka_hand/molmoact/tabletop_stand_the_water_bottle",
+  "episode": 0,
+  "project": "franka_hand/molmoact",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:25:09-07:00",
+  "robot_type": "Franka Emika Panda + Franka Hand with pantor 3D-printed jaws (MolmoAct household / tabletop, Ai2)",
+  "fps": 10.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/molmoact.json",
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "RECOVERED from the source render log (convert_1003/mv_urdf/videos/franka_hand_molmoact/<ds>__ep0/_render.log, 2026-10-03): headless Rerun (lerobot_rerun_viz.py) with config/molmoact.json, stride 1 on the 10 fps source, tiles right, third_0, third_1; not in any site table, and no OpenCV command exists on disk (clip record: urdf franka_hand_pantor, export molmoact_samples_8afc6f8f_20261003). Per-episode intrinsics in meta/episodes drive both tools, so the config only sets the view order (its hfov 70 is a 2026-09-06 prior fallback)",
+  "site_renderer": "rerun",
+  "episode_length": 204,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 1,
+    "source_frames": 204,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "third_0_main_camera_rgb",
+    "third_1_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "third_0_main_camera_rgb",
+      "third_1_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "franka_hand_pantor"
+    },
+    "n_frames": 204,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 462.0,
+        "fy": 617.0
+      },
+      "third_0_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 460.0,
+        "fy": 460.0
+      },
+      "third_1_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 460.0,
+        "fy": 460.0
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "third_0_main_camera_rgb.mp4",
+    "third_1_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "9863642b58c031d4141248d209729ddd2c1b15e9e436bd306a21ab557c428b14",
+  "input_manifest_sha256": "243607bbab096f1c08346109155963870a8d23ddd78e39602f2b462834fae751"
+}

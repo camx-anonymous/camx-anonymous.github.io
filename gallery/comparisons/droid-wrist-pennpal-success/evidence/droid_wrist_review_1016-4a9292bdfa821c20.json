@@ -1,0 +1,291 @@
+{
+  "date": "2026-10-16",
+  "status": "image-fit candidates, not physical hand-eye calibration",
+  "method": "Translation-only fit of upper gripper silhouettes in BOTH wrist eyes at frame 0; recorded rotation, stereo baseline and per-episode intrinsics retained. Three translations are optimized jointly across both eyes. Source world flange pose is preserved by retargeting the camera. Canonical inputs are never rewritten.",
+  "limitations": [
+    "Camera translation, physical mounting offset and residual CAD error cannot be separated by this fit.",
+    "Visible linkage edges still differ; these are not a pixel-perfect or metric-calibration pass.",
+    "Low-resolution samples lack the stereo pair and per-episode intrinsics; their wrist calibration is not corrected by these overrides.",
+    "Other episodes are deliberately not assigned a calibration from a different recording."
+  ],
+  "width_fix": {
+    "old_zero_width_gap_mm": 10.0690191242,
+    "new_zero_width_gap_mm": 1.51123138696,
+    "reason": "Invert URDF four-bar pad-face gap; cap at the stock joint limit of 0.8 rad."
+  },
+  "primary_sources": [
+    "https://raw.githubusercontent.com/droid-dataset/droid/main/config/panda/franka_panda.yaml",
+    "https://droid-dataset.github.io/droid/hardware-setup/assembly.html"
+  ],
+  "cases": [
+    {
+      "dataset": "AUTOLab_failure",
+      "episode": 0,
+      "config": "config/droid_autolab_failure_wrist_review_1016.json",
+      "video_key": "observation.image.right_stereo_camera_left_rgb",
+      "video_sha256": "502810869cb688065b92f11f6bea3852737d476b4f3d1153e6133011ae9b595d",
+      "data_sha256": "b7a97f26b65a24118d2777e4128dc9c628ad3f5736cd6fec1ce6debfbd4236c7",
+      "expected_eef": {
+        "right": [
+          0.01473624911159277,
+          0.08162503689527512,
+          0.015828194096684456,
+          0.6930966291300154,
+          0.10946465147873741,
+          -0.11203688244153785,
+          0.7036208423135499
+        ]
+      },
+      "corrected_eef": [
+        0.0007798532748892056,
+        0.07140745347787811,
+        0.010818651275059848,
+        0.6930966291300154,
+        0.10946465147873741,
+        -0.11203688244153785,
+        0.7036208423135499
+      ],
+      "translation_delta_camera_mm": [
+        -13.956395836703564,
+        -10.217583417397002,
+        -5.009542821624607
+      ],
+      "fit": {
+        "frame": 0,
+        "dark_threshold": 90,
+        "max_distance_px": 40,
+        "regions_xyxy": [
+          [
+            210,
+            250,
+            780,
+            395
+          ],
+          [
+            35,
+            250,
+            650,
+            395
+          ]
+        ],
+        "column_intervals": [
+          [
+            [
+              210,
+              780
+            ]
+          ],
+          [
+            [
+              35,
+              650
+            ]
+          ]
+        ],
+        "objective_before_px2": 1053.2261962890625,
+        "objective_after_px2": 115.31452941894531
+      },
+      "validation": {
+        "held_out_frames": [
+          55,
+          110,
+          149,
+          165,
+          219
+        ],
+        "views": [
+          "right_stereo_camera_left_rgb",
+          "right_stereo_camera_right_rgb"
+        ],
+        "method": "Visual comparison of translucent CAD on raw decoded frames; includes minimum-width and open states. This is not an independently measured landmark error.",
+        "finding": "Fingertips much closer in both eyes; residual linkage contours remain."
+      }
+    },
+    {
+      "dataset": "PennPAL_success",
+      "episode": 0,
+      "config": "config/droid_pennpal_success_wrist_review_1016.json",
+      "video_key": "observation.image.right_stereo_camera_left_rgb",
+      "video_sha256": "3961dd7317e4a2be7b8f7f37cccd57eb53d40964ae97d02c6a7518e54991ae8d",
+      "data_sha256": "358a6db23dd2f733d73a5b0d5750de129325ba53588312656221dcf44c01a236",
+      "expected_eef": {
+        "right": [
+          0.006636874284595251,
+          0.08386547863483429,
+          0.012780566699802876,
+          0.693907504289747,
+          0.12453182876011738,
+          -0.11016097743835566,
+          0.7006059935269335
+        ]
+      },
+      "corrected_eef": [
+        -0.0008733546360183359,
+        0.07687969121725258,
+        0.01457693998627246,
+        0.693907504289747,
+        0.12453182876011738,
+        -0.11016097743835566,
+        0.7006059935269335
+      ],
+      "translation_delta_camera_mm": [
+        -7.510228920613587,
+        -6.985787417581712,
+        1.796373286469584
+      ],
+      "fit": {
+        "frame": 0,
+        "dark_threshold": 90,
+        "max_distance_px": 40,
+        "regions_xyxy": [
+          [
+            190,
+            240,
+            780,
+            380
+          ],
+          [
+            30,
+            240,
+            650,
+            380
+          ]
+        ],
+        "column_intervals": [
+          [
+            [
+              210,
+              460
+            ],
+            [
+              650,
+              780
+            ]
+          ],
+          [
+            [
+              35,
+              210
+            ],
+            [
+              450,
+              545
+            ]
+          ]
+        ],
+        "objective_before_px2": 675.0611572265625,
+        "objective_after_px2": 58.00716018676758
+      },
+      "validation": {
+        "held_out_frames": [
+          34,
+          57,
+          68,
+          102,
+          136
+        ],
+        "views": [
+          "right_stereo_camera_left_rgb",
+          "right_stereo_camera_right_rgb"
+        ],
+        "method": "Visual comparison of translucent CAD on raw decoded frames; includes minimum-width and open states. This is not an independently measured landmark error.",
+        "finding": "Fingertips much closer in both eyes; residual linkage contours remain."
+      }
+    },
+    {
+      "dataset": "WEIRD_success",
+      "episode": 0,
+      "config": "config/droid_weird_success_wrist_review_1016.json",
+      "video_key": "observation.image.right_stereo_camera_left_rgb",
+      "video_sha256": "5100e1186384cf91ec0e07a932137f0dff31f1774e844c134ac29e43fea7a508",
+      "data_sha256": "b8fff8eb62516fdf1eee13ede2fb9b5eaddd356fa7305024b689952b8c198369",
+      "expected_eef": {
+        "right": [
+          -0.008629506453871727,
+          0.0914878249168396,
+          -0.02475837804377079,
+          0.6881450884990193,
+          0.13526347032442454,
+          -0.1184475623784332,
+          0.7029440274567227
+        ]
+      },
+      "corrected_eef": [
+        -0.003643217166299044,
+        0.07717893891209826,
+        0.017804103789275244,
+        0.6881450884990193,
+        0.13526347032442454,
+        -0.1184475623784332,
+        0.7029440274567227
+      ],
+      "translation_delta_camera_mm": [
+        4.986289287572683,
+        -14.308886004741337,
+        42.562481833046036
+      ],
+      "fit": {
+        "frame": 0,
+        "dark_threshold": 90,
+        "max_distance_px": 40,
+        "regions_xyxy": [
+          [
+            220,
+            240,
+            800,
+            380
+          ],
+          [
+            25,
+            240,
+            660,
+            380
+          ]
+        ],
+        "column_intervals": [
+          [
+            [
+              220,
+              470
+            ],
+            [
+              640,
+              790
+            ]
+          ],
+          [
+            [
+              25,
+              210
+            ],
+            [
+              440,
+              505
+            ],
+            [
+              530,
+              650
+            ]
+          ]
+        ],
+        "objective_before_px2": 979.5947875976562,
+        "objective_after_px2": 71.89090728759766
+      },
+      "validation": {
+        "held_out_frames": [
+          108,
+          195,
+          217,
+          325,
+          433
+        ],
+        "views": [
+          "right_stereo_camera_left_rgb",
+          "right_stereo_camera_right_rgb"
+        ],
+        "method": "Visual comparison of translucent CAD on raw decoded frames; includes minimum-width and open states. This is not an independently measured landmark error.",
+        "finding": "Fingertips much closer in both eyes; residual linkage contours remain."
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "dataset": "aloha/galaxea/wipe_the_sewage_stains_with_a_ground_cloth",
+  "episode": 0,
+  "project": "aloha/galaxea",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:17:39-07:00",
+  "robot_type": "Galaxea R1-Lite",
+  "fps": 15.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/galaxea.json",
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route (headless Rerun, lerobot_rerun_viz.py), viz config from build_mv_site.config_for (build_mv_site.py:126); the sample tree carries no per-episode intrinsics: the lens is the viz config hfov_deg/vfov_deg (multiview builds the pinhole the Rerun route used) (hfov only, square pixels)",
+  "site_renderer": "rerun",
+  "episode_length": 1373,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 7.5,
+    "stride": 2,
+    "source_frames": 675,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "head_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "head_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "galaxea_r1lite",
+      "left": "galaxea_r1lite"
+    },
+    "n_frames": 338,
+    "out_fps": 7.5,
+    "tile_w": [
+      854,
+      854,
+      854
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 87.06",
+        "fx": 449.49,
+        "fy": 449.49
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 87.06",
+        "fx": 449.49,
+        "fy": 449.49
+      },
+      "head_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 112.0",
+        "fx": 288.02,
+        "fy": 288.02
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "head_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "0fd7ad93aa216ec1ba87b7ab69c1683c2581900a409e47a04282429b6bf2c5e4",
+  "input_manifest_sha256": "ffb4717c71489c7a5c0a5df39028d554563ea599f6f547f3709d5a0fe9173e79"
+}

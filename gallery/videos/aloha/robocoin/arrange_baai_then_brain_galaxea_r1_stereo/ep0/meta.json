@@ -1,0 +1,111 @@
+{
+  "dataset": "aloha/robocoin/arrange_baai_then_brain_galaxea_r1_stereo",
+  "episode": 0,
+  "project": "aloha/robocoin",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:00:56-07:00",
+  "robot_type": "Galaxea R1-Lite",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/robocoin_cobot_magic.json",
+    "config_by_rig": [
+      {
+        "when": {
+          "robot_type_contains": "Galaxea"
+        },
+        "config": "config/robocoin_galaxea_r1_stereo.json"
+      }
+    ],
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "matched_rule": {
+      "robot_type_contains": "Galaxea"
+    },
+    "config_key": "config_by_rig[0].config"
+  },
+  "note": "site: rerun_clips.py rerun route (headless Rerun, lerobot_rerun_viz.py), viz config from build_mv_site.config_for (build_mv_site.py:130: robocoin_galaxea_r1_stereo.json when robot_type contains Galaxea, else robocoin_cobot_magic.json); the sample tree carries no per-episode intrinsics: the lens is the viz config hfov_deg/vfov_deg (multiview builds the pinhole the Rerun route used); gripper model per rig (galaxea r1-lite / cobot magic v2), profile auto",
+  "site_renderer": "rerun",
+  "episode_length": 1688,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 1350,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "head_stereo_camera_left_rgb",
+    "head_stereo_camera_right_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "head_stereo_camera_left_rgb",
+      "head_stereo_camera_right_rgb"
+    ],
+    "sides": {
+      "right": "galaxea_r1lite",
+      "left": "galaxea_r1lite"
+    },
+    "n_frames": 450,
+    "out_fps": 10.0,
+    "tile_w": [
+      854,
+      854,
+      854,
+      854
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 87.06",
+        "fx": 449.49,
+        "fy": 449.49
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 87.06",
+        "fx": 449.49,
+        "fy": 449.49
+      },
+      "head_stereo_camera_left_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 112.0",
+        "fx": 288.02,
+        "fy": 288.02
+      },
+      "head_stereo_camera_right_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 112.0",
+        "fx": 288.02,
+        "fy": 288.02
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "head_stereo_camera_left_rgb.mp4",
+    "head_stereo_camera_right_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "a73c187b864507226ca15442d459875a09ab525a68e1b2a20d797f694e47c6b1",
+  "input_manifest_sha256": "104e2f64f6d295a7e8d654a3be034ccec75a6e4f650759eede28e2abe04b0502"
+}

@@ -1,0 +1,210 @@
+{
+  "dataset": "flexiv/openneo_flexiv/align_the_ceramic_bowls",
+  "episode": 0,
+  "conclusion": "The center offset is real and inherited from a visually tuned camera/TCP prior. The renderer uses that origin consistently; the previous correction restored session orientation but did not recalibrate center. A translation-only diagnostic candidate improves independent frames, with orientation unchanged. It is suitable for visual review, not promotion to physical/training calibration.",
+  "evidence_of_inherited_center_prior": {
+    "bundled_config": "[local path]",
+    "bundled_config_realpath": "[local path]",
+    "sha256": "4e8e8ac70113a3cc5accafca3bc92512b63ad62788888fcea27bf0e5f0781b5d",
+    "key": "data_process_config.embodiments.flexiv.arms.right._camera_in_eef_note",
+    "exact_value": "2026-09-10 pass 14 (flexiv): camera 11.4 cm behind / 8.7 cm above the TCP (fx 391.9 D405-class, distance = fx / jaw slope 2733 px/m, direction 10:7.7); orientation so the TCP projects at pixel (370,230) -- the fingertip pixel (330,230) shifted +40 px right on the user's read of the pass-13 clip (yaw +9.3 deg) -- pitch 39.6 deg, then camera ROLL -16 deg about the optical axis (user pick, pass 13). The fingertip detector is unreliable on this larger gripper, so pixel and roll are visual picks.",
+    "session_key": "data_process_config.embodiments.flexiv.arms.right._camera_in_eef_by_source_episode_note",
+    "session_exact_value": "2026-09-28: the flexiv wrist camera was RE-MOUNTED between recording SESSIONS (contiguous blocks of release episodes inside a task; tasks interleave with sessions), so ONE value per embodiment or per task is wrong. Measured on all 20,767 converted episodes: jaw-axis tilt in the wrist image (line through the two fingertips, + = right tip lower; 3 open-gripper frames per episode, strict dark-finger blob rules), piecewise constant per block, clusters -22.5 / -7 / +1 / +10 deg; wipe_the_whiteboard (the pass-13/14 clip, roll -16) reads +8.85. Rows below = ONE hypothesis: roll only. camera_in_eef(row) = pass-14 value @ Rz(8.85 - tilt_deg) about the camera's own optical axis, position and pitch unchanged (user approved the renders on align/press_the_button/classify_the_battery/block_store_in_box/put_the_toothpaste, camx_shared/[local account]/openneo_flexiv_wrist_roll_by_task_20260928). Keyed by SOURCE episode index (release order). source: block = >=3 readable episodes in the block; block+gap = unreadable episodes between/next to blocks take the nearest block's value; task_first_pass = no block in the task, per-task read on episodes 0-1 (n>=6 frames, mad<=5 deg, no disagreeing strict reads); task_sparse_median = median of >=5 scattered strict reads; default_unverified = nothing readable (dark backdrop / dark objects), keeps camera_in_eef_xyz_wxyz and is listed here so the gap is visible. An episode outside every row uses camera_in_eef_xyz_wxyz. With this table the converter writes right_eef_pose_in_main_xyz_wxyz PER EPISODE into meta/episodes (no static info.json field). Coverage (episodes): {\"block\": 4202, \"block+gap\": 12156, \"gap_nearest_block\": 530, \"default_unverified\": 3516, \"task_sparse_median\": 60, \"task_first_pass\": 303}.",
+    "implication": "Pass14 intentionally shifted a different clip fingertip target +40px right; subsequent session correction changed roll only while translation and pitch stayed fixed. That visual prior is not a measured per-session center calibration."
+  },
+  "origin_audit": {
+    "current_axes_origin_px": [
+      365.61075574382596,
+      217.19692200589577
+    ],
+    "ten_second_visible_fin_midpoint_px": [
+      321.5,
+      245.0
+    ],
+    "ten_second_origin_minus_visible_midpoint_px": [
+      44.11075574382596,
+      -27.80307799410423
+    ],
+    "TCP_definition": "Converter takes source eef pose; bundled Flexiv eef_in_flange_xyz_wxyz=null, renderer T_eef_renderTCP has zero translation and Ry(-90deg). No accidental additional flange/TCP translation was found. Physical source TCP-to-fin contact relationship is not measured.",
+    "white_boxes": "Primitive boxes are20x8x12mm display solids, centered10mm behind TCP along approach; their geometric centers project16-18px below their front endpoints. These boxes are not the shape/contact centers of the real curved tactile fins.",
+    "width_model": "Primitive x coordinate stays0 as width changes. Visible silhouette midpoint moves~23.5px vertically between28mm and98mm recorded widths. A fixed rigid line cannot fit all opening states exactly. The upper silhouette extrema can move through linkage, fin shape, perspective, or changing contact; their midpoint is not proven to equal the physical TCP."
+  },
+  "candidate": {
+    "status": "diagnostic_only",
+    "files": {
+      "video": "right_main_camera_rgb.mp4",
+      "meta": "meta.json",
+      "before_after": "current_vs_translation_candidate.mp4",
+      "frame10": "render_comparison_10s.png",
+      "comparison_models": "fixed_orientation_comparison.jpg"
+    },
+    "optical_translation_before_m": [
+      0.01654895767569542,
+      -0.008273644372820854,
+      0.14219313859939575
+    ],
+    "optical_translation_candidate_m": [
+      -0.0006324547091705404,
+      -0.0017545959906643792,
+      0.14291834059211012
+    ],
+    "quaternion_changed": false,
+    "width_changed": false,
+    "intrinsics_changed": false,
+    "fit_times_s": [
+      0,
+      13
+    ],
+    "fit_widths_m": [
+      0.09797000139951706,
+      0.02806999906897545
+    ],
+    "heldout_stable_frames": 13,
+    "heldout_unseen_width_frames": 7,
+    "heldout_unseen_widths_m": [
+      0.03994,
+      0.05811
+    ],
+    "current_metrics": {
+      "endpoint_error_px": {
+        "n": 26,
+        "median": 48.51896688630428,
+        "p90": 60.82234565780998,
+        "max": 64.12096280377779,
+        "rms": 49.87013632835743
+      },
+      "projected_jaw_midpoint_error_px": {
+        "n": 13,
+        "median": 46.26981018533772,
+        "p90": 57.92068749961671,
+        "max": 58.53550521620894,
+        "rms": 49.606560749268574
+      },
+      "axes_origin_to_visible_fin_midpoint_px": {
+        "n": 13,
+        "median": 45.288050898856035,
+        "p90": 52.23948558358569,
+        "max": 52.831654829047785,
+        "rms": 46.5666159003063
+      }
+    },
+    "candidate_metrics": {
+      "endpoint_error_px": {
+        "n": 26,
+        "median": 11.616147397045957,
+        "p90": 17.724495438642748,
+        "max": 19.02497442163326,
+        "rms": 12.811645957459367
+      },
+      "projected_jaw_midpoint_error_px": {
+        "n": 13,
+        "median": 11.565870485798865,
+        "p90": 14.079844361935043,
+        "max": 15.541096749642042,
+        "rms": 11.74347672996843
+      },
+      "axes_origin_to_visible_fin_midpoint_px": {
+        "n": 13,
+        "median": 10.851448316592618,
+        "p90": 14.562009479884303,
+        "max": 16.237837807316115,
+        "rms": 11.921140002504243
+      }
+    },
+    "unseen_width_metrics": {
+      "endpoint_error_px": {
+        "n": 14,
+        "median": 11.616147397045957,
+        "p90": 16.587697399944798,
+        "max": 19.02497442163326,
+        "rms": 12.612291574334561
+      },
+      "projected_jaw_midpoint_error_px": {
+        "n": 7,
+        "median": 10.326553553880512,
+        "p90": 14.683102160069252,
+        "max": 15.541096749642042,
+        "rms": 11.552283988873555
+      },
+      "axes_origin_to_visible_fin_midpoint_px": {
+        "n": 7,
+        "median": 10.851448316592618,
+        "p90": 15.28830832833695,
+        "max": 16.237837807316115,
+        "rms": 12.126751812239752
+      }
+    },
+    "scope": "One episode/session; holds out58mm and40mm openings and additional times, but repeated frames are not independent calibration configurations. 3-5px landmark uncertainty; physical contact acceptance metric is unavailable."
+  },
+  "why_translation_not_unique_physical_calibration": {
+    "image_alternative": "Changing assumed principal point by the fitted pixel shift produces nearly the same endpoint residual as changing optical translation. A gripper-local origin offset produces the same own-wrist projection as an equivalent camera translation. One wrist image stream with unknown actual fin geometry does not distinguish these causes.",
+    "principal_point_alternative_delta_px": [
+      -47.461829565395405,
+      17.89853664817285
+    ],
+    "principal_point_alternative_endpoint_metrics": {
+      "n": 26,
+      "median": 11.494319398459208,
+      "p90": 18.614180303158214,
+      "max": 19.83079230390103,
+      "rms": 12.821684712962758
+    },
+    "focal_only": "Changing focal length alone with centered principal point cannot move a near-central origin horizontally by45px while preserving the observed jaw separation."
+  },
+  "opening_dependent_hypothesis": {
+    "status": "diagnostic_only_not_for_publication",
+    "equation": "t(w)=t0 + R_current[:,0] * k * (w/0.1m)^2",
+    "parameters": [
+      -0.0012700950178479605,
+      -0.007059650109224682,
+      0.15354437866164458,
+      -0.015497454546619134
+    ],
+    "orientation_changed": false,
+    "heldout_stable_metrics": {
+      "endpoint_error_px": {
+        "n": 26,
+        "median": 6.453871326661848,
+        "p90": 11.888524582859212,
+        "max": 15.812815195432444,
+        "rms": 8.168299891593795
+      },
+      "projected_jaw_midpoint_error_px": {
+        "n": 13,
+        "median": 3.566296977410236,
+        "p90": 6.523159966586317,
+        "max": 9.899196968841936,
+        "rms": 4.7068063151703985
+      },
+      "axes_origin_to_visible_fin_midpoint_px": {
+        "n": 13,
+        "median": 4.9082869571971655,
+        "p90": 7.990331677191077,
+        "max": 10.742753419859426,
+        "rms": 5.722297807816383
+      }
+    },
+    "interpretation": "Lower residual supports missing opening-dependent display geometry, but this is not measured hardware linkage and does not justify moving a physical TCP with width."
+  },
+  "remaining": [
+    "Measure optical intrinsics/distortion or obtain per-device calibration.",
+    "Obtain tactile fin geometry and establish the source TCP/contact landmark relationship.",
+    "Measure opening-dependent linkage/fin motion rather than moving the stored TCP to the silhouette midpoint.",
+    "Check state/image timing around fast closure: transition frames have larger residuals and were excluded from stable-width calibration metrics. No time shift was applied.",
+    "Validate additional episodes from the same physical session before generalizing the display candidate."
+  ],
+  "data_safety": "No canonical/training source, ALOHA, live gallery, or repository configuration changed. Scratch diagnostic script and artifacts only.",
+  "reproduction": {
+    "script": "investigate.py",
+    "render_command": "candidate_render_command.json",
+    "measurements": "measurements.json"
+  },
+  "hashes": {
+    "investigate.py": "7087f8056181b7e90517e4d837cd243e3c42524a4ef404d8d4aa168c3ebc1012",
+    "measurements.json": "6f7acb8846c0a88fed7b8c57dd6a67bebbfcaca067fa8743c85b42cfd1b34808",
+    "candidate_render_command.json": "79e6188bed6c0f27cfa9487836eeed4f531dbacdc4202d8cb46227fff610b458",
+    "translation_candidate.mp4": "8d7c68d3c37d1c97c3f98b1ff6e669acb5831865332547d8e8c3629a1bd64df1",
+    "current_vs_translation_candidate.mp4": "72ad1ac999fbd2b2a74796ebef7f8d5093699ad276fe2cfe7aa26994e5b21a58",
+    "meta.json": "96f508284560e3151b2ec7b968faf8fbc7b706b6a50e6cf3121b8e964a7d0093"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "dataset": "ur/openneo_ur/plug_usb_light",
+  "episode": 0,
+  "project": "ur/openneo_ur",
+  "project_inferred_from": "--project",
+  "lib_version": "lib-sha256:d2302f979c61",
+  "timestamp": "2026-10-15T09:00:04-07:00",
+  "robot_type": "OpenNeoData UR5e/UR7e",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "openneo",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/openneo_ur.json",
+    "calib": {
+      "main": "calib/openneo_wrist_d405_640x480_assumed.json:stretch"
+    },
+    "eef_tcp": {
+      "right": "0,0,0.105,0.5,0.5,-0.5,0.5"
+    },
+    "extra": [
+      "--parallel-jaw"
+    ],
+    "own_only": false,
+    "views": [
+      "right_main_camera_rgb"
+    ],
+    "site_renderer": "opencv",
+    "overlay_mode": "primitive",
+    "config_key": "config"
+  },
+  "note": "site: overlay_picks.py:154 NEO(openneo_ur.json, eef_tcp NEO_UR_TCP) via the rerun_clips MULTIVIEW set: primitive stand-in (OpenNeoData publishes no gripper CAD): parallel jaw bar + pads at the recorded width, tool-centre axes; the renderer TCP frame (x approach, y jaw, z camera side) is passed explicitly because the OpenNeo eef frames follow each arm; eef_tcp (approach = eef z, camera side = -eef y, TCP 105 mm past the flange) composed with the static info.json eef; assumed D405 wrist lens; wrist stream only (third_0 dropped 2026-09-28)",
+  "site_renderer": "opencv",
+  "episode_length": 1355,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 1350,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "openneo"
+    },
+    "n_frames": 450,
+    "out_fps": 10.0,
+    "tile_w": [
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "[local path]",
+        "fx": 391.9,
+        "fy": 391.9
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "input_manifest_sha256": "748290c1129ab37fe2b72e975bbb46d3124622361413505f0a4ea4bb04698f8d",
+  "gallery_run_signature": "95673179c204c97b4d019842a941f194792aed03ddbb5944874046d25ff9cc92",
+  "preview_refresh": {
+    "source_export_id": null,
+    "source_release_check": "PASS",
+    "video_encoder": "h264_nvenc",
+    "gpu": 0
+  }
+}

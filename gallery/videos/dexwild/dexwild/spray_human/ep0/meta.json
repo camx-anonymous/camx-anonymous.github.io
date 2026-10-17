@@ -1,0 +1,53 @@
+{
+  "dataset": "dexwild/dexwild/spray_human",
+  "episode": 0,
+  "project": "dexwild/dexwild",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:27:00-07:00",
+  "robot_type": "DexWild human hand (Manus glove + two palm cameras, joints retargeted to LEAP Hand V2) (human)",
+  "fps": 30.0,
+  "route": "raw",
+  "recipe": {
+    "route": "raw",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "own_only": false,
+    "site_renderer": "raw",
+    "no_overlay": "the release publishes no camera intrinsics and no camera-to-hand transform for the palm cameras, and the LEAP Hand V2 has no CAD here",
+    "overlay_mode": "raw",
+    "config_key": "config"
+  },
+  "note": "site: tools/raw_only_clips.py REASONS; up to 5 streams (palm thumb/pinky fisheyes + ZED exterior), copied as is",
+  "site_renderer": "raw",
+  "episode_length": 267,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 267,
+    "max_views": 4,
+    "frame": null
+  },
+  "no_overlay": "the release publishes no camera intrinsics and no camera-to-hand transform for the palm cameras, and the LEAP Hand V2 has no CAD here",
+  "views": [
+    "right_main_camera_rgb",
+    "third_0_main_camera_rgb",
+    "right_pinky_camera_rgb"
+  ],
+  "notes": [
+    "route raw: --look white does not apply (no renderer runs)"
+  ],
+  "outputs": [
+    "right_main_camera_rgb.mp4",
+    "third_0_main_camera_rgb.mp4",
+    "right_pinky_camera_rgb.mp4",
+    "stitched.mp4",
+    "poster.png"
+  ],
+  "status": "raw",
+  "gallery_run_signature": "8ed2c2a0b8a4ccc52906b6dd4fd7d800d8c3aee4f664921279f064360a55aa31",
+  "input_manifest_sha256": "63bf0849c9c9cdce25ef4e575e4ac7f84037b250508dc82fec81263d0aa69f78"
+}

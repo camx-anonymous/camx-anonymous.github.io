@@ -1,0 +1,24 @@
+[
+  {
+    "kind": "raw",
+    "frame": 142,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "285"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/raw/franka_hand_fmb__multi_object_board_1__ep0.mp4"
+  },
+  {
+    "kind": "overlay",
+    "frame": 142,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "285"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/videos/franka_hand_fmb__multi_object_board_1__ep0.mp4"
+  }
+]

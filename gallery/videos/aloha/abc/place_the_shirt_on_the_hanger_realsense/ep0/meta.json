@@ -1,0 +1,103 @@
+{
+  "dataset": "aloha/abc/place_the_shirt_on_the_hanger_realsense",
+  "episode": 0,
+  "project": "aloha/abc",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:25:29-07:00",
+  "robot_type": "YAM",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/abc_realsense.json",
+    "config_by_rig": [
+      {
+        "when": {
+          "n_videos": 4
+        },
+        "config": "config/abc_zed.json",
+        "views": [
+          "right_main_camera_rgb",
+          "left_main_camera_rgb",
+          "head_stereo_camera_left_rgb"
+        ]
+      }
+    ],
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route (headless Rerun, lerobot_rerun_viz.py), viz config from build_mv_site.config_for (build_mv_site.py:125: abc_zed.json when the rig has 4 streams, else abc_realsense.json); per-episode intrinsics in meta/episodes; the ZED rule lists the three tiles of the site clip (fold_and_stack_the_t_shirts_zed ep4: right, left, head_stereo_camera_left; the default rule would add head_stereo_camera_right_rgb as a fourth); gripper variant per episode = flexible / linear / crank (registry yam / yam_linear_4310 / yam_crank_4310; profile auto prefers meta/episodes <side>_gripper_variant over the optional info.json model). overlay_picks.py:249-253 passed registry:<model> explicitly per pick. The curation planner once SKIP_RIGS'd the ZED station for Rerun (URDF not drawn in ZED wrist views, rerun 0.37); the 2026-10-06 site clip was a Rerun render nonetheless, and multiview has no such limit",
+  "site_renderer": "rerun",
+  "episode_length": 1301,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 1301,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "head_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "head_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "yam_crank_4310",
+      "left": "yam_crank_4310"
+    },
+    "n_frames": 434,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 434.96,
+        "fy": 434.37
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 434.45,
+        "fy": 433.96
+      },
+      "head_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 436.09,
+        "fy": 435.59
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "head_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "dbc8899a31e8ec18e6648bf48f8b49e3ed405be4799e1b87f0bb104ee143c133",
+  "input_manifest_sha256": "70ff3ee7a0544c6cfe7eef6cf4b756022bbf0f475c8a165c94258092bf92d9da"
+}

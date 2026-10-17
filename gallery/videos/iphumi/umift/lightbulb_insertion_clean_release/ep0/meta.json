@@ -1,0 +1,79 @@
+{
+  "dataset": "iphumi/umift/lightbulb_insertion_clean_release",
+  "episode": 0,
+  "project": "iphumi/umift",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:04:36-07:00",
+  "robot_type": "iPhUMI",
+  "fps": 60.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "registry:umift",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/iphumi_left.json",
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route, build_mv_site.config_for iphumi branch (build_mv_site.py:132-137); per-episode intrinsics for the phone main + ultrawide streams; profile auto (iphumi: UMI paper-figure URDF at the stored TCP, GoPro visual excluded); left-hand sets -> mv_site/configs/iphumi_left.json; RRD_EXTRA_ARGS (build_mv_site.py:111) --gripper-profile-override left=umift: the UMI-FT CAD (grippers/umift) at the stored iPhUMI TCP with the registry root offset (info.json still says iPhUMI)",
+  "site_renderer": "rerun",
+  "episode_length": 456,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 6,
+    "source_frames": 456,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "left_main_camera_rgb",
+    "left_attached_camera_0_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "left_main_camera_rgb",
+      "left_attached_camera_0_rgb"
+    ],
+    "sides": {
+      "left": "umift"
+    },
+    "n_frames": 76,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 464.98,
+        "fy": 464.98
+      },
+      "left_attached_camera_0_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 257.51,
+        "fy": 257.51
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "left_main_camera_rgb.mp4",
+    "left_attached_camera_0_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "7e3ba4a8ad9dfb51f2e796c3ef810a7fed0e6b86a8a1d6350b68c14d3e41c138",
+  "input_manifest_sha256": "31a19bcee765788f81165c3c1633abd89416e421858779a0e0cf3e6ee3fcbe36"
+}

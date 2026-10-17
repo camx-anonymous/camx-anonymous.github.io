@@ -1,0 +1,98 @@
+{
+  "dataset": "aloha/robocoin/water_bottle_storage_cobot_magic",
+  "episode": 0,
+  "project": "aloha/robocoin",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:18:33-07:00",
+  "robot_type": "Agilex Cobot Magic (ARX5)",
+  "fps": 30.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/robocoin_cobot_magic.json",
+    "config_by_rig": [
+      {
+        "when": {
+          "robot_type_contains": "Galaxea"
+        },
+        "config": "config/robocoin_galaxea_r1_stereo.json"
+      }
+    ],
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route (headless Rerun, lerobot_rerun_viz.py), viz config from build_mv_site.config_for (build_mv_site.py:130: robocoin_galaxea_r1_stereo.json when robot_type contains Galaxea, else robocoin_cobot_magic.json); the sample tree carries no per-episode intrinsics: the lens is the viz config hfov_deg/vfov_deg (multiview builds the pinhole the Rerun route used); gripper model per rig (galaxea r1-lite / cobot magic v2), profile auto",
+  "site_renderer": "rerun",
+  "episode_length": 657,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 3,
+    "source_frames": 657,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "head_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "head_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "cobot_magic_v2",
+      "left": "cobot_magic_v2"
+    },
+    "n_frames": 219,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 54.78",
+        "fx": 617.61,
+        "fy": 617.61
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 54.78",
+        "fx": 617.61,
+        "fy": 617.61
+      },
+      "head_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 69.5",
+        "fx": 461.28,
+        "fy": 461.28
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "head_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "2cdcf14af5f0401dbb5c9ecd4a181cda5f0af644ff514cf912f2b4af774cf278",
+  "input_manifest_sha256": "9ca8b808c1e88dc846eca1fbe5cc141ba15533b07f2057bd551961685bdc9c55"
+}

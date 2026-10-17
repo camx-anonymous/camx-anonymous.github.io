@@ -1,0 +1,24 @@
+[
+  {
+    "kind": "raw",
+    "frame": 150,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "300"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/raw/aloha_aloha_lerobot_mobile__cabinet__ep6.mp4"
+  },
+  {
+    "kind": "overlay",
+    "frame": 150,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "300"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/videos/aloha_aloha_lerobot_mobile__cabinet__ep6.mp4"
+  }
+]

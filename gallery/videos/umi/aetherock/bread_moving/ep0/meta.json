@@ -1,0 +1,74 @@
+{
+  "dataset": "umi/aetherock/bread_moving",
+  "episode": 0,
+  "project": "umi/aetherock",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:05:59-07:00",
+  "robot_type": "AetheRock",
+  "fps": 24.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "primitive",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "calib": {
+      "main": "calib/aetherock_wrist_fisheye_assumed.json:stretch"
+    },
+    "eef": {
+      "right": "0,0.055,0.045,0.5,0.5,-0.5,0.5"
+    },
+    "own_only": false,
+    "site_renderer": "opencv",
+    "overlay_mode": "primitive",
+    "config_key": "config"
+  },
+  "note": "site: overlay_picks.py:130-133 via the rerun_clips MULTIVIEW set: no CAD, no published lens, no camera-to-TCP lever arm (the release pose is the camera itself); lens = the fitted image circle read as a 190 deg equidistant fisheye (ASSUMED); tool centre = a CANDIDATE picked on the wrist video (pads on the orange fingertip rings 45 mm ahead / 55 mm below the lens, 2026-09-28), not a fit",
+  "site_renderer": "opencv",
+  "episode_length": 153,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 12.0,
+    "stride": 2,
+    "source_frames": 153,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "primitive"
+    },
+    "n_frames": 77,
+    "out_fps": 12.0,
+    "tile_w": [
+      480
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "kb4",
+        "source": "[local path]",
+        "fx": 61.76,
+        "fy": 61.76
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "13e5429e89bbf8cc5277bee659e8d4e4b5b02d42e0f7044cd0dbed5117f5cd6b",
+  "input_manifest_sha256": "01c5075914eecf60b6782d800d0ecb1168bcaa9c79fe43282c07d4f0c2c90467"
+}

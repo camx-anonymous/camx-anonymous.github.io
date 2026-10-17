@@ -1,0 +1,24 @@
+[
+  {
+    "kind": "raw",
+    "frame": 25,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "51"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/raw/aloha_biplay__dough_cut__ep10.mp4"
+  },
+  {
+    "kind": "overlay",
+    "frame": 25,
+    "probe": {
+      "width": 1440,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "51"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/videos/aloha_biplay__dough_cut__ep10.mp4"
+  }
+]

@@ -1,0 +1,90 @@
+{
+  "dataset": "aloha/cosmos_policy/fold_shirt",
+  "episode": 0,
+  "project": "aloha/cosmos_policy",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:00:38-07:00",
+  "robot_type": "ALOHA 2 style (ALOHA-Cosmos-Policy; ViperX 300 S x2 followers, ALOHA 2 fingers, 3 RGB cameras fx ~606 px @640)",
+  "fps": 25.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/aloha_cosmos_policy.json",
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route (headless Rerun, lerobot_rerun_viz.py), viz config from build_mv_site.config_for (build_mv_site.py:145: BiPlay D405 wrist fov + fitted cam_high focal); the sample tree carries no per-episode intrinsics: the lens is the viz config hfov_deg/vfov_deg (multiview builds the pinhole the Rerun route used)",
+  "site_renderer": "rerun",
+  "episode_length": 1500,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 12.5,
+    "stride": 2,
+    "source_frames": 1125,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "head_main_camera_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "head_main_camera_rgb"
+    ],
+    "sides": {
+      "right": "aloha2",
+      "left": "aloha2"
+    },
+    "n_frames": 563,
+    "out_fps": 12.5,
+    "tile_w": [
+      480,
+      480,
+      480
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 55.7",
+        "fx": 242.26,
+        "fy": 323.29
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 55.7",
+        "fx": 242.26,
+        "fy": 323.29
+      },
+      "head_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "viz config hfov 55.7",
+        "fx": 242.26,
+        "fy": 323.29
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "head_main_camera_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "6e1fe3a1a03c1840c8ff4d8261e84b25776c0451023c9676922617fe2c351f89",
+  "input_manifest_sha256": "4d6ee2a5ff06b2241035b392c567047b6ca50a86fbc56e9c2a79d64d74bd4479"
+}

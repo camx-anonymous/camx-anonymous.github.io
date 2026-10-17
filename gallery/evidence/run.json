@@ -1,0 +1,16 @@
+{
+  "status": "complete",
+  "selected": 301,
+  "reused": 7,
+  "queued": 294,
+  "jobs": 12,
+  "renderer_digest": "cfa46297776146b062d8bd71af40a7a2edd37ce3db0411cfe38cc51831a189f8",
+  "started_at": "2026-10-13T18:00:38.661674-07:00",
+  "failed": 0,
+  "completed": 301,
+  "elapsed_seconds": 2204.88,
+  "counts": {
+    "ok": 282,
+    "raw": 19
+  }
+}

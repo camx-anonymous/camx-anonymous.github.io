@@ -1,0 +1,180 @@
+{
+  "status": "capture_artifacts_confirmed; review_only_quality_candidate_prepared",
+  "dataset": "dexwild/dexwild/spray_human",
+  "episode_index": 0,
+  "source_export_id": "dexwild_spray_human_6e2cf061_20261004",
+  "source_info_sha256": "e0aeb924132c6772a13d6b8e03d06f201b68e2bd8be07b916918e4a7e8ff21ae",
+  "frames": 267,
+  "fps": 30,
+  "nominal_duration_s": 8.9,
+  "finding": "Six exterior images contain large horizontal/spatial tears in the released HDF5 uint8 RGB arrays before video encoding. The updated 30fps overlay faithfully retains them. This is distinct from pose/axis jitter, exposure flicker, and display sampling judder.",
+  "confirmed_bad_frames": [
+    {
+      "frame": 59,
+      "video_time_s": 1.9666666666666666,
+      "source_image_key": "1736807057794792448.jpg",
+      "source_elapsed_s": 2.303747584,
+      "raw_rgb_sha256": "9d3ec5d671412f757bf084ccb28cfee5df2fe0a0c8930b2ada1ea6b96f56a578"
+    },
+    {
+      "frame": 66,
+      "video_time_s": 2.2,
+      "source_image_key": "1736807058071930368.jpg",
+      "source_elapsed_s": 2.580885504,
+      "raw_rgb_sha256": "21d8020fcc74467d869f4774e8a5ee7023d8ac4aa7febb39fa46488b60d4d22e"
+    },
+    {
+      "frame": 87,
+      "video_time_s": 2.9,
+      "source_image_key": "1736807058902906624.jpg",
+      "source_elapsed_s": 3.41186176,
+      "raw_rgb_sha256": "0d12b46e1c907fe72fc232b43aea116d7e9a38ddda79c7b5bc9a6362d584b0a2"
+    },
+    {
+      "frame": 103,
+      "video_time_s": 3.433333333333333,
+      "source_image_key": "1736807059527962112.jpg",
+      "source_elapsed_s": 4.036917248,
+      "raw_rgb_sha256": "7279ff62d52ee96db5d9d36727e7b50a07f1ae57f70ba1e3d573a5e95c6568f1"
+    },
+    {
+      "frame": 105,
+      "video_time_s": 3.5,
+      "source_image_key": "1736807059607547392.jpg",
+      "source_elapsed_s": 4.116502528,
+      "raw_rgb_sha256": "65f5be202792686225c237f8240c65dd0a0b6978517b121499de31b64d2e30d3"
+    },
+    {
+      "frame": 239,
+      "video_time_s": 7.966666666666667,
+      "source_image_key": "1736807064872690688.jpg",
+      "source_elapsed_s": 9.381645824,
+      "raw_rgb_sha256": "ee24699d2ceaec44e2c45b4399a5ee573eacd622be35fd46301af666f65903d1"
+    }
+  ],
+  "capture_count": 6,
+  "exterior_frame_fraction": 0.02247191011235955,
+  "source_proof": {
+    "parts_glob": "[local path]",
+    "hdf5_member": "human_spray_data.hdf5",
+    "episode": "ep_0000",
+    "group": "zed_obs",
+    "array_shape": [
+      240,
+      320,
+      3
+    ],
+    "dtype": "uint8",
+    "raw_frames_visually_reviewed": 267,
+    "all_six_tears_present_in_raw": true,
+    "hardware_cause": "Unknown: capture, buffering or upstream preprocessing may have produced the tears; exact device or transport fault is not established.",
+    "screenshot_match": "The displaced upper band and hand position match source frame 105 at nominal 3.50 s."
+  },
+  "decoder_validation": {
+    "clips_checked": 6,
+    "frames_per_clip": 267,
+    "modes": [
+      "software ffmpeg decoder",
+      "NVIDIA NVDEC"
+    ],
+    "stderr_empty_all": true,
+    "cpu_nvdec_rgb_mae_range": [
+      0.6831525046816479,
+      0.8391052525488972
+    ],
+    "interpretation": "Both decoders preserve the same large tears; sub-level average RGB conversion differences do not explain them. Original raw RGB arrays independently establish that corruption predates both decoders."
+  },
+  "offline_detector": {
+    "raw_flags": [
+      59,
+      66,
+      87,
+      103,
+      104,
+      105,
+      239
+    ],
+    "confirmed": [
+      59,
+      66,
+      87,
+      103,
+      105,
+      239
+    ],
+    "false_positive": {
+      "frame": 104,
+      "reason": "The clean image lies between two differently torn neighbors 103 and 105; bottom-band sandwich test mistakes it for an outlier."
+    },
+    "other_views_flags": {
+      "right_main_camera_rgb": 0,
+      "right_pinky_camera_rgb": 0
+    },
+    "coverage": "All 801 sample image frames scored; all 267 original exterior images visually inspected."
+  },
+  "training_proxy_replay": {
+    "module": "projects/cosmos3/cam_uva/datasets/bad_frame_proxy.py",
+    "config": {
+      "enabled": true,
+      "max_flags_per_clip": 0,
+      "subsample": 8,
+      "abs_min": 6,
+      "ratio_min": 2.5,
+      "band_rows": 6,
+      "band_abs_min": 10,
+      "band_ratio_min": 3.5
+    },
+    "native_30fps_flags": [
+      59,
+      66,
+      87,
+      103,
+      104,
+      105,
+      239
+    ],
+    "sampled_stride2_offset1_misses": [
+      103
+    ],
+    "why": "At stride 2, corrupt frame 105 becomes a neighbor of frame 103; the two-sided isolated-frame assumption fails. This replay is on whole episode arrays; individual sampled windows and boundary halos can differ.",
+    "replay_file": "training_proxy_replay.json"
+  },
+  "filter_recommendation": {
+    "activation": "not_applied",
+    "current_diet": "Parent audit found no DexWild dataset block in current nano_final_training. This is a candidate for later onboarding, not a claim that the dataset is currently trained or filtered.",
+    "dataset_scope": "the matched one-episode sample export only",
+    "max_bad_frames_per_clip": 0,
+    "bad_frame_proxy": {
+      "enabled": true,
+      "max_flags_per_clip": 0
+    },
+    "training_policy": "Reject sampled windows containing a confirmed bad frame in any used view; do not delete or retime source rows.",
+    "validation_display_policy": "Hold-last may conceal one-frame damage if explicitly labeled, but does not restore the recorded image and should not be used as image/pose ground truth."
+  },
+  "quality_candidate": {
+    "root": "[local path]",
+    "parquet": "[local path]",
+    "sidecar": "[local path]",
+    "rows": 6,
+    "frame104_excluded": true,
+    "identity": "Exact gallery sample export ID and info hash recorded; candidate is not applied and is not a full-dataset scan."
+  },
+  "limitations": [
+    "Only episode 0 was audited. A full DexWild scan with reviewed coverage is needed before dataset-wide activation.",
+    "Image interpolation cannot recover missing source pixels. Window rejection protects training; concealment only changes display.",
+    "Palm cameras have zero automatic tear flags in this sample; absence of flags is not proof of absence of all possible visual defects.",
+    "Existing camera mount calibration and pose noise are unchanged.",
+    "No canonical data, training configuration, website or ALOHA changes were made by this agent."
+  ],
+  "evidence": [
+    "raw_source_updated_tears.jpg",
+    "frame105_raw_export.jpg",
+    "exterior_flagged_contact.jpg",
+    "decoder_validation.json",
+    "existing_detector/labels.parquet",
+    "training_proxy_replay.json",
+    "proposed_filter_settings.json",
+    "quality_candidate/meta/quality/bad_frames.parquet",
+    "quality_candidate/meta/quality/bad_frames.json"
+  ]
+}

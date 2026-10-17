@@ -1,0 +1,100 @@
+{
+  "dataset": "iphumi/behavior_prompting/right_arm_across_error_correction",
+  "episode": 0,
+  "project": "iphumi/behavior_prompting",
+  "project_inferred_from": "path",
+  "lib_version": "lib-sha256:03cb1b576857",
+  "timestamp": "2026-10-13T18:20:29-07:00",
+  "robot_type": "iPhUMI",
+  "fps": 60.0,
+  "route": "multiview",
+  "recipe": {
+    "route": "multiview",
+    "profile": "auto",
+    "fit": "crop",
+    "cross": "on",
+    "theta_max_deg": 100.0,
+    "config": "config/iphumi_bimanual.json",
+    "own_only": false,
+    "site_renderer": "rerun",
+    "overlay_mode": "urdf",
+    "config_key": "config"
+  },
+  "note": "site: rerun_clips.py rerun route, build_mv_site.config_for iphumi branch (build_mv_site.py:132-137); per-episode intrinsics for the phone main + ultrawide streams; profile auto (iphumi: UMI paper-figure URDF at the stored TCP, GoPro visual excluded); 4 streams -> iphumi_bimanual.json",
+  "site_renderer": "rerun",
+  "episode_length": 526,
+  "clip": {
+    "seconds": 45.0,
+    "out_fps": 10.0,
+    "stride": 6,
+    "source_frames": 526,
+    "max_views": 4,
+    "frame": null
+  },
+  "views": [
+    "right_main_camera_rgb",
+    "left_main_camera_rgb",
+    "left_attached_camera_0_rgb",
+    "right_attached_camera_0_rgb"
+  ],
+  "renderer_summary": {
+    "views": [
+      "right_main_camera_rgb",
+      "left_main_camera_rgb",
+      "left_attached_camera_0_rgb",
+      "right_attached_camera_0_rgb"
+    ],
+    "sides": {
+      "right": "iphumi",
+      "left": "iphumi"
+    },
+    "n_frames": 88,
+    "out_fps": 10.0,
+    "tile_w": [
+      640,
+      640,
+      640,
+      640
+    ],
+    "tile_h": 480,
+    "calib": {
+      "right_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 432.68,
+        "fy": 432.68
+      },
+      "left_main_camera_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 428.0,
+        "fy": 428.0
+      },
+      "left_attached_camera_0_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 248.0,
+        "fy": 248.0
+      },
+      "right_attached_camera_0_rgb": {
+        "model": "pinhole",
+        "source": "meta/episodes intrinsics (episode 0)",
+        "fx": 249.76,
+        "fy": 249.76
+      }
+    }
+  },
+  "outputs": [
+    "stitched.mp4",
+    "stitched.json",
+    "poster_mid.png",
+    "poster.png",
+    "right_main_camera_rgb.mp4",
+    "left_main_camera_rgb.mp4",
+    "left_attached_camera_0_rgb.mp4",
+    "right_attached_camera_0_rgb.mp4"
+  ],
+  "status": "ok",
+  "gallery_run_signature": "9726a5b249ab5e91d517bae13dd0611d51fb3556d578d341f0d5021fa1f3653a",
+  "input_manifest_sha256": "c05755760c41ceb9ade5ab5f0e899d498095199854a2b016021c85192ba480ec"
+}

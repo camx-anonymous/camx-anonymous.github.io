@@ -1,0 +1,24 @@
+[
+  {
+    "kind": "raw",
+    "frame": 225,
+    "probe": {
+      "width": 1450,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "450"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/raw/agibot_agibot_world_2026__il_3400__ep9.mp4"
+  },
+  {
+    "kind": "overlay",
+    "frame": 225,
+    "probe": {
+      "width": 1450,
+      "height": 360,
+      "r_frame_rate": "10/1",
+      "nb_frames": "450"
+    },
+    "url": "https://camx-anonymous.github.io/overlays/videos/agibot_agibot_world_2026__il_3400__ep9.mp4"
+  }
+]
