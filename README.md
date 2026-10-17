@@ -96,6 +96,32 @@ This repository is anonymized for review.
 
 ## Rebuilding the data
 
+The October 16 DROID rebuild is recorded in `data/droid-preview-review.json`.
+All six existing previews retain their selected episodes and camera order and
+use the corrected Robotiq jaw geometry. WEIRD episode 0 uses the guarded stereo
+wrist translation candidate from its public sample; AUTOLab episode 4 and
+PennPAL episode 1 retain their own calibration. The three low-resolution clips
+retain the earlier episode-anchor repairs, including TRI's reviewed exterior
+calibration transfer. Residual alignment remains unvalidated, and the training
+data and downloadable sample archives are unchanged.
+
+To reproduce this subset, use a fresh output directory and a JSON input map of
+`dataset_id: {"root": "/path/to/input", "kind": "input provenance"}` covering the
+six DROID datasets in the catalog. Use the reviewed input derivatives named in
+each clip's `alignment_audit`, and the published WEIRD episode-0 sample for its
+hash-guarded fit. The portable release must include the October 16 jaw fix and
+`calib/droid_wrist_review_1016.json`:
+
+```bash
+python tools/rebuild_droid_previews.py --release /path/to/reprojection \
+  --inputs /path/to/droid-inputs.json --out /path/to/new-build --jobs 3 --install
+```
+
+The command renders and checks all six clips before installing their overlays,
+matching raw companions, posters, versioned catalog entries and review report.
+It saves the prior website files under the build's `before/` directory. Omit
+`--install` to prepare the files without changing the checkout.
+
 The October 15 preview review is recorded in `data/preview-review.json`. It refreshes the selected RoboMIND,
 Flexiv, MuSe and RB-Y1 episodes with the current portable reprojection recipes, and imports the reviewed
 DexWild 30 fps diagnostic. Bridge and ManipForce episode-0 CAD candidates have explicit calibration limits;

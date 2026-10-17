@@ -1,0 +1,226 @@
+{
+  "reviewed_at": "2026-10-16T18:14:16-07:00",
+  "scope": "All existing DROID website previews; original episode selections retained",
+  "clip_count": 6,
+  "data_modified": false,
+  "release_manifest_sha256": "9668d0e7f3cdd66f438dd08ada8e51fa7080b203e0c3ad436416e9f998177b82",
+  "validation": "All overlay/raw pairs fully decoded; matching dimensions, frame counts, rates and camera order",
+  "clips": [
+    {
+      "dataset": "robotiq/droid/AUTOLab_failure",
+      "episode": 4,
+      "views": [
+        "right_stereo_camera_left_rgb",
+        "right_stereo_camera_right_rgb",
+        "third_0_stereo_camera_left_rgb",
+        "third_1_stereo_camera_left_rgb"
+      ],
+      "frames": 311,
+      "fps": 14.9254,
+      "width": 2562,
+      "height": 360,
+      "source_kind": "converted source; original website episode",
+      "source_sha256": {
+        "meta/info.json": "d97243bb064d83684e9a1c1b901b866d71e995c7545cfa3705a35fe14f768317",
+        "meta/episodes/chunk-000/file-000.parquet": "434cafa5ffc2ca3a339f08cdee2a4c1b51e79d98f6f894610dd7c9e8d74fc0d8",
+        "meta/episodes/chunk-000/file-001.parquet": "2e4e29fd2e08ca5faf70f1a608c29cbc16315990703e645c383e04513e89008c",
+        "meta/tasks.parquet": "99bd5c43eddf89d0e3498133ae220e1d13d4ebc692b64066b4d9949162d787f9",
+        "data/chunk-000/file-000.parquet": "257752bbfff369ad69c53712127b7789bd5514d7b701d7a5b69137c6c1a78db9",
+        "videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4": "aecfb469771d66d753604e46405a8c482fed1f3fdafc43e6fc249ca7f805ee0d",
+        "videos/observation.image.right_stereo_camera_right_rgb/chunk-000/file-000.mp4": "57b6c1b7638de082a7205fb0f809feaab5c4dcfab8a170ba14ce1400f28232bf",
+        "videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4": "a64c9e85c31c56ed3ff36797557ad6811010eae7f8ecfcd8e12f772aab956813",
+        "videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4": "bf79781ef6524bccb882957adea1d0bbb8e0c05444444c8c4a76525933ed86be"
+      },
+      "lib_version": "lib-sha256:6fa4c9aa996d",
+      "config": "config/droid.json",
+      "wrist_translation_candidate": false,
+      "review_note": "Rebuilt with corrected Robotiq jaw geometry. Existing camera calibration retained; residual wrist alignment is unvalidated.",
+      "files": {
+        "overlays/videos/robotiq_droid__AUTOLab_failure__ep4.mp4": "8eebf92fe1b4146aa66900d587401b6bd3425dbe76c416859880c0e07c22b4da",
+        "overlays/posters/robotiq_droid__AUTOLab_failure__ep4.jpg": "20d02e9b2660aee2b01ecc508c66e477e042ffecee1832c41edb61885fa75585",
+        "overlays/raw/robotiq_droid__AUTOLab_failure__ep4.mp4": "abfda2631e8e421ae199d609bbe3df699dd8ff1e01fdb94a9df8136db6ec0f0a",
+        "overlays/raw/robotiq_droid__AUTOLab_failure__ep4.jpg": "503eae36ae68ee8d4ed85548cce49f625edc167ca2a9b8991f5844f4121a67cd"
+      },
+      "render_fingerprint": "89a552446c23d917d38aea923b4cdd570a8001a8dcbec14261ae730fdc43a6ee"
+    },
+    {
+      "dataset": "robotiq/droid/PennPAL_success",
+      "episode": 1,
+      "views": [
+        "right_stereo_camera_left_rgb",
+        "right_stereo_camera_right_rgb",
+        "third_0_stereo_camera_left_rgb",
+        "third_1_stereo_camera_left_rgb"
+      ],
+      "frames": 120,
+      "fps": 14.9254,
+      "width": 2562,
+      "height": 360,
+      "source_kind": "converted source; original website episode",
+      "source_sha256": {
+        "meta/info.json": "d1e752586f1772a899ef32d2aa4d758a5da8dd3788e2ad3b2190c6c66a417fbe",
+        "meta/episodes/chunk-000/file-000.parquet": "d1e023099f01ea8d81652e8bb494af72a85e3e7acef90725a0612abe3ccdbfe4",
+        "meta/episodes/chunk-000/file-001.parquet": "1c0fab2837db75947c0caee47df59f7cda2a47c1171a594419453b91d69e3781",
+        "meta/eef_in_main.parquet": "cf05d01bee3ec7af3f387fe1408e65badae4ae6546a677dcee3182642d292fb7",
+        "meta/tasks.parquet": "9a1c503b37acdf4ab5456fc26cc9d52fbbbf1a47a23fc08b6287ea9d0a5a2bbe",
+        "data/chunk-000/file-000.parquet": "dedae2181c3f41260b889f77da49fac087a806ecb662f8906933e1aa3395c366",
+        "videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4": "76f1251671cdd96adb8bcb0f055bc8c144a156568b9c201d563ad93979d97c7c",
+        "videos/observation.image.right_stereo_camera_right_rgb/chunk-000/file-000.mp4": "9bafdcd488b18d567b8d59d321b10ddef783fd82fb7ddf77276aea4cce12d088",
+        "videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4": "032a06b116cb6b908e04fe5c1595771fd09f2050566836a07f1e26454d242da3",
+        "videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4": "f799f7ef0f3007ede642484c045006419df089c9e9fec8cc90a99e727e05e0e7"
+      },
+      "lib_version": "lib-sha256:6fa4c9aa996d",
+      "config": "config/droid.json",
+      "wrist_translation_candidate": false,
+      "review_note": "Rebuilt with corrected Robotiq jaw geometry. Existing camera calibration retained; residual wrist alignment is unvalidated.",
+      "files": {
+        "overlays/videos/robotiq_droid__PennPAL_success__ep1.mp4": "28a3a2da1bdd3cbaa47c563d036ceb9f05a83ec2a6df3f31648c39cd631e59b2",
+        "overlays/posters/robotiq_droid__PennPAL_success__ep1.jpg": "c9c0d01f9407a08e577362dd7912f59af5e2872f22c1b38c82aefca06d9d6212",
+        "overlays/raw/robotiq_droid__PennPAL_success__ep1.mp4": "baad3a1f5ee350f12b431e163c6902967f5c64053c482e159936e0265313ccf6",
+        "overlays/raw/robotiq_droid__PennPAL_success__ep1.jpg": "39992b05a3141dc3581f3cdcc9201c6042c8b36db691cfff6a0eda53b92c5717"
+      },
+      "render_fingerprint": "c3755e0c635fa64241c0ecdca5d344fb85264790aee77d925a2f11cc8cb792a8"
+    },
+    {
+      "dataset": "robotiq/droid/WEIRD_success",
+      "episode": 0,
+      "views": [
+        "right_stereo_camera_left_rgb",
+        "right_stereo_camera_right_rgb",
+        "third_0_stereo_camera_left_rgb",
+        "third_1_stereo_camera_left_rgb"
+      ],
+      "frames": 434,
+      "fps": 14.9254,
+      "width": 2562,
+      "height": 360,
+      "source_kind": "published episode-0 sample; exact guarded wrist candidate",
+      "source_sha256": {
+        "meta/info.json": "38e72d191b90d83e18ce0066fa2f97c6339fe95b27aca34d04180e2f34c45599",
+        "meta/episodes/chunk-000/file-000.parquet": "7b0d382a763d1675de3894c5e985dff7f996fe8465ea929fce9c9e0e141961ed",
+        "meta/tasks.parquet": "45f447ec84209364a04f6463c793812c666e582196a80c9e3b842e1331e4e696",
+        "data/chunk-000/file-000.parquet": "b8fff8eb62516fdf1eee13ede2fb9b5eaddd356fa7305024b689952b8c198369",
+        "videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4": "5100e1186384cf91ec0e07a932137f0dff31f1774e844c134ac29e43fea7a508",
+        "videos/observation.image.right_stereo_camera_right_rgb/chunk-000/file-000.mp4": "9c872e17c50f3006f27a1ea0298dd3803b82161720506b194524d08b61f0b846",
+        "videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4": "2ae3a477ca7d8b9ec9783a9702d12df08d580a5ec0f99288933097b59c292224",
+        "videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4": "54239ecfb5b3cb5e57ead54f5c0871c8e16f79f5a3bd260895c733df2bea057b"
+      },
+      "lib_version": "lib-sha256:6fa4c9aa996d",
+      "config": "config/droid_weird_success_wrist_review_1016.json",
+      "wrist_translation_candidate": true,
+      "review_note": "Rebuilt with corrected Robotiq jaw geometry. Wrist placement is fitted to both stereo views of this recording. Camera calibration and remaining CAD alignment errors are unvalidated.",
+      "files": {
+        "overlays/videos/robotiq_droid__WEIRD_success__ep0.mp4": "1445343f1548e3cf2b56ac5542b0dac67ee4fa4ae7310c453826d5454f4912e8",
+        "overlays/posters/robotiq_droid__WEIRD_success__ep0.jpg": "7289b901c3c92d969c233c4f108af229fe2bb331a60c95cd89375564ba24ba4f",
+        "overlays/raw/robotiq_droid__WEIRD_success__ep0.mp4": "4f6e4819a2d16eeaeb9ae797f2a1156234c886ce1c0e02226f8547b6d85fa240",
+        "overlays/raw/robotiq_droid__WEIRD_success__ep0.jpg": "d7d653cc7df7a65801f2f6284188ce23853eea2cfae9e792fc859f66e7f82778"
+      },
+      "render_fingerprint": "cb6a1581cf24a0bf0ccdb7e37835551723afd701f41a9a4b344efcaaf68b99fe"
+    },
+    {
+      "dataset": "robotiq/droid_lowres/AUTOLab_success",
+      "episode": 0,
+      "views": [
+        "right_stereo_camera_left_rgb",
+        "third_0_stereo_camera_left_rgb",
+        "third_1_stereo_camera_left_rgb"
+      ],
+      "frames": 94,
+      "fps": 7.5,
+      "width": 1918,
+      "height": 360,
+      "source_kind": "existing reviewed episode-anchor derivative",
+      "source_sha256": {
+        "meta/info.json": "593f1ebd5e0ba497d331a6041026d9f0c0d443810e79c4b57b4cb8a37b99464b",
+        "meta/episodes/chunk-000/file-000.parquet": "d69d9d433979cc903a6296cda9f23cb70742e3b41b4637378f6454de37221acd",
+        "meta/eef_in_main.parquet": "4406f1be3f167192c988fb04f9bac888a9e1d4f62d65a4c0ebc3982f20816587",
+        "meta/tasks.parquet": "ae2797bf1ced7fd7d07fef6689bb38cec293aa665f33ac7d879933710d9f9600",
+        "data/chunk-000/file-000.parquet": "9b156d788c2d006fa9d4fcce93dcc483f6b0bcdbb126c32579c75835730a789b",
+        "videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4": "0ca76cda198ba8659d9ab0b214c7fef1453823fcf70c3dfd7624c591fe9beff1",
+        "videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4": "4df7ac7d9c65f7c9653bdc36e8604a9d1686deb9e4d2b883243486ca18cd9073",
+        "videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4": "9dfa7f42e1f1d5e33063857b8eb1b9c9ce771421505a401c6aab26e3677f48a6"
+      },
+      "lib_version": "lib-sha256:6fa4c9aa996d",
+      "config": "config/droid.json",
+      "wrist_translation_candidate": false,
+      "review_note": "Rebuilt with corrected Robotiq jaw geometry. Existing camera calibration retained; residual wrist alignment is unvalidated. The previously reviewed calibration repair is retained.",
+      "files": {
+        "overlays/videos/robotiq_droid_lowres__AUTOLab_success__ep0.mp4": "857a6bec565a69d8d8c4b30d78468afbcc25ed9722c1d05b1dd41cef15a5fc44",
+        "overlays/posters/robotiq_droid_lowres__AUTOLab_success__ep0.jpg": "cfe8dd732deefc9e12451ea166786313cbb82f7b0606614442905c640ef3c876",
+        "overlays/raw/robotiq_droid_lowres__AUTOLab_success__ep0.mp4": "d16ac659a05c161bf36c4d4da92bb06c224f0b2b7d68ab97e912b322d0bebd1e",
+        "overlays/raw/robotiq_droid_lowres__AUTOLab_success__ep0.jpg": "a9b4b3970d73d3ff4a8e9d92cc2ae7b90b1168f273bb2c4cffb1a909d9229391"
+      },
+      "render_fingerprint": "f8511577183be5dea7f99c368f07db7d8b37d167501329d14be13d335975faba"
+    },
+    {
+      "dataset": "robotiq/droid_lowres/IPRL_success",
+      "episode": 0,
+      "views": [
+        "right_stereo_camera_left_rgb",
+        "third_0_stereo_camera_left_rgb",
+        "third_1_stereo_camera_left_rgb"
+      ],
+      "frames": 267,
+      "fps": 7.5,
+      "width": 1918,
+      "height": 360,
+      "source_kind": "existing reviewed episode-anchor derivative",
+      "source_sha256": {
+        "meta/info.json": "bdd94c6d6f721c665f9e051fbd4b09f8c77b3ba422a2892838f3ee0d0a2d2a69",
+        "meta/episodes/chunk-000/file-000.parquet": "696c0094c265023cc8754709c532ffdcbc55c5cea8c3402dfcee3ac87be82fc9",
+        "meta/eef_in_main.parquet": "b4ce2025acf91d7f8c490a1e2ea0164c92c759d83b130988b3361ff4008920dd",
+        "meta/tasks.parquet": "89e092977c64f093a9e88e79ab82eda6f05179a564d9fab6df7b9ab4efa58522",
+        "data/chunk-000/file-000.parquet": "924a5fc7ba5c2616d17d4090fb1b970f9aae1478e6358c3be03edc0b47b97e1d",
+        "videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4": "3b32930a7237d69f1c395ba548fe8e67f44c995ae3128ae35832140bced0884c",
+        "videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4": "1d65af517354f128aa35823d9d88fe87c61d5c16e22b93a8fff6ffb8df12b744",
+        "videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4": "d714797ae05a16831bd59d1defe735d1b361d396c5e6c5e4ddccded560f24d1b"
+      },
+      "lib_version": "lib-sha256:6fa4c9aa996d",
+      "config": "config/droid.json",
+      "wrist_translation_candidate": false,
+      "review_note": "Rebuilt with corrected Robotiq jaw geometry. Existing camera calibration retained; residual wrist alignment is unvalidated. The previously reviewed calibration repair is retained.",
+      "files": {
+        "overlays/videos/robotiq_droid_lowres__IPRL_success__ep0.mp4": "e2681011ecc62240fc246eb64c38a4822e8165b4010b4b4e9c3d2ee8663650dc",
+        "overlays/posters/robotiq_droid_lowres__IPRL_success__ep0.jpg": "22689e0b8e9789c1649b3108acbc467ea7978ee6733f31402015a8955dc804e8",
+        "overlays/raw/robotiq_droid_lowres__IPRL_success__ep0.mp4": "acdd033192c2b611383274e9aa52578c9b4368b35b138dc84272dcaa415cc397",
+        "overlays/raw/robotiq_droid_lowres__IPRL_success__ep0.jpg": "2194846dfa18fd4cab6c1d6a1009fe4b7f365d3ece2f66d46b6c7f0f84cf3218"
+      },
+      "render_fingerprint": "8189da1f6a18e74b079055bbb940d768f7f212229389f731295c90c1749f3672"
+    },
+    {
+      "dataset": "robotiq/droid_lowres/TRI_success",
+      "episode": 0,
+      "views": [
+        "right_stereo_camera_left_rgb",
+        "third_0_stereo_camera_left_rgb",
+        "third_1_stereo_camera_left_rgb"
+      ],
+      "frames": 86,
+      "fps": 7.5,
+      "width": 1918,
+      "height": 360,
+      "source_kind": "existing reviewed episode-anchor and exterior-calibration derivative",
+      "source_sha256": {
+        "meta/info.json": "9017325fa1effa6966ddd9cc6c79658bdbaa4863c17f6e3da8e3b06f3fe9bce3",
+        "meta/episodes/chunk-000/file-000.parquet": "8e7e01c5abf8dc3169b767514828c0c789dbae214c0c4b1f7e40a5054811f9f2",
+        "meta/eef_in_main.parquet": "e3f71d84ddc07d787d5651566245012176cc3303021da1c999dd259e4cb2911a",
+        "meta/tasks.parquet": "40cc1df7370d5c2b2cc5e5048c175e61a39d8e835f3ace2362ca7d5e3ec4a55b",
+        "data/chunk-000/file-000.parquet": "0ded798af0b381496b8332aa731d24c334ef1b095eac33fd99f5a79d89faad3c",
+        "videos/observation.image.right_stereo_camera_left_rgb/chunk-000/file-000.mp4": "e04dc61fa1d9d517904bf2297a636d144bd9cbf8a8935c857c2c6259ad42610e",
+        "videos/observation.image.third_0_stereo_camera_left_rgb/chunk-000/file-000.mp4": "4dac67ff7dbb944a60893f97ef364adc6a944253c3714e30b1532dbf0e82442f",
+        "videos/observation.image.third_1_stereo_camera_left_rgb/chunk-000/file-000.mp4": "51a60082c0326b8d831853e2822b13e5f3dbbe860f275fc403ee6c09525f48c2"
+      },
+      "lib_version": "lib-sha256:6fa4c9aa996d",
+      "config": "config/droid.json",
+      "wrist_translation_candidate": false,
+      "review_note": "Rebuilt with corrected Robotiq jaw geometry. Existing camera calibration retained; residual wrist alignment is unvalidated. The previously reviewed calibration repair is retained.",
+      "files": {
+        "overlays/videos/robotiq_droid_lowres__TRI_success__ep0.mp4": "89dd7585936dd8e1f6ea5a03bce843555b1b070f3f80a0f34df6436e602feaaa",
+        "overlays/posters/robotiq_droid_lowres__TRI_success__ep0.jpg": "7340365ea592e8c9b805b8e23ea92f79cead28e57ac2ab706128b2166e43eb3a",
+        "overlays/raw/robotiq_droid_lowres__TRI_success__ep0.mp4": "6056be73b836665fea0588331e27f215f7cdf89c4decedb78f36ebef46b2fb2a",
+        "overlays/raw/robotiq_droid_lowres__TRI_success__ep0.jpg": "24dfa5fec44a9169107889b83429266a211520a72f0fa1674c1ae15074691939"
+      },
+      "render_fingerprint": "f408c3a0836ec1b4c1e1facb71d1d9fd47fcfc1eacab1fda7dc20ec2507ab3a9"
+    }
+  ]
+}
