@@ -116,6 +116,7 @@ SPECS = {
     'hifi_umi/hifi_umi': MV(calib={'all': 'hifi_umi_hand_fisheye.json:stretch'}, profile='hifi_umi',
                             overlay='primitive stand-in (no CAD): hinged fingers spanning the recorded tip gap, tool-centre axes, '
                                     'camera markers; Kannala-Brandt hand-camera calibration'),
+    'manipforce/manipforce': None,   # set below (MANIPFORCE): author CAD through the image-fitted D455 + D405, one clip per task
     'realman/realsource': MV(config='realsource.json'),                              # ctag2f90d URDF, per-episode K
     'robotiq/droid_lowres': MV(config='droid.json', hfov={'right_stereo_camera_left_rgb': 82.4, 'right_stereo_camera_right_rgb': 82.4,
                                                           'third_0_stereo_camera_left_rgb': 101.4, 'third_1_stereo_camera_left_rgb': 100.6}),
@@ -154,6 +155,25 @@ SPECS = {
     'ur/openneo_ur': NEO('openneo_ur.json', None, eef_tcp=NEO_UR_TCP),                  # wrist stream only (third_0 dropped)
     'wsg50/rh20t_cfg3': dict(RH20T, profile='primitive'),                            # see dahuan/rh20t_cfg1
 }
+# ManipForce (2026-10-17): the author CAD (grippers/manipforce, registry profile `manipforce`) at the dataset's right_eef_pose_in_main,
+# which the width backfill (camx/data_processing/manipforce/scripts/recover_gripper_width.py, report config/cad_projection_all_tasks_
+# 20261017.json) stores as inv(the image-fitted camera_in_tcp) -- no retarget, no fixed width: observation.state.right_gripper_width_m is
+# the per-frame pad gap recovered from the jaw ArUco markers (the profile adds the pad allowance). The attached D405 draws through
+# info.json right_attached_camera_0_pose_in_main (fitted; its upside-down mounting is in that pose, the video stays as released).
+# Lenses (config/manipforce_2view.json): the authors' NOMINAL D455 pinhole and an ASSUMED 375 px D405 pinhole selected by a connector-silhouette
+# sweep; neither is a device calibration. Validation (docs/reviews/manipforce_cad_validation_1017.md): D405 = connector-silhouette candidate, 2.0 px
+# median / 11.4 px p90 on 108 frozen-test frames, depth uncertain by ~1 cm; installed pads larger than the CAD fingers. One clip per task (NEW_PICKS).
+MANIPFORCE = MV(config='manipforce_2view.json', profile='registry:manipforce', mode='urdf', extra=['--alpha', '1.0'],
+                views=['right_main_camera_rgb', 'right_attached_camera_0_rgb'],
+                overlay='author CAD (grippers/manipforce) at the image-fitted camera-to-TCP pose (projection candidate), jaw width inferred per '
+                        'frame from the jaw markers; assumed pinhole intrinsics (nominal D455, 375 px D405), not device calibration',
+                overlay_label='CAD connector projection candidate (image-fitted cameras)',
+                review_note=("Both cameras (D455 main, D405 attached) are image/CAD fits with assumed intrinsics (the authors' nominal D455 pinhole; a D405 focal of 375 "
+                             'px selected by a connector-silhouette sweep), not device calibration. The D405 pose is a connector-silhouette candidate: 2.0 px median'
+                             ' / 11.4 px p90 connector error on 108 frozen-test frames from 36 unused episodes; its depth along the optical axis is uncertain by about '
+                             '1 cm. The installed finger pads are larger than the CAD fingers, so the drawn finger outlines are not accurate and fingertip acceptance is'
+                             ' unmeasured. The jaw width is inferred per frame from the jaw markers (12 mm label scale assumption plus an inferred pad allowance), not a released channel.'))
+SPECS['manipforce/manipforce'] = MANIPFORCE
 
 
 def key_of(project): return project.replace('/', '_')
@@ -299,6 +319,7 @@ DEXORA = MV(config='dexora.json', **dict(AXES, extra=['--camera-frames', '--alph
 #    lens, calib/dexumi_oak1w_640x400_equidistant.json): the CAD lands right of the replayed hand; the flange frame is ~9 cm behind the lens.
 NEW_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
     ('xhand/dexora', DEXORA, [('articulation', 0), ('assemble', 0), ('dexterous', 0), ('pick_and_place', 0)]),
+    ('manipforce/manipforce', MANIPFORCE, [('battery_insertion', 0), ('box_flipping', 0), ('gear_assembly', 8)]),   # the site's episodes, one per task
 ] for ds, ep in picks]
 
 
@@ -453,6 +474,8 @@ def pack_one(project, dataset, ep, spec, out, **_):
             'built': datetime.datetime.now().astimezone().strftime('%Y-%m-%dT%H:%M:%S%z')}
     for field in ('overlay_scope', 'calibration'):
         if field in summary: meta[field] = summary[field]
+    for field in ('overlay_label', 'review_note'):   # caption fields a spec carries (tools/rerun_clips.py attach copies them to the clip record)
+        if spec.get(field): meta[field] = spec[field]
     json.dump(meta, open(os.path.join(d, 'meta.json'), 'w'), indent=1)
     json.dump({'views': view_names, 'n_frames': n, 'out_fps': meta['out_fps'], 'fisheye': meta['fisheye'], 'tool': spec['tool'],
                'overlay_mode': mode}, open(os.path.join(d, 'DONE.json'), 'w'))

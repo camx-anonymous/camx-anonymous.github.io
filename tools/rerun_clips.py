@@ -101,9 +101,11 @@ FISHEYE['umi/vista_umi'] = dict(FISHEYE['umi/umi_benchmark'], model='lumos swing
 # UMI rigs, whose stock-CAD stand-in does not land on the fingers), fisheye rigs with their own lens file (UMI-3D, AetheRock,
 # HiFi-UMI, GenRobot V4), RoboMIND UR5 (no-mimic Robotiq URDF) and the 180p DROID twin (the viewer draws nothing at 320x180).
 # Their renderer, configs and lens files are on camera-cross-embodiment origin/main: CAMX_VIZ_MV names that checkout's visualization dir.
+# ManipForce (2026-10-17): the author CAD through the image-fitted D455 + D405 cameras of the width backfill, per-view nominal lenses
+# (config/manipforce_2view.json, overlay_picks.MANIPFORCE); the curation planner has no two-view config for it.
 MULTIVIEW = {'agibot/agibot_world_beta', 'flexiv/openneo_flexiv', 'ur/openneo_ur', 'robotiq/robomind_ur5',
              'umi/umi3d', 'umi/aetherock', 'hifi_umi/hifi_umi', 'genrobot/gripper_v4', 'aloha/openneo_arx5', 'aloha/openneo_arx5_single',
-             'umi/openneo_umi', 'umi/openneo_umi_single', 'robotiq/droid_lowres'}
+             'umi/openneo_umi', 'umi/openneo_umi_single', 'robotiq/droid_lowres', 'manipforce/manipforce'}
 VIZ_MV = os.path.expanduser(os.environ.get('CAMX_VIZ_MV', '/data/camx/visualization'))
 KEEP = set()
 # bimanual rigs whose two hands are NOT in one world frame (build_site_data.WORLD_FRAME_NOTES): each view draws its own gripper only
@@ -317,7 +319,7 @@ def route_of(o):
     proj = proj_of(o)
     if not os.path.isfile(os.path.join(dataset_root(ROOT, o['dataset']), 'meta', 'info.json')): return 'keep', 'dataset not in this tree'
     if proj in FISHEYE: return 'fisheye', None
-    if proj in MULTIVIEW: return 'multiview', None
+    if proj in MULTIVIEW: return 'multiview', multiview_config(o)
     if proj in KEEP: return 'keep', None
     cd = os.path.join(CUR, o['key'], o['slug'])
     if os.path.isfile(os.path.join(cd, 'DONE.json')):
@@ -331,6 +333,15 @@ def route_of(o):
     if cfg is None and proj in EXTRA_CONFIG: cfg = EXTRA_CONFIG[proj] if os.path.isabs(EXTRA_CONFIG[proj]) else os.path.join(VIZ, EXTRA_CONFIG[proj])
     if cfg is None or not os.path.isfile(str(cfg)): return 'keep', f'no viz config ({cfg})'
     return 'rerun', str(cfg)
+
+
+def multiview_config(o):
+    """The viz config the multiview route will render with (plan output only: multiview_one re-reads the spec itself)."""
+    sys.path.insert(0, HERE); import overlay_picks as OP
+    proj = proj_of(o); ds = o['dataset'].split('/', 2)[2]; ep = int(o['episode'])
+    spec = next((p[3] for p in OP.EXPLICIT_PICKS + OP.REPLACE_PICKS + OP.NEW_PICKS if p[:3] == (proj, ds, ep)), None) or OP.SPECS.get(proj)
+    if spec is None: return 'NO SPEC in overlay_picks.py (render will fail)'
+    return os.path.join(VIZ_MV, 'config', spec['config']) if spec.get('config') else f"{spec['tool']} (no viz config)"
 
 
 def plan(ovs):

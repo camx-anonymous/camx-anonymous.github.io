@@ -2,11 +2,10 @@
 """Raw-only example clips: datasets whose release gives nothing to project a gripper through still get an example clip on
 their page -- the raw camera views, no overlay pane (clip record ``mode: 'raw'``, the reason in ``no_overlay``).
 
-Why these rigs get no overlay (2026-10-06):
+Why these rigs get no overlay (2026-10-06; manipforce/manipforce left this list 2026-10-17: CAD projection through the
+image-fitted cameras + recovered jaw width, tools/rerun_clips.py multiview route, config manipforce_2view.json):
   dexwild/dexwild          no camera intrinsics and no camera-to-hand transform for the palm cameras (the release has only the
                            wrist tracker's pose in the exterior camera), and no LEAP Hand V2 CAD in this checkout
-  manipforce/manipforce    the fitted camera_in_eef has NO translation (unknown; the lens sits ~0.2 m behind the jaw tips),
-                           no gripper width (a binary open flag only) and no CAD
   dexumi/dexumi            inspire_*: no Inspire RH56 hand model or CAD and no fingertip width in the release; xhand_*: the XHAND1
                            CAD at the UR5 flange pose of the DexUMI calibration through the nominal 150 deg lens lands right of
                            the replayed hand (tried 2026-10-06, tools/overlay_picks.py) -- withheld until the transform is fitted
@@ -36,8 +35,6 @@ OUT_FPS, MAX_SEC = 10, 45
 REASONS = {
     'dexwild/dexwild': 'the release publishes no camera intrinsics and no camera-to-hand transform for the palm cameras, '
                        'and the LEAP Hand V2 has no CAD here',
-    'manipforce/manipforce': 'the release publishes no camera-to-tool translation (the fitted camera_in_eef has zero translation), '
-                             'no gripper width and no CAD',
     'dexumi/dexumi': 'the Inspire RH56 hand model and CAD are not published and the release records no fingertip width',
     'dexumi/dexumi/xhand': 'the XHAND1 CAD placed at the UR5 flange pose of the DexUMI calibration through the nominal OAK-1 W lens '
                            'does not land on the replayed hand; the camera-to-flange transform needs a fit first',
@@ -49,7 +46,6 @@ def reason_of(project, dataset): return REASONS.get(f'{project}/{dataset.split("
 PICKS = [(p, ds, ep) for p, picks in [
     ('dexwild/dexwild', [('clothes_human', 0), ('clothes_robot', 0), ('florist_human', 0), ('florist_robot', 0), ('pour_human', 0),
                          ('pour_robot', 0), ('spray_human', 0), ('spray_robot', 0), ('toy_human', 0), ('toy_robot', 1)]),
-    ('manipforce/manipforce', [('battery_insertion', 14), ('box_flipping', 0), ('gear_assembly', 8)]),
     ('dexumi/dexumi', [('inspire_cube_picking', 1), ('inspire_egg_carton', 0), ('inspire_tool_use', 1), ('xhand_kitchen', 0), ('xhand_tool_use', 1)]),
     ('widowx/bridge_v2', [('bridge_v2', 6)]),
 ] for ds, ep in picks]
