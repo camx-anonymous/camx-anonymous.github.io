@@ -16,10 +16,12 @@ from fractions import Fraction
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from urllib.parse import unquote, urlsplit
@@ -53,6 +55,28 @@ def local_path(root, url):
 
 PRIVATE_KEYS = {'dataset_root', 'command', 'command_shell', 'stdout_tail',
                 'stderr_tail', 'source_realpath', 'config_resolved', 'profile_resolved'}
+PRIVATE_PATH_RE = re.compile(r'/(?:storage|home|nfs|tmp)/[^\s\"<>]+')
+# Account and host names are deployment configuration (CAMX_PRIVATE_NAMES / --private-names-file),
+# never literals in this file: this script is shipped with the public release.
+PRIVATE_NAMES_RE = None
+
+
+def parse_private_names(env_value=None, names_file=None):
+    """Names to redact: a comma-separated env value and/or a file with one name per line ('#' comments)."""
+    names = [n.strip() for n in (env_value or '').split(',')]
+    if names_file:
+        names += [line.split('#', 1)[0].strip() for line in Path(names_file).read_text().splitlines()]
+    return [n for n in dict.fromkeys(names) if n]
+
+
+def configure_private_names(names):
+    """Compile the account-name redaction used by public_value; no names means paths only."""
+    global PRIVATE_NAMES_RE
+    names = [n for n in dict.fromkeys(n.strip() for n in names) if n]
+    PRIVATE_NAMES_RE = re.compile(
+        r'\b(?:' + '|'.join(re.escape(n) for n in sorted(names, key=len, reverse=True)) + r')\b',
+        re.I) if names else None
+    return PRIVATE_NAMES_RE
 
 
 def public_value(value):
@@ -62,9 +86,8 @@ def public_value(value):
     if isinstance(value, list):
         return [public_value(v) for v in value]
     if isinstance(value, str):
-        value = re.sub(r'/(?:storage|home|nfs|tmp)/[^\s\"<>]+', '[local path]', value)
-        return re.sub(r'\b(?:yihuai|chilingh?|yutianch|desktop001|realdesktop016)\b',
-                      '[local account]', value, flags=re.I)
+        value = PRIVATE_PATH_RE.sub('[local path]', value)
+        return PRIVATE_NAMES_RE.sub('[local account]', value) if PRIVATE_NAMES_RE else value
     return value
 
 
@@ -74,6 +97,12 @@ def probe(path):
         '-of', 'json', path]))['streams'][0]
     return {'width': int(s['width']), 'height': int(s['height']),
             'frames': int(s['nb_frames']), 'rate': s['r_frame_rate']}
+
+
+def raw_tile_widths(view_infos, strip_height):
+    """Tile widths of a raw strip, as reproject.py's cut_raw builds it: every view is rescaled to the
+    common height with ffmpeg ``scale=-2:H`` (nearest even width, ties to even) and then hstacked."""
+    return [2 * round(Fraction(v['width'] * strip_height, 2 * v['height'])) for v in view_infos]
 
 
 def refs(value):
@@ -129,7 +158,9 @@ def build(source, website, work, gpu=1, jobs=2, quiet_seconds=60):
             track(p)
     if quiet_seconds and any(time.time() - n / 1e9 < quiet_seconds for _, n in inputs.values()):
         raise ValueError('Gallery is still changing; waiting for a quiet snapshot')
-    signature = hashlib.sha256(json.dumps(inputs, sort_keys=True).encode() + Path(__file__).read_bytes()).hexdigest()
+    redaction = (PRIVATE_NAMES_RE.pattern if PRIVATE_NAMES_RE else '').encode()
+    signature = hashlib.sha256(json.dumps(inputs, sort_keys=True).encode() + Path(__file__).read_bytes()
+                               + redaction).hexdigest()
     existing = website / 'data/gallery-sync.json'
     if existing.exists():
         old = json.loads(existing.read_text())
@@ -198,17 +229,20 @@ def build(source, website, work, gpu=1, jobs=2, quiet_seconds=60):
             if c['poster']:
                 copy_asset(c['poster'])
             views = meta.get('views', [])
-            widths = (meta.get('renderer_summary') or {}).get('tile_w')
+            summary = meta.get('renderer_summary') or {}
+            strip = probe(local_path(source, stitch_url))
+            widths = summary.get('tile_w')
             if not widths:
-                widths = [probe(local_path(source, v['url']))['width'] for v in c['views'][1:]]
+                # Raw clips have no renderer summary: their strip is the per-view videos rescaled to the
+                # stitched height, so a tile is that rescaled width, not the view's native width.
+                widths = raw_tile_widths([probe(local_path(source, v['url'])) for v in c['views'][1:]],
+                                         strip['height'])
             if len(widths) != len(views) or len(c['views']) != len(views) + 1:
                 raise ValueError('Unknown tile geometry: ' + c['id'])
             full = sum(widths)
-            if full != probe(local_path(source, stitch_url))['width']:
+            if full != strip['width']:
                 raise ValueError('Camera tiles do not cover the stitched video: ' + c['id'])
-            source_height = (meta.get('renderer_summary') or {}).get('tile_h')
-            if not source_height:
-                source_height = probe(local_path(source, stitch_url))['height']
+            source_height = summary.get('tile_h') or strip['height']
             offset = 0
             for v, width in zip(c['views'][1:], widths):
                 v['url'] = stitch_url
@@ -256,7 +290,8 @@ def build(source, website, work, gpu=1, jobs=2, quiet_seconds=60):
             dump(stage / 'comparisons.json', public_value(comparisons))
         gallery['publication'] = {'source_gallery_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
                                   'encoding': 'Same rendered frames, H.264 NVENC, up to 360 rows; camera views crop the stitched strip.'}
-        dump(stage / 'gallery.json', public_value(gallery))
+        published = public_value(gallery)
+        dump(stage / 'gallery.json', published)
         now = datetime.now(timezone.utc).isoformat()
         hashes = {str(p.relative_to(stage)): sha(p) for p in stage.rglob('*') if p.is_file()}
         total = sum(p.stat().st_size for p in stage.rglob('*') if p.is_file())
@@ -273,8 +308,9 @@ def build(source, website, work, gpu=1, jobs=2, quiet_seconds=60):
                   'clips': len(clips), 'projects': gallery['project_count'],
                   'bytes': total, 'files': hashes,
                   'scope': 'Local gallery episodes, renders, comparisons and caveats; historical preview pages remain separately available.'}
-        # Validate all relative manifest references before touching the destination.
-        for c in clips:
+        # Validate the relative references OF THE SANITIZED MANIFEST before touching the destination
+        # (public_value rewrites paths, so a dataset-id segment such as "home" breaks a URL only there).
+        for c in published['clips']:
             for url in [c['poster'], c['meta_url'], *[v['url'] for v in c['views']]]:
                 if url:
                     local_path(stage, url)
@@ -349,7 +385,16 @@ def main():
     p.add_argument('--quiet-seconds', type=int, default=60)
     p.add_argument('--push', action='store_true')
     p.add_argument('--verify-live', help='Base URL whose deployment must match after publication')
+    p.add_argument('--private-names-file', type=Path,
+                   help='Account/host names to redact, one per line (adds to CAMX_PRIVATE_NAMES)')
     a = p.parse_args()
+    names = parse_private_names(os.environ.get('CAMX_PRIVATE_NAMES'), a.private_names_file)
+    if not names and a.push:
+        sys.exit('publish_gallery: refusing to --push with no private names configured; '
+                 'set CAMX_PRIVATE_NAMES=name1,name2 or pass --private-names-file')
+    if not names:
+        print('publish_gallery: no private names configured; only local paths are redacted', file=sys.stderr)
+    configure_private_names(names)
     a.work.mkdir(parents=True, exist_ok=True)
     with (a.work / 'publish.lock').open('w') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
