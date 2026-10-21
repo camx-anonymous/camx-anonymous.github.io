@@ -1,7 +1,0 @@
-.gallery-embedded body>header,.gallery-embedded body>main,.gallery-embedded body>footer{display:none}
-.gallery-embedded #player-dialog{position:relative;inset:auto;margin:0;width:100%;max-width:none;max-height:none;min-height:100vh;border:0;border-radius:0;padding:16px}
-.gallery-embedded #player-dialog::backdrop{background:transparent;backdrop-filter:none}
-.gallery-embedded #close-player{display:none}
-.gallery-embedded .dialog-top h2{font-size:18px}
-.projection-audit-link{color:#815a19}
-.projection-audit-note{padding:12px;border-left:3px solid #bd792c;background:#fff1d9;font-size:12px;line-height:1.5}
