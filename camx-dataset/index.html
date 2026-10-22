@@ -326,7 +326,11 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const human=s=>{s=String(s).replace(/_+/g,' ').replace(/\s+/g,' ').trim();return s.charAt(0).toUpperCase()+s.slice(1)};
 const modeName=m=>m==='urdf'?'URDF projection':m==='cad'?'CAD projection':m==='camera-path'?'camera path + up axis':m==='raw'?'none (raw video only)':m==='axes'?'coordinate frames (no CAD)':m;
 const $=id=>document.getElementById(id);
-let D,P={},L=[],PEND=[],sel=new Set(),SRC={},SRCP={},SRCD={},SRCOK=false;
+let D,P={},L=[],ALL=[],PEND=[],sel=new Set(),SRC={},SRCP={},SRCD={},SRCOK=false;
+// For now the browse tree and the cards list only the datasets that have an example clip (own or same-task sibling; 2026-10-21,
+// user: hide the tasks without a clip until every dataset has one). ?all=1 lists every dataset. The header's sample row and the
+// download sets always cover the whole catalogue (ALL): the one-episode sample archives exist for every dataset.
+const ONLY_CLIPS=!new URLSearchParams(location.search).has('all');
 // D.pending: the sources of the paper's appendix tables with no converted data here yet (../data/pending.json), listed with the paper's counts
 // SHOW_PEND: the "Listed in the paper, not converted yet" cards under the dataset cards; off for now, and the tree leaves these sources out
 const SHOW_PEND=false;
@@ -341,7 +345,7 @@ const oneCmd=r=>r.sample?`# CAMX sample · ${r.id} · episode 0 · ${fmtDur(r.sa
 function order(rows){const rank={},seen={};
   rows.slice().sort((a,b)=>b.hours-a.hours).forEach(r=>{rank[r.id]=seen[r.project]=(seen[r.project]||0)+1});
   return rows.slice().sort((a,b)=>(rank[a.id]-rank[b.id])||(P[b.project].hours-P[a.project].hours)||(b.hours-a.hours))}
-function load(){fetch('../data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=order(d.datasets);PEND=d.pending||[];
+function load(){fetch('../data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=ALL=order(d.datasets);PEND=d.pending||[];if(ONLY_CLIPS)L=ALL.filter(r=>clipOf(r));
   try{JSON.parse(localStorage.getItem('camx.sel')||'[]').forEach(x=>sel.add(x))}catch(e){}
   fetch('../data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};SRCOK=true;tree();downloads();if($('drawer').classList.contains('open')){if(S.open)drawer(S.open);else if(S.openPend!=null)drawerPend(S.openPend)}}).catch(()=>{});
   stats();tree();render();downloads();})}
@@ -352,10 +356,15 @@ function agg(rows){return rows.reduce((a,r)=>{a.n++;a.ep+=r.episodes||0;a.h+=r.h
 // The site's own sums can differ from them, so they are only the fallback: converted datasets plus the listed sources (totals.pending)
 const tot=k=>{const t=D.totals;return (t.paper||{})[k]??(k==='sources'?t.sources:k==='embodiments'?t.embodiments_listed||t.embodiments:t[k]+((t.pending||{})[k]||0))};
 // two rows: the full dataset (the paper's totals, tot) and the one-episode samples published on this site (summed over the rows with a sample); sources are counted like the paper's table rows, one per embodiment and source
-function stats(){const sm=sampled(L),uniq=k=>new Set(sm.map(r=>r[k])).size;
+function stats(){const sm=sampled(ALL),uniq=k=>new Set(sm.map(r=>r[k])).size;
   const rows=[['Full dataset',[[fmt(tot('episodes')),'episodes'],[fmtH(tot('hours'))+' h','of video'],[tot('datasets').toLocaleString(),'datasets'],[tot('sources')||'–','sources'],[tot('embodiments'),'robot platforms'],[MORPHS.length,'morphologies']]],
     ['Sample dataset',[[fmt(sm.length),'episodes'],[fmtH(sm.reduce((a,r)=>a+r.sample.seconds,0)/3600)+' h','of video'],[sm.length.toLocaleString(),'datasets'],[new Set(sm.map(r=>r.embodiment+'|'+r.source)).size,'sources'],[uniq('embodiment'),'robot platforms'],[uniq('morph'),'morphologies']]]];
-  $('stats').innerHTML=rows.map(([l,c])=>`<div class="rl">${l}</div>`+c.map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')).join('')}
+  $('stats').innerHTML=rows.map(([l,c])=>`<div class="rl">${l}</div>`+c.map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')).join('');
+  // which datasets the browse list holds (ONLY_CLIPS): the rest stays reachable through the download commands and ?all=1
+  const hid=ALL.length-ALL.filter(r=>clipOf(r)).length,note=$('listNote')||$('stats').insertAdjacentElement('afterend',Object.assign(document.createElement('p'),{id:'listNote'}));
+  note.style.cssText='margin:8px 0 0;font:400 13px/1.5 var(--sans);color:var(--ink3)';
+  note.innerHTML=ONLY_CLIPS?`Browsing the ${L.length.toLocaleString()} datasets that have an example clip; ${hid.toLocaleString()} more without a clip are still in the sample archives and the download commands. <a href="?all=1">Show all ${ALL.length.toLocaleString()} datasets</a>`
+    :`Browsing all ${ALL.length.toLocaleString()} datasets; ${hid.toLocaleString()} have no example clip yet. <a href="./">Only datasets with a clip</a>`}
 
 /* ---------- browse: tree, cards ---------- */
 /* every tree row is a filter button plus a tick box that selects the whole group for download;
@@ -409,12 +418,14 @@ function syncCards(){$('cards').querySelectorAll('.dcard').forEach(c=>{const on=
 function filtered(){return L.filter(r=>(S.cat==='all'||r.morph===S.cat)&&(!S.robot||r.embodiment===S.robot)&&(!S.source||r.source===S.source))}
 function pendFiltered(){return PEND.filter(p=>(S.cat==='all'||p.morph===S.cat)&&(!S.robot||p.embodiment===S.robot)&&(!S.source||p.source===S.source))}
 const noteText=p=>p.note&&D.pending_notes?D.pending_notes[p.note]||'':'';
-// the example clip of a dataset: its own, else a clip of its project from the same rig -- same station and the same
-// gripper jaws (r.station / r.variant, tools/build_site_data.py; the clip's jaws are its grippers[].model), then same
-// jaws, then same station, then the first clip. ABC's RealSense fleet mixes three i2rt jaw types, each with its own
-// wrist-camera mount, so a clip of another jaw type shows a CAD that does not belong to the dataset's rig. Every clip
-// has a raw companion with the same frames, size and tiling (../overlays/raw/, tools/raw_clips.py); the cards show only
-// the raw poster
+// the example clip of a dataset: its own, else a clip of a sibling dataset of the SAME TASK (o.also_for, the datasets
+// whose first caption is the clip's; tools/build_site_data.py same_task_pass), preferring the same rig -- same station
+// and the same gripper jaws (r.station / r.variant; the clip's jaws are its grippers[].model), then same jaws, then same
+// station. A dataset with neither gets no example clip: until 2026-10-21 the page fell back to the project's first clip,
+// so 3,982 of 4,336 records played a video of another task next to their own caption. ABC's RealSense fleet mixes three
+// i2rt jaw types, each with its own wrist-camera mount, so a clip of another jaw type shows a CAD that does not belong to
+// the dataset's rig. Every clip has a raw companion with the same frames, size and tiling (../overlays/raw/,
+// tools/raw_clips.py); the cards show only the raw poster
 const RAW='../overlays/raw/';
 const clipName=o=>`${o.key}__${o.slug}`;
 const clipVersion=o=>o.render_fingerprint?`?v=${o.render_fingerprint.slice(0,12)}`:'';
@@ -422,11 +433,10 @@ const clipJaws=o=>{const m=new Set(Object.values(o.grippers||{}).map(g=>g.model)
 const clipStation=o=>{const row=L.find(x=>x.id===o.dataset);return row?row.station||null:null};
 const clipOf=r=>{const p=P[r.project],ov=p.overlays;if(!ov.length)return null;
   const own=ov.find(o=>o.dataset===r.id);if(own)return own;
-  // Beta ids name distinct tasks: a supermarket clip cannot preview Fold shorts. Every Beta dataset has its own clip since 2026-10-11.
-  if(r.project==='agibot/agibot_world_beta')return null;
+  const same=ov.filter(o=>(o.also_for||[]).includes(r.id));if(!same.length)return null;
   const st=r.station||null,jaws=r.variant||null;
   const sameSt=o=>!st||clipStation(o)===st,sameJaws=o=>!jaws||clipJaws(o)===jaws;
-  return ov.find(o=>sameSt(o)&&sameJaws(o))||(jaws&&ov.find(sameJaws))||(st&&ov.find(sameSt))||ov[0]};
+  return same.find(o=>sameSt(o)&&sameJaws(o))||(jaws&&same.find(sameJaws))||(st&&same.find(sameSt))||same[0]};
 // the clip is borrowed from a sibling dataset: say so, and whether its rig matches
 const clipNote=(r,o)=>{if(!o||o.dataset===r.id)return '';const st=r.station&&clipStation(o)&&clipStation(o)!==r.station,
   jaws=r.variant&&clipJaws(o)&&clipJaws(o)!==r.variant;
@@ -508,8 +518,8 @@ function gate(rows,label,then,verb){const ss=srcOf(rows);if(!ss.length){then();r
 function sizeOf(rows){const sm=sampled(rows);return {n:sm.length,miss:rows.length-sm.length,b:sm.reduce((a,r)=>a+r.sample.bytes,0),s:sm.reduce((a,r)=>a+r.sample.seconds,0)}}
 function slices(){const out=[];
   if(sel.size){const rows=L.filter(r=>sel.has(r.id));out.push({id:'sel',name:'Your selection',desc:`${rows.length.toLocaleString()} dataset${rows.length>1?'s':''} ticked`,rows,sel:true})}
-  out.push({id:'full',name:'All morphologies',desc:`${L.length.toLocaleString()} datasets · ${MORPHS.length} morphologies`,rows:L});
-  MORPHS.forEach(m=>{const rows=L.filter(r=>r.morph===m.id);const plats=new Set(rows.map(r=>r.embodiment)).size;
+  out.push({id:'full',name:'All morphologies',desc:`${ALL.length.toLocaleString()} datasets · ${MORPHS.length} morphologies`,rows:ALL});
+  MORPHS.forEach(m=>{const rows=ALL.filter(r=>r.morph===m.id);const plats=new Set(rows.map(r=>r.embodiment)).size;
     out.push({id:m.id,name:m.label,desc:`${rows.length.toLocaleString()} datasets · ${plats} platform${plats>1?'s':''}`,rows})});
   return out}
 function sliceCard(s){const z=sizeOf(s.rows),on=s.id===S.slice;

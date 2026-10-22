@@ -146,6 +146,32 @@ def merge_projects(out):
     return out
 
 
+def same_task_pass(out):
+    """projects[].overlays[].also_for: the sibling datasets (same project) whose own first caption is the clip's caption,
+    so the dataset page may show the clip for them too. A dataset without an own clip and without a same-task sibling
+    clip gets no example clip: before 2026-10-21 the page fell back to the project's first clip, so 3,982 of 4,336
+    records played a video of another task next to their own caption. Captions from data/captions.json (first
+    instruction, first wording); a project whose datasets are not in the file gets no sharing."""
+    caps = json.load(open(CAPTIONS)) if os.path.isfile(CAPTIONS) else {}
+    first = lambda s: str(s or '').split('||')[0].strip().lower()
+    # a dataset's identity for sharing: its first instruction plus its task group name where there is one (AgiBot World
+    # 2026 opens every episode with a generic label such as "Pick up the item." under distinct task groups)
+    placeholder = {'', 'unknown task.', 'unknown task', 'unknown', 'unlabeled', 'unlabeled.', 'untitled.', 'untitled', 'none', 'n/a'}
+    key = lambda i: (first(((caps.get(i) or {}).get('tasks') or [''])[0]), first((caps.get(i) or {}).get('name'))) if caps.get(i) else None
+    own = {r['id']: key(r['id']) for r in out['datasets']}
+    by_proj = collections.defaultdict(list)
+    for r in out['datasets']: by_proj[r['project']].append(r['id'])
+    n = 0
+    for p in out['projects']:
+        for o in p['overlays']:
+            t = first(o.get('task')); o.pop('also_for', None); k = own.get(o['dataset'])
+            if not t or not k or k[0] != t or t in placeholder: continue   # the clip's caption must be its own dataset's real first instruction
+            also = sorted(i for i in by_proj.get(p['key'], []) if i != o['dataset'] and own.get(i) == k)
+            if also: o['also_for'] = also; n += len(also)
+    print(f'{n} dataset records share a same-task sibling clip (also_for)', file=sys.stderr)
+    return out
+
+
 # --- paper alignment -------------------------------------------------------------------------------------------
 # The browse tree follows the source tables of the paper's appendix (tab:camx_sources, tab:camx_sources_held; user,
 # 2026-10-02): the inventory files every hand-held rig under UMI and bands each leaf by its own form factor, the paper
@@ -839,7 +865,7 @@ def main():
     a = ap.parse_args()
     if a.clips_only:
         out = clips_pass(json.load(open(a.out)), a.root, [x.strip().strip('/') for x in a.clips_only.split(',') if x.strip()])
-        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
+        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(out))))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     if a.scrub_only or a.attach_samples_only or a.captions_only or a.tasks_only or a.variants_only:
@@ -848,7 +874,7 @@ def main():
         if a.captions_only: out = captions_pass(out, a.root); dataset_captions(out, a.root)
         if a.tasks_only: out = tasks_pass(out, a.root)
         if a.variants_only: out = variants_pass(out, a.root)
-        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
+        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(out))))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     inv = json.load(open(INVENTORY))
@@ -858,7 +884,7 @@ def main():
     if a.add:
         out, new = add_leaves(json.load(open(a.out)), a.root, a.add.split(','), stats, inv_rows)
         out = variants_pass(tasks_pass(out, a.root, rows=new), a.root, rows=new)
-        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
+        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(out))))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr)
         dataset_captions(out, a.root)
@@ -887,7 +913,7 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(variants_pass(tasks_pass(captions_pass(out, a.root), a.root), a.root), SAMPLES))))))
+    out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(variants_pass(tasks_pass(captions_pass(out, a.root), a.root), a.root), SAMPLES)))))))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)
