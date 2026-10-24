@@ -370,13 +370,12 @@ function stats(){const sm=sampled(ALL),uniq=k=>new Set(sm.map(r=>r[k])).size;
   const rows=[['Full dataset',[[fmt(tot('episodes')),'episodes'],[fmtH(tot('hours'))+' h','of video'],[tot('datasets').toLocaleString(),'datasets'],[tot('sources')||'–','sources'],[tot('embodiments'),'robot platforms'],[MORPHS.length,'morphologies']]],
     ['Sample dataset',[[fmt(sm.length),'episodes'],[fmtH(sm.reduce((a,r)=>a+r.sample.seconds,0)/3600)+' h','of video'],[sm.length.toLocaleString(),'datasets'],[new Set(sm.map(r=>r.embodiment+'|'+r.source)).size,'sources'],[uniq('embodiment'),'robot platforms'],[uniq('morph'),'morphologies']]]];
   $('stats').innerHTML=rows.map(([l,c])=>`<div class="rl">${l}</div>`+c.map(([v,k])=>`<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('')).join('');
-  // which datasets the browse list holds (ONLY_CLIPS): the rest stays reachable through the download commands and ?all=1
-  const hid=ALL.length-ALL.filter(r=>clipOf(r)).length,note=$('listNote')||$('stats').insertAdjacentElement('afterend',Object.assign(document.createElement('p'),{id:'listNote'}));
+  // the note under the stats (the browse list holds only the datasets with a clip, ONLY_CLIPS; ?all=1 lists every dataset; 2026-10-24,
+  // user: the "Browsing N datasets ... Show all" sentence is gone, the quality note stays)
+  const note=$('listNote')||$('stats').insertAdjacentElement('afterend',Object.assign(document.createElement('p'),{id:'listNote'}));
   note.style.cssText='margin:8px 0 0;font:400 13px/1.5 var(--sans);color:var(--ink3)';
-  note.innerHTML=(ONLY_CLIPS?`Browsing the ${L.length.toLocaleString()} datasets that have an example clip; ${hid.toLocaleString()} more without a clip are still in the sample archives and the download commands. <a href="?all=1">Show all ${ALL.length.toLocaleString()} datasets</a>`
-    :`Browsing all ${ALL.length.toLocaleString()} datasets; ${hid.toLocaleString()} have no example clip yet. <a href="./">Only datasets with a clip</a>`)
-    // the example clips are re-encoded hard to stay under the file size limit of GitHub Pages; the sample archives hold the real quality
-    +`<br>The example clips on this page are compressed aggressively to fit the file size limit of GitHub Pages; the <a href="#download">dataset samples</a> have a much higher video quality than the clips shown here.`}
+  // the example clips are re-encoded hard to stay under the file size limit of GitHub Pages; the sample archives hold the real quality
+  note.innerHTML=`The example clips on this page are compressed aggressively to fit the file size limit of GitHub Pages; the <a href="#download">dataset samples</a> have a much higher video quality than the clips shown here.`}
 
 /* ---------- browse: tree, cards ---------- */
 /* every tree row is a filter button plus a tick box that selects the whole group for download;
