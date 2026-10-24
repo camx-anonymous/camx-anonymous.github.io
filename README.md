@@ -23,24 +23,24 @@ This repository is anonymized for review.
   file that is not `info.json`, `episodes/`, `tasks.parquet`, `stats.json` or `_SUCCESS`, and runs the
   anonymisation pass), uploaded with `tools/publish_samples.py`, and merged into `data/datasets.json` as each
   row's `sample` (`{url, bytes, frames, seconds}`) by `tools/build_site_data.py --attach-samples-only`.
-- `overlays/` — camera-projection example clips, a few episodes per project: the gripper URDF as the opaque
+- Example clips in `camx-dataset/` — camera-projection example clips, a few episodes per project: the gripper URDF as the opaque
   light-grey CAD mesh of the headless Rerun viewer (the look of the curation pages; fisheye rigs, which that viewer
   cannot draw through, go through the OpenCV fisheye renderer with the same grey, `tools/white_overlay.py`), or,
   where no URDF is released, a primitive stand-in: hinged fingers that follow the recorded jaw width plus
   the tool-centre frame as RGB = xyz axes; the OpenNeoData rigs draw the stock PiPER / ARX X5 / UMI gripper CAD as
   a stand-in (`standin` on the clip record). Everything is projected through each dataset's own poses and intrinsics. Clips are
-  served from `overlays/videos/` (tracked, so Pages sends them as `video/mp4`; iOS Safari will not play the
-  `application/octet-stream` that GitHub release assets come back as); posters live in `overlays/posters/`. The site is fully static
+  served from `overlays/videos/` as `video/mp4`; posters live in `overlays/posters/`. The site is fully static
   (GitHub Pages); there is no rendering backend.
 - `overlays/raw/` — the raw companion of every example clip (`<key>__<slug>.mp4` + `.jpg` poster): the same episode,
   camera views, tile order, frame sampling and frame size, with nothing drawn on it (`tools/raw_clips.py`). The
   dataset cards of the dataset page show only the raw poster. Clicking a card opens the dataset record and, beside
   it (above it on a phone), a comparison viewer that plays the raw clip next to the overlay clip in step; picking one
-  camera view crops both clips to that tile and shows them side by side. Under the clips the viewer shows the caption
+  camera view crops both clips to that tile and shows them side by side. The clip / episode selector exposes
+  additional clips inside this viewer and switches videos, camera geometry, and captions together. Under the clips the viewer shows the caption
   of the frame on screen: each clip's `task` in `data/datasets.json`, or, for an episode annotated per sub-task whose
   caption changes while the clip plays, its `captions` track (`[[start second, caption], ...]`). The build reads both
   from the dataset's current data (the episode's per-frame `task_index` through `meta/tasks.parquet`), the same
-  source as the record's Caption row, so the viewer, the overlays page and the record always agree; the render
+  source as the record's Caption row, so the viewer and the record always agree; the render
   tree's `meta.json` task string is a snapshot from render time (it goes stale when an annotation bank is
   re-expanded) and only stands in when the dataset cannot be read. A caption with alternate wordings (the datasets'
   `||`-joined language annotations, 2-25 per task) gets an "augmented ‹ 1 / n ›" stepper through all its wordings.
@@ -94,6 +94,9 @@ This repository is anonymized for review.
   of a record adds the license text and the source page. The
   generated script carries a three-line header that links `data/citations.bib`.
 
+The separate `/overlays/` page has been removed. Its media assets remain in `overlays/`;
+all clip browsing now takes place in `camx-dataset/`.
+
 ## Rebuilding the data
 
 The October 16 DROID rebuild is recorded in `data/droid-preview-review.json`.
@@ -126,7 +129,7 @@ The October 15 preview review is recorded in `data/preview-review.json`. It refr
 Flexiv, MuSe and RB-Y1 episodes with the current portable reprojection recipes, and imports the reviewed
 DexWild 30 fps diagnostic. Bridge and ManipForce episode-0 CAD candidates have explicit calibration limits;
 their other episodes retain raw playback. Dexora articulation shows raw video after its proposed correction
-was rejected. `review_note` and `overlay_label` are displayed by both viewers; `render_fingerprint` versions
+was rejected. `review_note` and `overlay_label` are displayed by the comparison viewer; `render_fingerprint` versions
 media URLs so cached videos cannot conceal a refresh. Raw companions must match the exact source episode,
 view order, dimensions, frame count and rate of each overlay. The downloadable sample archives keep their
 existing versions; affected dataset records explain when their preview uses newer converted data.

@@ -6,6 +6,7 @@
 <title>CAMX — Cross-Embodiment Robot Manipulation Dataset</title>
 <meta name="description" content="CAMX: real-world robot manipulation across handheld, single-arm, bimanual and mobile-manipulator embodiments, re-exported into one camera-aware LeRobot-v3 layout. Browse every dataset and fetch one-episode samples from GitHub with a single command (anonymous submission).">
 <link rel="stylesheet" href="../site.css">
+<script src="../assets/catalog.js"></script>
 <style>
 /* ---------- hero ---------- */
 .hero{padding-top:64px;padding-bottom:20px}
@@ -213,6 +214,9 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .cmp .hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0 0 10px}
 .cmp .hd b{font:500 14px/1.4 var(--sans)}
 .cmp .hd span{font:400 12px/1.5 var(--mono);color:var(--ink3);overflow-wrap:anywhere}
+.cmp .clip-picker{display:grid;gap:5px;margin:0 0 12px}
+.cmp .clip-picker label{font:500 11px/1.7 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+.cmp .clip-picker select{width:100%;min-width:0;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:400 12px/1.5 var(--mono)}
 .cmp .panes{display:grid;gap:12px}
 .cmp .panes.side{grid-template-columns:1fr 1fr;align-items:end}
 .cmp figure{margin:0;min-width:0}
@@ -345,10 +349,10 @@ const oneCmd=r=>r.sample?`# CAMX sample · ${r.id} · episode 0 · ${fmtDur(r.sa
 function order(rows){const rank={},seen={};
   rows.slice().sort((a,b)=>b.hours-a.hours).forEach(r=>{rank[r.id]=seen[r.project]=(seen[r.project]||0)+1});
   return rows.slice().sort((a,b)=>(rank[a.id]-rank[b.id])||(P[b.project].hours-P[a.project].hours)||(b.hours-a.hours))}
-function load(){fetch('../data/datasets.json').then(r=>r.json()).then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=ALL=order(d.datasets);PEND=d.pending||[];if(ONLY_CLIPS)L=ALL.filter(r=>clipOf(r));
+function load(){CamxCatalog.load().then(d=>{D=d;d.projects.forEach(p=>P[p.key]=p);L=ALL=order(d.datasets);PEND=d.pending||[];if(ONLY_CLIPS)L=ALL.filter(r=>clipOf(r));
   try{JSON.parse(localStorage.getItem('camx.sel')||'[]').forEach(x=>sel.add(x))}catch(e){}
   fetch('../data/sources.json').then(r=>r.json()).then(j=>{SRC=j.sources||{};SRCP=j.projects||{};SRCD=j.datasets||{};SRCOK=true;tree();downloads();if($('drawer').classList.contains('open')){if(S.open)drawer(S.open);else if(S.openPend!=null)drawerPend(S.openPend)}}).catch(()=>{});
-  stats();tree();render();downloads();})}
+  stats();tree();render();downloads();}).catch(error=>{console.error(error);$('cards').textContent='The catalog could not be loaded. Please reload to try again.';})}
 
 function agg(rows){return rows.reduce((a,r)=>{a.n++;a.ep+=r.episodes||0;a.h+=r.hours||0;a.b+=r.bytes_est||0;return a},{n:0,ep:0,h:0,b:0})}
 
@@ -426,9 +430,17 @@ const noteText=p=>p.note&&D.pending_notes?D.pending_notes[p.note]||'':'';
 // i2rt jaw types, each with its own wrist-camera mount, so a clip of another jaw type shows a CAD that does not belong to
 // the dataset's rig. Every clip has a raw companion with the same frames, size and tiling (../overlays/raw/,
 // tools/raw_clips.py); the cards show only the raw poster
-const RAW='../overlays/raw/';
+const RAW='../overlays/raw/';   // fallback when data/datasets.json carries no raw_base / poster_base
+// the raw mp4, the poster jpg and the overlay mp4 come from three independent bases (tools/release_clips.py attach):
+// posters stay in the repo while the mp4s may be hosted outside it; a record's own overlay_url / raw_url (GitHub Release
+// assets planned by release_clips.py plan) win over the bases
+const rawBase=()=>D.raw_base||RAW,posterBase=()=>D.poster_base||RAW;
 const clipName=o=>`${o.key}__${o.slug}`;
-const clipVersion=o=>o.render_fingerprint?`?v=${o.render_fingerprint.slice(0,12)}`:'';
+// Keep existing query parameters and fragments intact when adding the render cache key.
+const clipVersion=(url,o)=>{if(!o.render_fingerprint)return url;const at=url.indexOf('#'),path=at<0?url:url.slice(0,at),hash=at<0?'':url.slice(at);
+  return path+(path.includes('?')?(/[?&]$/.test(path)?'':'&'):'?')+'v='+encodeURIComponent(String(o.render_fingerprint).slice(0,12))+hash};
+const clipUrls=o=>{const f=clipName(o);return {raw:clipVersion(o.raw_url||rawBase()+f+'.mp4',o),
+  overlay:clipVersion(o.overlay_url||(D.overlay_base||'../overlays/videos/')+f+'.mp4',o),poster:clipVersion(posterBase()+f+'.jpg',o)}};
 const clipJaws=o=>{const m=new Set(Object.values(o.grippers||{}).map(g=>g.model).filter(Boolean));return m.size===1?[...m][0]:null};
 const clipStation=o=>{const row=L.find(x=>x.id===o.dataset);return row?row.station||null:null};
 const clipOf=r=>{const p=P[r.project],ov=p.overlays;if(!ov.length)return null;
@@ -437,11 +449,15 @@ const clipOf=r=>{const p=P[r.project],ov=p.overlays;if(!ov.length)return null;
   const st=r.station||null,jaws=r.variant||null;
   const sameSt=o=>!st||clipStation(o)===st,sameJaws=o=>!jaws||clipJaws(o)===jaws;
   return same.find(o=>sameSt(o)&&sameJaws(o))||(jaws&&same.find(sameJaws))||(st&&same.find(sameSt))||same[0]};
+// Keep the card's default first, then expose every owned episode/render. A row without an owned clip
+// may browse only the explicitly marked same-task siblings, with the previously preferred rig first.
+const clipsOf=r=>{const first=clipOf(r);if(!first)return [];const own=first.dataset===r.id;
+  return [first,...P[r.project].overlays.filter(o=>o!==first&&(own?o.dataset===r.id:(o.also_for||[]).includes(r.id)))]};
 // the clip is borrowed from a sibling dataset: say so, and whether its rig matches
 const clipNote=(r,o)=>{if(!o||o.dataset===r.id)return '';const st=r.station&&clipStation(o)&&clipStation(o)!==r.station,
   jaws=r.variant&&clipJaws(o)&&clipJaws(o)!==r.variant;
   return st||jaws?` <span class="note">(sibling dataset${jaws?`, ${esc(clipJaws(o))} jaws, this dataset uses ${esc(r.variant)}`:''}${st?`, ${esc(clipStation(o))} station`:''}: overlay geometry differs)</span>`:(r.station&&clipStation(o)&&r.variant&&clipJaws(o))?' <span class="note">(sibling dataset, same rig)</span>':' <span class="note">(sibling dataset)</span>'};
-function thumb(r){const o=clipOf(r);return o?{poster:RAW+clipName(o)+'.jpg'+clipVersion(o)}:null}
+function thumb(r){const o=clipOf(r);return o?{poster:clipUrls(o).poster}:null}
 
 // the heading of a dataset: info.json's task name where the build found one (AgiBot World, whose ids are opaque numbers;
 // r.title), else the id's last part made readable. A dataset holding several tasks, or one task annotated per sub-task,
@@ -449,7 +465,7 @@ function thumb(r){const o=clipOf(r);return o?{poster:RAW+clipName(o)+'.jpg'+clip
 const title=r=>r.title||human(r.name);
 const mixTag=r=>r.tm?`<span class="tk">${r.tm.kind==='steps'?'sub-task captions':fmt(r.tm.n_task)+' tasks'}</span>`:'';
 function card(r){const t=thumb(r),on=sel.has(r.id);
-  const th=t?`<div class="thumb has" title="Open the example clip"><img src="${t.poster}" alt="" loading="lazy"><span class="play"><i></i></span>${mixTag(r)}<span class="dur">${fmtH(r.hours)} h</span></div>`
+  const th=t?`<div class="thumb has" title="Open the example clip"><img src="${esc(t.poster)}" alt="" loading="lazy"><span class="play"><i></i></span>${mixTag(r)}<span class="dur">${fmtH(r.hours)} h</span></div>`
     :`<div class="thumb"><span class="tl">no example clip</span>${mixTag(r)}<span class="dur">${fmtH(r.hours)} h</span></div>`;
   return `<article class="dcard${on?' on':''}" data-id="${esc(r.id)}">${th}${ck(on,'','Select '+title(r)+' for download')}<div class="body"><div class="ttl">${esc(title(r))}</div>${r.title?`<div class="sub">${esc(r.name)}</div>`:''}
     <div class="meta"><span class="cat">${esc(ML[r.morph]||r.morph)}</span><span>›</span><span>${esc(r.embodiment)}</span><span>·</span><span>${esc(r.source)}</span></div></div></article>`}
@@ -568,16 +584,21 @@ function dl(name,text,type){const a=document.createElement('a');a.href=URL.creat
    camera views (equal heights, left to right in o.views), shown whole: one above the other, or side by side when the
    strip is narrow, each tile tagged with the short name of its view. */
 let CMP=null;
+const clipChoices=new Map();
 const wide=matchMedia('(min-width:1100px)');
-function tilesOf(o){const row=L.find(x=>x.id===o.dataset);const ar=o.views.map(v=>{const c=row&&row.cams.find(c=>c.name===v);return c?c.w/c.h:4/3});
+function tilesOf(o){const positive=n=>Number.isFinite(n)&&n>0,row=L.find(x=>x.id===o.dataset);
+  // Renderers can resize or crop views: use the actual encoded tile sizes when recorded.
+  const explicit=positive(o.tile_h)&&Array.isArray(o.tile_w)&&o.tile_w.length===o.views.length&&o.tile_w.every(positive);
+  const ar=explicit?o.tile_w.map(w=>w/o.tile_h):o.views.map(v=>{const c=row&&(row.cams||[]).find(c=>c.name===v);return c&&positive(c.w)&&positive(c.h)?c.w/c.h:4/3});
   const A=ar.reduce((a,b)=>a+b,0);let x=0;return {A,X:ar.map(a=>{const l=x/A;x+=a;return l})}}
 // the short name of a camera view, drawn on its tile: right_main_camera_rgb -> right, third_0_main_camera_rgb -> third 0
 const viewTag=v=>v.replace(/^head_stereo_camera_(left|right)_rgb$/,'head $1').replace(/_rgb$/,'').replace(/_main_camera|_camera/,'').replace(/_/g,' ');
-function closeCmp(){if(!CMP)return;CMP.querySelectorAll('video').forEach(v=>{v.pause();v.removeAttribute('src');v.load()});CMP.remove();CMP=null;$('stage').classList.remove('show')}
+function closeCmp(){if(!CMP)return;const old=CMP;CMP=null;old.querySelectorAll('video').forEach(v=>{v.pause();v.removeAttribute('src');v.load()});old.remove();$('stage').classList.remove('show')}
 function placeCmp(){if(!CMP)return;const st=$('stage'),dl=$('drawerBody').querySelector('dl');
   if(wide.matches){st.appendChild(CMP);st.classList.add('show')}else{st.classList.remove('show');if(dl)dl.before(CMP)}}
 wide.addEventListener('change',placeCmp);
-function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesOf(o),f=clipName(o);
+function openCmp(r,choice){closeCmp();const clips=clipsOf(r),wanted=choice||clipChoices.get(r.id),o=clips.find(c=>clipName(c)===wanted)||clips[0];if(!o)return;
+  clipChoices.set(r.id,clipName(o));const {A,X}=tilesOf(o),urls=clipUrls(o);
   const el=CMP=document.createElement('div');el.className='cmp';
   const tags=o.views.map((v,i)=>`<span class="vtag" style="left:${(100*X[i]).toFixed(3)}%">${esc(viewTag(v))}</span>`).join('');
   const pane=(cap,src)=>`<figure><figcaption>${cap}</figcaption><div class="win"><video src="${esc(src)}" muted loop playsinline preload="auto"></video>${tags}</div></figure>`;
@@ -587,23 +608,25 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesO
   // a raw-only clip (o.mode 'raw', tools/raw_only_clips.py): the release gives nothing to project a gripper through, so one pane
   const raw=o.mode==='raw';
   el.innerHTML=`<div class="hd"><b>Example clip</b><span>${esc(o.dataset)} · ep ${esc(o.episode)}${clipNote(r,o)}</span></div>
-    <div class="panes">${pane('Raw video'+(raw?` <span class="note">(no gripper overlay: ${esc(o.no_overlay||'the release gives nothing to project a gripper through')})</span>`:''),RAW+f+'.mp4'+clipVersion(o))}${raw?'':pane((o.overlay_label?esc(o.overlay_label):o.mode==='axes'?'Coordinate frames <span class="note">(no CAD: flange and camera axes, x red / y green / z blue)</span>':o.mode==='primitive'?'Gripper overlay <span class="note">(no CAD: tip only)</span>':o.standin?`Gripper CAD overlay <span class="note">(${o.standin_note?esc(o.standin_note)+' as stand-in':'stock '+esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))+' gripper as stand-in'})</span>`:o.overlay_scope==='wrist_fingers'?'Fitted finger CAD overlay <span class="note">(wrist views; fingers and short links only)</span>':'Gripper CAD overlay')+(o.own_only?' <span class="note">(own gripper per view: no shared frame)</span>':''),D.overlay_base+f+'.mp4'+clipVersion(o))}</div>
+    ${clips.length>1?`<div class="clip-picker"><label for="cmpClip">Clip / episode · ${clips.length} available</label><select id="cmpClip">${clips.map(c=>`<option value="${esc(clipName(c))}"${c===o?' selected':''}>Episode ${esc(c.episode)} · ${esc(c.slug)}</option>`).join('')}</select></div>`:''}
+    <div class="panes">${pane('Raw video'+(raw?` <span class="note">(no gripper overlay: ${esc(o.no_overlay||'the release gives nothing to project a gripper through')})</span>`:''),urls.raw)}${raw?'':pane((o.overlay_label?esc(o.overlay_label):o.mode==='axes'?'Coordinate frames <span class="note">(no CAD: flange and camera axes, x red / y green / z blue)</span>':o.mode==='primitive'?'Gripper overlay <span class="note">(no CAD: tip only)</span>':o.standin?`Gripper CAD overlay <span class="note">(${o.standin_note?esc(o.standin_note)+' as stand-in':'stock '+esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))+' gripper as stand-in'})</span>`:o.overlay_scope==='wrist_fingers'?'Fitted finger CAD overlay <span class="note">(wrist views; fingers and short links only)</span>':'Gripper CAD overlay')+(o.own_only?' <span class="note">(own gripper per view: no shared frame)</span>':''),urls.overlay)}</div>
     ${o.review_note?`<p class="note" style="margin:12px 16px">${esc(o.review_note)}</p>`:''}
     ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
     <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
   const vids=el.querySelectorAll('video'),a=vids[0],b=vids[1]||a,pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
+  const picker=el.querySelector('.clip-picker select');if(picker)picker.onchange=()=>{openCmp(r,picker.value);CMP?.querySelector('.clip-picker select')?.focus()};
   // the caption of the frame on screen
   const cap=el.querySelector('.cap'),capUI=cap&&capBox(cap);let seg=-1;
   const capAt=t=>{if(!cap)return;let i=0;caps.forEach((c,k)=>{if(c[0]<=t+.05)i=k});if(i!==seg){seg=i;capUI.set(caps[i][1])}};
   capAt(0);
   // the raw clip leads and the overlay follows it: same frame count and rate, so only decoder drift has to be corrected
-  const sync=()=>{if(Math.abs(b.currentTime-a.currentTime)>.07)b.currentTime=a.currentTime;capAt(a.currentTime)};
-  const toggle=()=>{if(a.paused){const p=a.play();if(p&&p.catch)p.catch(()=>{})}else a.pause()};
+  const sync=()=>{if(CMP!==el)return;if(Math.abs(b.currentTime-a.currentTime)>.07)b.currentTime=a.currentTime;capAt(a.currentTime)};
+  const toggle=()=>{if(CMP!==el)return;if(a.paused){const p=a.play();if(p&&p.catch)p.catch(()=>{})}else a.pause()};
   a.addEventListener('timeupdate',()=>{sync();if(a.duration)pos.value=1000*a.currentTime/a.duration});
   a.addEventListener('seeked',sync);
-  a.addEventListener('play',()=>{const p=b.play();if(p&&p.catch)p.catch(()=>{});pp.textContent='❚❚';pp.setAttribute('aria-label','Pause')});
-  a.addEventListener('pause',()=>{b.pause();pp.textContent='▶';pp.setAttribute('aria-label','Play')});
-  pos.oninput=()=>{if(a.duration)a.currentTime=b.currentTime=pos.value/1000*a.duration};
+  a.addEventListener('play',()=>{if(CMP!==el)return;if(b!==a){const p=b.play();if(p&&p.catch)p.catch(()=>{})}pp.textContent='❚❚';pp.setAttribute('aria-label','Pause')});
+  a.addEventListener('pause',()=>{if(CMP!==el)return;if(b!==a)b.pause();pp.textContent='▶';pp.setAttribute('aria-label','Play')});
+  pos.oninput=()=>{if(CMP===el&&a.duration){a.currentTime=b.currentTime=pos.value/1000*a.duration;sync()}};
   pp.onclick=toggle;
   el.querySelectorAll('.win').forEach(w=>{w.onclick=toggle;
     w.firstChild.addEventListener('error',()=>w.insertAdjacentHTML('beforeend','<div class="err">Clip failed to load.</div>'))});
@@ -612,8 +635,8 @@ function openCmp(r){closeCmp();const o=clipOf(r);if(!o)return;const {A,X}=tilesO
   el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=A;w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(A/(side||raw?1:2)).toFixed(4)}))`});
   placeCmp();
   // start both together once each has a frame; if one fails to load, the other still plays
-  let n=0;const need=raw?1:2,go=()=>{if(++n===need&&CMP===el)toggle()};
-  (raw?[a]:[a,b]).forEach(v=>{if(v.readyState>=2)go();else{v.addEventListener('loadeddata',go,{once:true});v.addEventListener('error',go,{once:true})}})}
+  const pending=new Set(vids),go=v=>{if(pending.delete(v)&&!pending.size&&CMP===el)toggle()};
+  vids.forEach(v=>{if(v.readyState>=2)go(v);else{v.addEventListener('loadeddata',()=>go(v),{once:true});v.addEventListener('error',()=>go(v),{once:true})}})}
 
 /* a caption and its wordings (the datasets' '||'-joined language annotations, the augmented captions): the text and,
    when there is more than one wording, an "augmented ‹ 1 / n ›" stepper through all of them. The host holds one <p>
@@ -622,7 +645,7 @@ const CAPALT='<span class="capalt" role="group" aria-label="Caption wordings" hi
 function capBox(host){const alt=host.querySelector('.capalt'),p=host.querySelector('p'),st=alt.querySelector('.stp');let w=[],i=0;
   const draw=()=>{alt.hidden=w.length<2;p.textContent=w[i]||'';st.children[1].textContent=`${i+1} / ${w.length}`};
   const step=d=>{i=(i+w.length+d)%w.length;draw()};st.children[0].onclick=()=>step(-1);st.children[2].onclick=()=>step(1);
-  return {set(text){w=String(text??'').split('||').map(s=>s.trim()).filter((s,k,a)=>s&&a.indexOf(s)===k);i=0;draw()}}}
+  return {set(text){w=(Array.isArray(text)?text:[text]).flatMap(t=>String(t??'').split('||')).map(s=>s.trim()).filter((s,k,a)=>s&&a.indexOf(s)===k);i=0;draw()}}}
 /* data/captions.json (tools/build_site_data.py): the language annotations of every dataset, {n: instructions in the
    dataset, tasks: [the first few, wordings '||'-joined], name?: the task group heading its sub-task labels (AgiBot)};
    fetched when the first record opens. The Caption row shows the first instruction (or the group) with its augmented stepper,
@@ -646,14 +669,14 @@ function mixRow(m){const st=m.kind==='steps',tot=m.skills.reduce((s,[,n])=>s+n,0
     <div class="skl">${top.map(([k,n])=>`${esc(k)} <b>${pct(n,tot)}</b>`).join(' · ')}${rest>0&&pct(rest,tot)!=='0%'?` · remaining <b>${pct(rest,tot)}</b>`:''} <span class="dim">of ${st?'sub-task captions':'episodes'}</span></div>
     <ul class="tops">${m.top.map(([c,n])=>`<li><span>${esc(c)}</span><span class="n">${fmt(n)} ${st?'×':'ep'}</span></li>`).join('')}</ul>`}
 
-function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const p=P[r.project];const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
+function drawer(id){const r=L.find(x=>x.id===id);if(!r)return;const clips=clipsOf(r),own=clips.some(o=>o.dataset===r.id);const si=SRC[srcName(r)]||{};S.open=id;S.openPend=null;
   const hw=r.robot_type&&r.robot_type.toLowerCase()!==String(r.embodiment).toLowerCase()?r.robot_type:null;
   const kv=[['Caption','<span class="dim">loading…</span>','capr'],r.tm?['Task mix',mixRow(r.tm),'mixr']:null,hw?['Hardware',esc(hw)]:null,['Episodes',esc(fmt(r.episodes))+(r.partial?' <span class="dim">'+(r.partial.source_totals?'in the source release; episode 0 converted':r.partial.episodes_kept===0?'full metadata; videos still transcoding':'sample only; full conversion pending')+'</span>':'')],['Duration',esc(fmtH(r.hours))+' h'],['FPS',esc(Math.round(r.fps))],
     ['Cameras',r.cams.map(c=>`${esc(c.name)} <span class="dim">${esc(c.role)} · ${c.w}×${c.h}${c.fisheye?' · fisheye':''}${c.model?' · '+esc(c.model):''}</span>`).join('<br>')],
     r.world_frame&&r.world_frame.shared===false?['World frame','<b>Not shared between the hands.</b> <span class="dim">'+esc(r.world_frame.note)+'</span>']:null,
     r.preview_note?['Preview version',esc(r.preview_note)]:null,
     ['Sample',r.sample?`<a href="${esc(r.sample.url)}">episode 0</a> <span class="dim">${esc(fmtDur(r.sample.seconds))} · ${esc(fmtB(r.sample.bytes))}</span>`:'<span class="dim">not published yet</span>'],
-    p.overlays.length?['Example clips',`<a href="../overlays/#${esc(p.key.replace('/','_'))}">${p.overlays.length} for ${esc(p.key)}</a>`]:null,
+    clips.length?['Example clips',`${clips.length} ${own?'for this dataset':'from same-task sibling datasets'}${clips.length>1?' · choose a clip / episode in the viewer':''}`]:null,
     ['License',licRow(si)],
     ['Cite',paperLinks(si,srcName(r))+((si.papers||[]).length?'<button type="button" class="lk" id="bibOne">Copy BibTeX</button>':'')]].filter(Boolean);
   $('drawerBody').innerHTML=`<div class="kicker">Dataset record</div><h3>${esc(title(r))}</h3>
