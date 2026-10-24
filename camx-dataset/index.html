@@ -373,8 +373,10 @@ function stats(){const sm=sampled(ALL),uniq=k=>new Set(sm.map(r=>r[k])).size;
   // which datasets the browse list holds (ONLY_CLIPS): the rest stays reachable through the download commands and ?all=1
   const hid=ALL.length-ALL.filter(r=>clipOf(r)).length,note=$('listNote')||$('stats').insertAdjacentElement('afterend',Object.assign(document.createElement('p'),{id:'listNote'}));
   note.style.cssText='margin:8px 0 0;font:400 13px/1.5 var(--sans);color:var(--ink3)';
-  note.innerHTML=ONLY_CLIPS?`Browsing the ${L.length.toLocaleString()} datasets that have an example clip; ${hid.toLocaleString()} more without a clip are still in the sample archives and the download commands. <a href="?all=1">Show all ${ALL.length.toLocaleString()} datasets</a>`
-    :`Browsing all ${ALL.length.toLocaleString()} datasets; ${hid.toLocaleString()} have no example clip yet. <a href="./">Only datasets with a clip</a>`}
+  note.innerHTML=(ONLY_CLIPS?`Browsing the ${L.length.toLocaleString()} datasets that have an example clip; ${hid.toLocaleString()} more without a clip are still in the sample archives and the download commands. <a href="?all=1">Show all ${ALL.length.toLocaleString()} datasets</a>`
+    :`Browsing all ${ALL.length.toLocaleString()} datasets; ${hid.toLocaleString()} have no example clip yet. <a href="./">Only datasets with a clip</a>`)
+    // the example clips are re-encoded hard to stay under the file size limit of GitHub Pages; the sample archives hold the real quality
+    +`<br>The example clips on this page are compressed aggressively to fit the file size limit of GitHub Pages; the <a href="#download">dataset samples</a> have a much higher video quality than the clips shown here.`}
 
 /* ---------- browse: tree, cards ---------- */
 /* every tree row is a filter button plus a tick box that selects the whole group for download;
