@@ -88,7 +88,12 @@ SOURCE_OF = {
     'franka_hand/fmb': 'FMB', 'franka_hand/rh20t_cfg5': 'RH20T', 'genrobot/10kh': 'GenRobot 10Kh',
     'genrobot/gripper_v4': 'GenRobot Gripper V4 tasks', 'hifi_umi/hifi_umi': 'HiFi-UMI-2K',
     'iphumi/behavior_prompting': 'Behavior Prompting', 'iphumi/gated_memory_policy': 'Gated Memory Policy',
-    'iphumi/hommi': 'HoMMI', 'iphumi/mofpo': 'MoFPO', 'iphumi/umift': 'UMIFT', 'openarm/openarm': 'OpenArm',
+    'iphumi/hommi': 'HoMMI', 'iphumi/mofpo': 'MoFPO', 'iphumi/umift': 'UMIFT',
+    # openarm/: one project per licensor since 2026-10-24 (the tree's LICENSE + SOURCE.md sit in each project dir); the source label
+    # names the Hub uploader, so the browse tree shows one row and one licence chip per licensor
+    'openarm/lerobot': 'OpenArm (LeRobot)', 'openarm/yuto_urushima': 'OpenArm (yuto-urushima)', 'openarm/nick3421': 'OpenArm (Nick3421)',
+    'openarm/pengli3': 'OpenArm (pengli3)', 'openarm/ahiroakiishikawa': 'OpenArm (aHiroakiIshikawa)', 'openarm/mddoai': 'OpenArm (mddoai)',
+    'openarm/rick0331': 'OpenArm (Rick0331)',
     'rby1/modpack': 'ModPack', 'realman/realsource': 'RealSource-World', 'robotiq/droid': 'DROID',
     'robotiq/droid_lowres': 'DROID', 'robotiq/rh20t_cfg4': 'RH20T', 'robotiq/rh20t_cfg6': 'RH20T', 'robotiq/rh20t_cfg7': 'RH20T',
     'robotiq/robomind_ur5': 'RoboMIND 2.0 UR', 'robotiq/roboset_kinesthetic': 'RoboSet', 'robotiq/roboset_teleop': 'RoboSet',
@@ -114,12 +119,10 @@ WORLD_FRAME_NOTES = {
     'fastumi/fastumi_100k_dual_arm': "each hand's trajectory is in its own frame, starting at its own origin; the release gives no transform between the two hands",
     'umi/openneo_umi': "the two devices are tracked in separate frames that both start at the same home pose; the right hand is placed 0.60 m to the right of the left by a manual prior, not a measurement",
 }
-# dataset id -> source, where one collection spans two paper rows: openarm/openarm holds the three OpenArm datasets of the
-# training mix (full_folding, high_quality_folding, pickplace) and the eight community uploads the paper lists as their
-# own row (coordinating conversion session, 2026-10-03)
-SOURCE_OF_DATASET = {f'openarm/openarm/{d}': 'OpenArm community' for d in (
-    'blue_cube_to_bin', 'box_pick', 'grab_sth', 'mini_dual_camera_blue_sponge', 'pick_and_place', 'pick_and_place_clean',
-    'tablewares_sort_merged', 'tape_to_box')}
+# dataset id -> source, where one collection spans two paper rows. Empty since 2026-10-24: openarm/openarm (three training-mix
+# datasets plus eight community uploads under one key) became one project per licensor, openarm/<uploader>/<dataset>, and the
+# two Yongareee uploads (box_pick, tape_to_box: no licence on the Hub) left the tree.
+SOURCE_OF_DATASET = {}
 
 # projects shown as one on the site: the leaf ids (and so the sample archives) keep their own path, but rows, the
 # browse tree's source level, the overlays page and the project totals all fold the first into the second

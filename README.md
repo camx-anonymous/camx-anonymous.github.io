@@ -86,7 +86,9 @@ This repository is anonymized for review.
 - `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the
   rows (`projects` maps a family/project to a more specific entry where one source ships under two licenses,
   e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7; `datasets` does the same per row for the
-  five lerobot ALOHA repos whose card says Apache-2.0). Hand-maintained; author given names are
+  five lerobot ALOHA repos whose card says Apache-2.0 and for the second Hub repo of the OpenArm LeRobot and mddoai
+  projects). OpenArm is one project per Hub uploader since 2026-10-24 (`openarm/<uploader>/`), each with its own
+  Apache-2.0 entry whose chip links to that uploader's dataset repo. Hand-maintained; author given names are
   abbreviated to initials. The build checks it (every source has an entry, no forbidden term) and writes
   `data/citations.bib` (every source paper) from it.
 - Download gate — every download action (the slice command's Copy / Save .sh, a record's "Copy sample command")

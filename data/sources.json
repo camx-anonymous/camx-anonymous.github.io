@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-03",
+ "updated": "2026-10-24",
  "_about": "License and papers of every source dataset, keyed by the source label of data/datasets.json rows; \"projects\" / \"datasets\" map a family/project or a row to a different entry where one source has more than one license. license.url is the license text; license.repo is the page that states the license, which the site's license chips link to: the dataset's Hugging Face / ModelScope repository where its card states it, else the project's GitHub repository, else the UMI Data Initiative listing (https://umi-data.github.io/) for UMI-family entries or the release page for the rest. Author given names are abbreviated to initials. Checked and turned into data/citations.bib by tools/build_site_data.py. Licenses of the UMI-family entries follow the UMI Data Initiative table.",
  "sources": {
   "ABC": {
@@ -1135,6 +1135,177 @@
      "bibtex": "@article{yang2026vista,\n  title={{VISTA}: Vision-Grounded and Physics-Validated Adaptation of {UMI} Data for {VLA} Training},\n  author={Yang, S. and Guo, L. and Lu, O. and Zhaxizhuoma and Zhang, D. and others},\n  journal={arXiv preprint arXiv:2606.04708},\n  year={2026},\n  eprint={2606.04708},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/2606.04708}\n}"
     }
    ]
+  },
+  "OpenArm (LeRobot)": {
+   "homepage": "https://huggingface.co/datasets/lerobot/full_folding",
+   "licensor": "Hugging Face LeRobot team (Hub org lerobot)",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/lerobot/full_folding"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (yuto-urushima)": {
+   "homepage": "https://huggingface.co/datasets/yuto-urushima/openarm_pickplace_05061241_94",
+   "licensor": "Hub user yuto-urushima",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/yuto-urushima/openarm_pickplace_05061241_94"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (Nick3421)": {
+   "homepage": "https://huggingface.co/datasets/Nick3421/my_openarm_dataset_m8",
+   "licensor": "Hub user Nick3421",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/Nick3421/my_openarm_dataset_m8"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (pengli3)": {
+   "homepage": "https://huggingface.co/datasets/pengli3/OpenArm_grab_sth_20260804_103051",
+   "licensor": "Hub user pengli3",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/pengli3/OpenArm_grab_sth_20260804_103051"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (aHiroakiIshikawa)": {
+   "homepage": "https://huggingface.co/datasets/aHiroakiIshikawa/openarm_mini_dual_camera_blue_sponge_0529_01",
+   "licensor": "Hub user aHiroakiIshikawa",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/aHiroakiIshikawa/openarm_mini_dual_camera_blue_sponge_0529_01"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (mddoai)": {
+   "homepage": "https://huggingface.co/datasets/mddoai/openarm_pap_18062026",
+   "licensor": "Hub user mddoai",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/mddoai/openarm_pap_18062026"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (Rick0331)": {
+   "homepage": "https://huggingface.co/datasets/Rick0331/openarm-tablewares-sort-merged3",
+   "licensor": "Hub user Rick0331",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/Rick0331/openarm-tablewares-sort-merged3"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (LeRobot: high_quality_folding)": {
+   "homepage": "https://huggingface.co/datasets/lerobot/high_quality_folding",
+   "licensor": "Hugging Face LeRobot team (Hub org lerobot)",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/lerobot/high_quality_folding"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
+  },
+  "OpenArm (mddoai: 2026-05-14_clean)": {
+   "homepage": "https://huggingface.co/datasets/mddoai/openarm_2026-05-14_clean",
+   "licensor": "Hub user mddoai",
+   "license": {
+    "name": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "repo": "https://huggingface.co/datasets/mddoai/openarm_2026-05-14_clean"
+   },
+   "papers": [
+    {
+     "key": "enactic2025openarm",
+     "title": "OpenArm: A Fully Open-Source Humanoid Arm for Physical AI Research and Deployment in Contact-Rich Environments",
+     "year": 2025,
+     "arxiv": null,
+     "url": "https://github.com/enactic/openarm",
+     "bibtex": "@misc{enactic2025openarm,\n  title        = {OpenArm: A Fully Open-Source Humanoid Arm for Physical {AI} Research and Deployment in Contact-Rich Environments},\n  howpublished = {\\url{https://github.com/enactic/openarm}},\n  year         = {2025},\n  note         = {Enactic, Inc.; project site \\url{https://openarm.dev}}\n}"
+    }
+   ]
   }
  },
  "projects": {
@@ -1148,6 +1319,8 @@
   "aloha/aloha_lerobot/fork_pick_up": "ALOHA (Apache-2.0 repos)",
   "aloha/aloha_lerobot/tape": "ALOHA (Apache-2.0 repos)",
   "aloha/aloha_lerobot/thread_velcro": "ALOHA (Apache-2.0 repos)",
-  "aloha/aloha_lerobot/towel": "ALOHA (Apache-2.0 repos)"
+  "aloha/aloha_lerobot/towel": "ALOHA (Apache-2.0 repos)",
+  "openarm/lerobot/high_quality_folding": "OpenArm (LeRobot: high_quality_folding)",
+  "openarm/mddoai/pick_and_place_clean": "OpenArm (mddoai: 2026-05-14_clean)"
  }
 }

@@ -293,7 +293,7 @@ REPLACE_PICKS = [(p, ds, ep, spec) for p, spec, picks in [
     ('iphumi/hommi', IPHUMI, [('delivery', 10), ('laundry', 4), ('tablescape', 7)]),
     ('iphumi/mofpo', MV(config='iphumi_bimanual_and_head.json'), [('pouring', 12), ('pouring', 168), ('pouring', 5), ('serving', 7)]),
     ('iphumi/umift', UMIFT, [('lightbulb_insertion_clean_release', 10), ('whiteboard_wiping_addition', 9), ('whiteboard_wiping_wrist_overshoot', 0)]),
-    ('openarm/openarm', MV(config='openarm.json'), [('full_folding', 7), ('high_quality_folding', 9)]),
+    ('openarm/lerobot', MV(config='openarm.json'), [('full_folding', 7), ('high_quality_folding', 9)]),  # openarm/openarm until 2026-10-24
     ('rby1/modpack', MV(config='rby1_modpack.json'), [('box_placing_together', 0), ('box_placing_together', 101), ('box_placing_together', 50)]),
     ('robotiq/droid', MV(config='droid.json'), [('AUTOLab_failure', 4), ('PennPAL_success', 1), ('WEIRD_success', 0)]),
     ('umi/mvumi', MVUMI, [('bottles_rack', 7), ('markers_placement', 6)]),
