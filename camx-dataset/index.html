@@ -258,7 +258,13 @@ button.ck[aria-checked="mixed"]::after{content:"";width:6px;height:2px;backgroun
 .drawer .tops li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.45}
 .drawer .tops li .n{font:400 11.5px/1.6 var(--mono);color:var(--ink4);white-space:nowrap}
 .dcard .tk{position:absolute;left:8px;top:8px;font:400 11px/1 var(--mono);padding:3px 6px;background:rgba(34,33,30,.8);color:#FAF9F6;border-radius:4px}
-.cmp .win:fullscreen{width:100%!important;height:100%;aspect-ratio:auto!important;border-radius:0}
+/* zoom (the full-screen button of the controls, as in the rollout gallery): the panes element goes full screen, so the raw
+   video and the overlay keep playing together; each window is as large as the screen allows at its aspect (--ar, set with it) */
+.cmp .panes:fullscreen{background:#000;padding:16px;gap:12px;align-content:center}
+.cmp .panes:fullscreen figure{width:100%}
+.cmp .panes:fullscreen figcaption{color:#b8b4ac}
+.cmp .panes:fullscreen .win{border-radius:0;width:min(100%,calc((50vh - 48px)*var(--ar)))!important}
+.cmp .panes.side:fullscreen .win,.cmp .panes:fullscreen figure:only-child .win{width:min(100%,calc((100vh - 60px)*var(--ar)))!important}
 .cmp .ctl button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .cmp .cap>.k{display:block;font:500 11px/1.7 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin:0 0 4px}
 </style>
@@ -593,7 +599,7 @@ function tilesOf(o){const positive=n=>Number.isFinite(n)&&n>0,row=L.find(x=>x.id
   const A=ar.reduce((a,b)=>a+b,0);let x=0;return {A,X:ar.map(a=>{const l=x/A;x+=a;return l})}}
 // the short name of a camera view, drawn on its tile: right_main_camera_rgb -> right, third_0_main_camera_rgb -> third 0
 const viewTag=v=>v.replace(/^head_stereo_camera_(left|right)_rgb$/,'head $1').replace(/_rgb$/,'').replace(/_main_camera|_camera/,'').replace(/_/g,' ');
-function closeCmp(){if(!CMP)return;const old=CMP;CMP=null;old.querySelectorAll('video').forEach(v=>{v.pause();v.removeAttribute('src');v.load()});old.remove();$('stage').classList.remove('show')}
+function closeCmp(){if(!CMP)return;if(document.fullscreenElement)document.exitFullscreen();const old=CMP;CMP=null;old.querySelectorAll('video').forEach(v=>{v.pause();v.removeAttribute('src');v.load()});old.remove();$('stage').classList.remove('show')}
 function placeCmp(){if(!CMP)return;const st=$('stage'),dl=$('drawerBody').querySelector('dl');
   if(wide.matches){st.appendChild(CMP);st.classList.add('show')}else{st.classList.remove('show');if(dl)dl.before(CMP)}}
 wide.addEventListener('change',placeCmp);
@@ -612,8 +618,8 @@ function openCmp(r,choice){closeCmp();const clips=clipsOf(r),wanted=choice||clip
     <div class="panes">${pane('Raw video'+(raw?` <span class="note">(no gripper overlay: ${esc(o.no_overlay||'the release gives nothing to project a gripper through')})</span>`:''),urls.raw)}${raw?'':pane((o.overlay_label?esc(o.overlay_label):o.mode==='axes'?'Coordinate frames <span class="note">(no CAD: flange and camera axes, x red / y green / z blue)</span>':o.mode==='primitive'?'Gripper overlay <span class="note">(no CAD: tip only)</span>':o.standin?`Gripper CAD overlay <span class="note">(${o.standin_note?esc(o.standin_note)+' as stand-in':'stock '+esc(o.standin.map(s=>s.replace(/_/g,' ').toUpperCase()).join(' / '))+' gripper as stand-in'})</span>`:o.overlay_scope==='wrist_fingers'?'Fitted finger CAD overlay <span class="note">(wrist views; fingers and short links only)</span>':'Gripper CAD overlay')+(o.own_only?' <span class="note">(own gripper per view: no shared frame)</span>':''),urls.overlay)}</div>
     ${o.review_note?`<p class="note" style="margin:12px 16px">${esc(o.review_note)}</p>`:''}
     ${caps.length?`<div class="cap"><div class="row"><span class="k">Caption</span>${CAPALT}</div><p></p></div>`:''}
-    <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"></div>`;
-  const vids=el.querySelectorAll('video'),a=vids[0],b=vids[1]||a,pp=el.querySelector('.ctl button'),pos=el.querySelector('.ctl input');
+    <div class="ctl"><button type="button" aria-label="Pause">❚❚</button><input type="range" min="0" max="1000" value="0" aria-label="Position in the clip"><button type="button" aria-label="Full screen" title="Full screen (both clips, in sync)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>`;
+  const vids=el.querySelectorAll('video'),a=vids[0],b=vids[1]||a,[pp,fs]=el.querySelectorAll('.ctl button'),pos=el.querySelector('.ctl input'),panes=el.querySelector('.panes');
   const picker=el.querySelector('.clip-picker select');if(picker)picker.onchange=()=>{openCmp(r,picker.value);CMP?.querySelector('.clip-picker select')?.focus()};
   // the caption of the frame on screen
   const cap=el.querySelector('.cap'),capUI=cap&&capBox(cap);let seg=-1;
@@ -628,11 +634,14 @@ function openCmp(r,choice){closeCmp();const clips=clipsOf(r),wanted=choice||clip
   a.addEventListener('pause',()=>{if(CMP!==el)return;if(b!==a)b.pause();pp.textContent='▶';pp.setAttribute('aria-label','Play')});
   pos.oninput=()=>{if(CMP===el&&a.duration){a.currentTime=b.currentTime=pos.value/1000*a.duration;sync()}};
   pp.onclick=toggle;
+  // zoom: the panes element goes full screen (not one window), so both clips stay on screen and on one clock
+  fs.onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else if(panes.requestFullscreen)panes.requestFullscreen()};
+  if(!panes.requestFullscreen)fs.hidden=true;
   el.querySelectorAll('.win').forEach(w=>{w.onclick=toggle;
     w.firstChild.addEventListener('error',()=>w.insertAdjacentHTML('beforeend','<div class="err">Clip failed to load.</div>'))});
   // the window takes the aspect of what is shown; its height is capped so both windows, the caption and the controls fit the stage
-  const side=!raw&&A<1.9;el.querySelector('.panes').classList.toggle('side',side);
-  el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=A;w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(A/(side||raw?1:2)).toFixed(4)}))`});
+  const side=!raw&&A<1.9;panes.classList.toggle('side',side);
+  el.querySelectorAll('.win').forEach(w=>{w.style.aspectRatio=A;w.style.setProperty('--ar',A);w.style.width=`min(100%,calc((100vh - ${cap?350:280}px)*${(A/(side||raw?1:2)).toFixed(4)}))`});
   placeCmp();
   // start both together once each has a frame; if one fails to load, the other still plays
   const pending=new Set(vids),go=v=>{if(pending.delete(v)&&!pending.size&&CMP===el)toggle()};
@@ -715,7 +724,7 @@ document.addEventListener('DOMContentLoaded',()=>{load();
     const c=e.target.closest('.dcard');if(c)drawer(c.dataset.id)});
   $('pend').addEventListener('click',e=>{const c=e.target.closest('.pcard');if(c)drawerPend(+c.dataset.pid)});
   $('drawerClose').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.fullscreenElement)closeDrawer()});  // in full screen, Esc only leaves it
 });
 </script>
 </body>
