@@ -6,6 +6,7 @@
 <title>CAMX Gripper Projection</title>
 <meta name="description" content="The gripper projected through each dataset's own camera poses and intrinsics, as a check of the CAMX camera and end-effector calibration.">
 <link rel="stylesheet" href="../site.css">
+<script src="../assets/catalog.js"></script>
 <script src="../clip.js" defer></script>
 <style>
 main>header{padding-top:64px;padding-bottom:8px}
@@ -47,7 +48,8 @@ footer p{margin:0 0 6px}
 <header>
   <p class="crumbs"><a href="../camx-dataset/">CAMX Dataset</a> / example clips</p>
   <h1>Gripper Projection</h1>
-  <p class="sub">A few episodes per project with the gripper projected through the dataset's own camera poses and intrinsics. If the drawn gripper sits on the real one, the calibration is consistent.</p>
+  <p class="sub">Browse the complete collection of available example clips, grouped by project. Projection clips draw the gripper through the dataset's own camera poses and intrinsics; raw-only clips are labeled.</p>
+  <p class="pnote" id="clipSummary" aria-live="polite">Loading clips…</p>
   <nav class="links">
     <a href="../camx-dataset/#browser">Browse the datasets</a>
   </nav>
@@ -59,7 +61,7 @@ footer p{margin:0 0 6px}
     <p class="pnote">Projects without an example clip in this release. Rendering needs a gripper profile (URDF + mount transform) for the rig; single-camera fisheye rigs need the fitted Kannala-Brandt lens model first.</p>
     <table><thead><tr><th>Project</th><th>Embodiment</th><th class="num">Datasets</th><th class="num">Hours</th><th>Why</th></tr></thead><tbody id="pendingBody"></tbody></table>
   </section>
-  <footer><p>Clips are 10 fps, ~45 s, 360p. Wrist tiles draw the gripper from the end-effector pose in that camera; other tiles place it through the world-frame camera trajectories; where the two hands are not in one world frame (<em>own gripper only</em>) each view draws its own gripper and nothing else. Left gripper green, right gripper blue.</p></footer>
+  <footer><p>Clip resolution, frame rate and duration vary; earlier previews use 360p camera tiles, while newer clips retain the rendered tile sizes. Wrist tiles draw the gripper from the end-effector pose in that camera; other tiles place it through the world-frame camera trajectories; where the two hands are not in one world frame (<em>own gripper only</em>) each view draws its own gripper and nothing else. Left gripper green, right gripper blue.</p></footer>
 </main>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -67,14 +69,23 @@ const fmtH=h=>h==null?'–':h>=100?Math.round(h).toLocaleString():h>=10?h.toFixe
 const taskList=t=>(Array.isArray(t)?t:String(t).split('||')).map(x=>String(x).trim()).filter(Boolean);
 // the captions of a clip: the sub-task captions in the order they play (o.captions, first wording each), else the wordings of its one task
 const capsOf=o=>o.captions?o.captions.map(c=>taskList(c[1])[0]).filter(Boolean):taskList(o.task||'');
+const rawBase=()=>D.raw_base||'raw/',posterBase=()=>D.poster_base||'posters/';
+const clipName=o=>`${o.key}__${o.slug}`;
+// Keep existing query parameters and fragments intact when adding the render cache key.
+const clipVersion=(url,o)=>{if(!o.render_fingerprint)return url;const at=url.indexOf('#'),path=at<0?url:url.slice(0,at),hash=at<0?'':url.slice(at);
+  return path+(path.includes('?')?(/[?&]$/.test(path)?'':'&'):'?')+'v='+encodeURIComponent(String(o.render_fingerprint).slice(0,12))+hash};
+const clipUrls=o=>{const f=clipName(o);return {raw:clipVersion(o.raw_url||rawBase()+f+'.mp4',o),
+  overlay:clipVersion(o.overlay_url||(D.overlay_base||'videos/')+f+'.mp4',o),poster:clipVersion(posterBase()+f+'.jpg',o)}};
 let D;
-fetch('../data/datasets.json').then(r=>r.json()).then(d=>{D=d;render();if(location.hash){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView()}});
+CamxCatalog.load().then(d=>{D=d;render();if(location.hash){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView()}}).catch(error=>{console.error(error);document.getElementById('content').textContent='The catalog could not be loaded. Please reload to try again.';});
 function render(){const projs=D.projects.filter(p=>p.overlays.length);
+  const clips=projs.flatMap(p=>p.overlays),rawCount=clips.filter(o=>o.mode==='raw').length;
+  document.getElementById('clipSummary').textContent=`${clips.length.toLocaleString()} clips across ${projs.length.toLocaleString()} projects · ${(clips.length-rawCount).toLocaleString()} projections · ${rawCount.toLocaleString()} raw-only clips`;
   let h='';
   projs.forEach(p=>{const ovs=p.overlays;const emb=Object.entries(p.embodiments).sort((a,b)=>b[1]-a[1])[0][0];
     h+=`<section class="proj" id="${esc(p.key.replace('/','_'))}"><h2>${esc(p.key)}<small>${esc(emb)} · ${p.datasets} datasets · ${fmtH(p.hours)} h · ${p.overlays.length} clip${p.overlays.length>1?'s':''}</small></h2>`;
-    h+='<div class="grid">'+ovs.map(o=>{const file=`${o.key}__${o.slug}`,raw=o.mode==='raw',version=o.render_fingerprint?'?v='+o.render_fingerprint.slice(0,12):'';const src=(raw?'raw/'+file+'.mp4':D.overlay_base+file+'.mp4')+version;
-      return `<div class="card"><div class="vid clip" data-src="${src}"><img src="posters/${file}.jpg${version}" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
+    h+='<div class="grid">'+ovs.map(o=>{const raw=o.mode==='raw',urls=clipUrls(o),src=raw?urls.raw:urls.overlay;
+      return `<div class="card"><div class="vid clip" data-src="${esc(src)}"><img src="${esc(urls.poster)}" alt="" loading="lazy"><div class="play"><span>▶</span></div></div>
         <div class="title">${esc(o.dataset)} · ep ${o.episode}</div>
         <div class="meta">${o.fisheye||o.own_only||o.overlay_scope||raw?'<div class="row">'+(raw?`<span class="chip" title="${esc(o.no_overlay||'')}">raw video only, no overlay</span>`:'')+(o.overlay_scope==='wrist_fingers'?'<span class="chip" title="Wrist views; camera-facing fingers and short links only">fitted finger CAD</span>':'')+(o.fisheye?'<span class="chip">fisheye</span>':'')+(o.own_only?'<span class="chip" title="the two hands are not in a shared world frame: each view draws its own gripper only">own gripper only</span>':'')+'</div>':''}
         ${o.overlay_label?`<div><span class="k">overlay</span>${esc(o.overlay_label)}</div>`:''}

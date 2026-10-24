@@ -590,7 +590,8 @@ SOURCES = os.path.join(REPO, 'data', 'sources.json')
 BIB = os.path.join(REPO, 'data', 'citations.bib')
 
 
-def sources_pass(out):
+def sources_pass(out, write_bib=True):
+    """Check source metadata; optionally regenerate the site's shared bibliography."""
     out['download'] = dict(DOWNLOAD)
     if not os.path.isfile(SOURCES):
         print(f'warning: {SOURCES} not found, no licenses / citations on the site', file=sys.stderr); return out
@@ -617,8 +618,9 @@ def sources_pass(out):
             seen.add(pp['key'])
             lic = (src[k].get('license') or {}).get('name')
             lines += ['', f'% {k}' + (f' · {lic}' if lic else ''), pp['bibtex'].strip()]
-    open(BIB, 'w').write('\n'.join(lines) + '\n')
-    print(f'{len(src)} sources, {len(seen)} source papers -> {os.path.relpath(BIB, REPO)}', file=sys.stderr)
+    if write_bib:
+        open(BIB, 'w').write('\n'.join(lines) + '\n')
+        print(f'{len(src)} sources, {len(seen)} source papers -> {os.path.relpath(BIB, REPO)}', file=sys.stderr)
     return out
 
 
@@ -884,10 +886,11 @@ def main():
     if a.add:
         out, new = add_leaves(json.load(open(a.out)), a.root, a.add.split(','), stats, inv_rows)
         out = variants_pass(tasks_pass(out, a.root, rows=new), a.root, rows=new)
-        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(out))))))
+        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
+        dataset_captions(out, a.root)
+        out = same_task_pass(out)
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr)
-        dataset_captions(out, a.root)
         for r in sorted(new, key=lambda r: r['id']):
             print(f"  {r['id']:60s} {r['embodiment']:22s} {r['source']:26s} {r['morph']:20s} {r['episodes']:6d} ep {r['hours']:7.2f} h "
                   f"{r['n_views']} views{'' if r['released'] else '  (no _SUCCESS)'}", file=sys.stderr)
@@ -913,11 +916,12 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(variants_pass(tasks_pass(captions_pass(out, a.root), a.root), a.root), SAMPLES)))))))
+    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(variants_pass(tasks_pass(captions_pass(out, a.root), a.root), a.root), SAMPLES))))))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
+    dataset_captions(out, a.root)
+    out = same_task_pass(out)
     json.dump(out, open(a.out, 'w'), separators=(',', ':'))
     print(json.dumps(out['totals']), file=sys.stderr)
-    dataset_captions(out, a.root)
     # cross-check against the inventory
     inv_h = collections.defaultdict(float)
     for r in rows: inv_h[(r['embodiment'], r['source'])] += r['hours']

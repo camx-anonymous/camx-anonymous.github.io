@@ -23,15 +23,21 @@ This repository is anonymized for review.
   file that is not `info.json`, `episodes/`, `tasks.parquet`, `stats.json` or `_SUCCESS`, and runs the
   anonymisation pass), uploaded with `tools/publish_samples.py`, and merged into `data/datasets.json` as each
   row's `sample` (`{url, bytes, frames, seconds}`) by `tools/build_site_data.py --attach-samples-only`.
-- `overlays/` — camera-projection example clips, a few episodes per project: the gripper URDF as the opaque
+- `overlays/` — the complete collection of available camera-projection example clips, grouped by project: the gripper URDF as the opaque
   light-grey CAD mesh of the headless Rerun viewer (the look of the curation pages; fisheye rigs, which that viewer
   cannot draw through, go through the OpenCV fisheye renderer with the same grey, `tools/white_overlay.py`), or,
   where no URDF is released, a primitive stand-in: hinged fingers that follow the recorded jaw width plus
   the tool-centre frame as RGB = xyz axes; the OpenNeoData rigs draw the stock PiPER / ARX X5 / UMI gripper CAD as
   a stand-in (`standin` on the clip record). Everything is projected through each dataset's own poses and intrinsics. Clips are
-  served from `overlays/videos/` (tracked, so Pages sends them as `video/mp4`; iOS Safari will not play the
-  `application/octet-stream` that GitHub release assets come back as); posters live in `overlays/posters/`. The site is fully static
+  served through each record's `overlay_url` / `raw_url` from the `clips-20261023-*` GitHub releases, with local media
+  retained for older examples. The new clips use 480-row camera tiles at 10 fps for up to 45 seconds. Posters live in
+  `overlays/posters/`. Chromium playback and seeking are verified against public release URLs; physical Safari/iOS
+  compatibility is unverified. The site is fully static
   (GitHub Pages); there is no rendering backend.
+- `data/catalog/` — a lossless, checksummed version of `data/datasets.json`, split into files no larger than 5 MiB
+  by `tools/write_site_catalog.py`. Both browsers load the shards through `assets/catalog.js`; the complete JSON
+  remains available to existing consumers. All completed targets have their own clip; retained older episodes are
+  also shown in the projection gallery. Raw-only examples are explicitly labeled.
 - `overlays/raw/` — the raw companion of every example clip (`<key>__<slug>.mp4` + `.jpg` poster): the same episode,
   camera views, tile order, frame sampling and frame size, with nothing drawn on it (`tools/raw_clips.py`). The
   dataset cards of the dataset page show only the raw poster. Clicking a card opens the dataset record and, beside
