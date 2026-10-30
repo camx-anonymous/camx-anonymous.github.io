@@ -4,6 +4,20 @@ Project page and data manager: https://camx-anonymous.github.io/
 
 This repository is anonymized for review.
 
+## Licence scope (2026-10-30)
+
+The site carries only data whose source licence allows commercial use. `tools/trim_noncommercial.py` drops the
+sources released under CC BY-NC-SA 4.0 (AgiBot World 2026 and Beta, DM-DataClaw, Galaxea Open-World, OpenNeoData,
+RealSource-World, TAMEn) from the rows, project records, clip records, captions, samples and the paper's unconverted
+list, and keeps RH20T to its RH20T-C episodes (scenes 0001-0005, CC BY-SA 4.0; RH20T-NC = scenes 0006-0010 is
+CC BY-NC 4.0): a RH20T row counts its licensed episodes only, a row without one is dropped, and the episode-0 sample
+archive and clip stay only when episode 0 is a licensed scene. The per-leaf split lives in
+`tools/configs/rh20t_scene_split.json` (`--scan-rh20t <camx_480p root>` refreshes it from `meta/episodes_source.jsonl`).
+`tools/build_site_data.py` applies the same pass in every build path, so a rebuild or `--add` cannot bring an excluded
+source back. The hero totals (`data/pending.json` `paper`) are the trimmed site totals plus the listed-but-unconverted
+entries, not the paper's appendix tables. The GitHub release assets of the removed keys (sample archives, clips) are
+deleted by the account owner with `gh release delete-asset`.
+
 ## Pages
 
 - `index.html` — the landing page: two buttons, CamX Dataset (`camx-dataset/`) and CamUVA Rollouts
@@ -69,9 +83,9 @@ This repository is anonymized for review.
   captions"), the record a Task mix row (the account, a stacked skill bar with legend, the top captions). Rows whose
   `info.json` carries a `task_name` (AgiBot World, opaque numeric ids) get `title`, shown over the id on the card and
   the record.
-- `data/datasets.json` — one row per converted dataset (3,585) plus per-project aggregates. The browse tree follows
+- `data/datasets.json` — one row per converted dataset (2,878) plus per-project aggregates. The browse tree follows
   the source tables of the paper's appendix: the build relabels rows into the paper's embodiment groups (iPhUMI,
-  TacUMI, Other research projects; Galaxea, UR5, ARX5 and OpenArm each inside one morphology band) and copies
+  Other research projects; Galaxea, UR5, ARX5 and OpenArm each inside one morphology band) and copies
   `data/pending.json` in as `pending`.
 - `data/pending.json` — hand-maintained: every source of the appendix tables that has no converted LeRobot-v3 data
   on the site yet (no sample archive, no example clip), with the paper's counts (datasets, episodes, frames, hours,
@@ -85,7 +99,7 @@ This repository is anonymized for review.
   the build picks the rows up.
 - `data/sources.json` — the license and the paper(s) of every source dataset, keyed by the source label of the
   rows (`projects` maps a family/project to a more specific entry where one source ships under two licenses,
-  e.g. FastUMI vs FastUMI-100K, RH20T configurations 1-5 vs 6-7; `datasets` does the same per row for the
+  e.g. FastUMI vs FastUMI-100K; `datasets` does the same per row for the
   five lerobot ALOHA repos whose card says Apache-2.0 and for the second Hub repo of the OpenArm LeRobot and mddoai
   projects). OpenArm is one project per Hub uploader since 2026-10-24 (`openarm/<uploader>/`), each with its own
   Apache-2.0 entry whose chip links to that uploader's dataset repo. Hand-maintained; author given names are

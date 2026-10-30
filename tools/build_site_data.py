@@ -30,6 +30,8 @@ OVERLAYS = os.path.join(BROWSER, 'mv_urdf', 'videos')
 OVERLAYS_EXTRA = [d for d in os.environ.get('CAMX_OVERLAYS_EXTRA', '').split(':') if d]
 sys.path.insert(0, HERE)
 from overlay_sources import dataset_root   # noqa: E402  (Bridge V2 side2 export, reviewed derivatives: the same map the renderers use)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # so the licence trim imports from any cwd
+from trim_noncommercial import trim_pass   # commercial-use sources only, applied after merge_projects in every build path (2026-10-30)
 
 # --- anonymisation ---------------------------------------------------------------------------------------------
 # The site is published anonymously: no author names, no institutions. Every string that reaches datasets.json goes
@@ -870,7 +872,7 @@ def main():
     a = ap.parse_args()
     if a.clips_only:
         out = clips_pass(json.load(open(a.out)), a.root, [x.strip().strip('/') for x in a.clips_only.split(',') if x.strip()])
-        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(out))))))
+        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(trim_pass(merge_projects(out)))))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     if a.scrub_only or a.attach_samples_only or a.captions_only or a.tasks_only or a.variants_only:
@@ -879,7 +881,7 @@ def main():
         if a.captions_only: out = captions_pass(out, a.root); dataset_captions(out, a.root)
         if a.tasks_only: out = tasks_pass(out, a.root)
         if a.variants_only: out = variants_pass(out, a.root)
-        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(merge_projects(out))))))
+        out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(trim_pass(merge_projects(out)))))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
         print(json.dumps(out['totals']), file=sys.stderr); return
     inv = json.load(open(INVENTORY))
@@ -889,7 +891,7 @@ def main():
     if a.add:
         out, new = add_leaves(json.load(open(a.out)), a.root, a.add.split(','), stats, inv_rows)
         out = variants_pass(tasks_pass(out, a.root, rows=new), a.root, rows=new)
-        out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(out)))))
+        out = sources_pass(pending_pass(align_paper(anonymise(trim_pass(merge_projects(out))))))
         dataset_captions(out, a.root)
         out = same_task_pass(out)
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
@@ -919,7 +921,7 @@ def main():
                       'frames': sum(r['frames'] for r in rows), 'hours': round(total_h, 1),
                       'embodiments': len({r['embodiment'] for r in rows}), 'overlays': sum(len(p['overlays']) for p in projects.values())},
            'projects': sorted(projects.values(), key=lambda p: p['key']), 'datasets': rows}
-    out = sources_pass(pending_pass(align_paper(anonymise(merge_projects(attach_samples(variants_pass(tasks_pass(captions_pass(out, a.root), a.root), a.root), SAMPLES))))))
+    out = sources_pass(pending_pass(align_paper(anonymise(trim_pass(merge_projects(attach_samples(variants_pass(tasks_pass(captions_pass(out, a.root), a.root), a.root), SAMPLES)))))))
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     dataset_captions(out, a.root)
     out = same_task_pass(out)
