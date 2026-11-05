@@ -132,6 +132,8 @@ def raw_one(o, force=False):
 
 
 def main():
+    import shared_render_root
+    shared_render_root.refuse_private_render('tools/raw_clips.py')   # served clips come from $CAMX_RENDER_ROOT only
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--only', default=None, help='project key or slug substring (comma-separated alternatives)')
     ap.add_argument('--force', action='store_true', help='redo clips whose raw companion is newer than the overlay clip')

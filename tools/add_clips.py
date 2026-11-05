@@ -25,6 +25,8 @@ def probe(mp4):
 
 
 def main():
+    import shared_render_root
+    shared_render_root.refuse_private_render('tools/add_clips.py')   # served clips come from $CAMX_RENDER_ROOT only
     ap = argparse.ArgumentParser(); ap.add_argument('src', nargs='+'); ap.add_argument('--as', dest='proj', default=None)
     a = ap.parse_args()
     vdir, pdir = os.path.join(REPO, 'overlays', 'videos'), os.path.join(REPO, 'overlays', 'posters')

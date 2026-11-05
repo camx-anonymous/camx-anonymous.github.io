@@ -48,6 +48,8 @@ def ff(*args):
 
 
 def main():
+    import shared_render_root
+    shared_render_root.refuse_private_render('tools/rebuild_droid_previews.py')   # served clips come from $CAMX_RENDER_ROOT only
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--release", type=Path, required=True)
     ap.add_argument("--inputs", type=Path, required=True)

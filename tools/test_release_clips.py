@@ -14,6 +14,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import release_clips as R
+import shared_render_root as SRR
 
 
 def media(width=1280, height=480, frames=450, rate='10/1', **extra):
@@ -156,7 +157,9 @@ class CommandTests(unittest.TestCase):
             args.out = tmp
             args.cq_map = str(Path(tmp, 'cq.json'))
             Path(args.cq_map).write_text('{"family/project":36}')
+            args.render = str(Path(tmp).parent)
             with patch.object(R, 'configure_codecs'), patch.object(R, 'find_renders', return_value=[('family/project', 'ds', 0, tmp)]), \
+                    patch.dict(os.environ, {'CAMX_RENDER_ROOT': ''}), \
                     patch.object(R, 'ProcessPoolExecutor', return_value=executor), contextlib.redirect_stderr(io.StringIO()), \
                     contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit) as error:
                 R.cmd_encode(args)
@@ -319,3 +322,42 @@ p.write_text(json.dumps(state))
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class SharedRenderRootTests(unittest.TestCase):
+    def test_encode_reads_the_shared_root_and_refuses_other_trees(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, other = Path(tmp, 'root'), Path(tmp, 'other')
+            root.mkdir(); other.mkdir()
+            with patch.dict(os.environ, {'CAMX_RENDER_ROOT': str(root)}):
+                self.assertEqual(SRR.resolve_render_tree(None), os.path.realpath(root))
+                self.assertEqual(SRR.resolve_render_tree(str(root)), os.path.realpath(root))
+                with self.assertRaises(SystemExit) as err:
+                    SRR.resolve_render_tree(str(other))
+                self.assertIn('not the shared render root', str(err.exception))
+                self.assertEqual(SRR.resolve_render_tree(str(other), private_ok=True), os.path.realpath(other))
+            with patch.dict(os.environ, {'CAMX_RENDER_ROOT': ''}):
+                with self.assertRaises(SystemExit) as err:
+                    SRR.resolve_render_tree(None)
+                self.assertIn('CAMX_RENDER_ROOT', str(err.exception))
+                self.assertEqual(SRR.resolve_render_tree(str(other)), os.path.realpath(other))
+
+    def test_inside_rejects_escapes_and_hidden_components(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp, 'root'); ep = root / 'fam' / 'proj' / 'ds' / 'ep0'; ep.mkdir(parents=True)
+            held = root / '.held' / 'fam' / 'proj' / 'ds' / 'ep0'; held.mkdir(parents=True)
+            away = Path(tmp, 'away', 'ep0'); away.mkdir(parents=True)
+            link = root / 'fam' / 'proj' / 'linked'; link.symlink_to(away.parent)
+            self.assertTrue(SRR.inside(root, ep))
+            self.assertFalse(SRR.inside(root, held))
+            self.assertFalse(SRR.inside(root, link / 'ep0'))
+            self.assertFalse(SRR.inside(root, root))
+
+    def test_legacy_renderers_refuse_without_the_override(self):
+        with patch.dict(os.environ, {'CAMX_PRIVATE_RENDER': ''}):
+            with self.assertRaises(SystemExit) as err:
+                SRR.refuse_private_render('tools/x.py')
+            self.assertIn('shared render root', str(err.exception))
+        with patch.dict(os.environ, {'CAMX_PRIVATE_RENDER': '1'}), contextlib.redirect_stderr(io.StringIO()) as log:
+            SRR.refuse_private_render('tools/x.py')
+        self.assertIn('private render', log.getvalue())

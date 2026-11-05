@@ -615,6 +615,8 @@ def attach():
 
 
 def main():
+    import shared_render_root
+    shared_render_root.refuse_private_render('tools/rerun_clips.py')   # served clips come from $CAMX_RENDER_ROOT only
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('cmd', choices=['plan', 'render', 'encode', 'attach'])
     ap.add_argument('--only', default=None, help='project key or slug substring (comma-separated alternatives)')

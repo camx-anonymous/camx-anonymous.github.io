@@ -159,8 +159,28 @@ existing versions; affected dataset records explain when their preview uses newe
 python3 tools/build_site_data.py            # scans camx_480p, joins the inventory + stats, writes data/datasets.json
 ```
 
-Clips that the shared render tree does not carry (every other project of the training tree, rigs without a
-URDF, re-renders) come from `tools/overlay_picks.py`: `render` runs the renderers of the camera-cross-embodiment
+## Where the example clips come from
+
+Every projection clip the site serves (overlay pane, raw companion, poster, clip record) is encoded from the ONE shared
+render root named by `$CAMX_RENDER_ROOT` (camx curation protocol 6.6): `<root>/<family>/<project>/<dataset>/ep<N>/` with the
+renderer's `stitched.mp4`, per-view videos and `meta.json` receipt. Only the renderer's `render_root.py` writes that root
+(`refresh` renders stale or missing clips INTO it from the clean tree, `seed` / `promote` place whole episode directories);
+`render_status.py` decides fresh / stale from the receipt. Nothing is rendered privately for the site: a clip that is stale or
+missing is refreshed in the root first, then
+
+```
+python3 tools/release_clips.py encode --samples <samples_tree> --cq-map <json> --out <clips_out>    # --render defaults to $CAMX_RENDER_ROOT
+python3 tools/release_clips.py plan ... && python3 tools/release_clips.py attach ...
+```
+
+reads it from there. `--render` refuses any tree other than the root (`--private-render-tree` encodes another tree for review
+only; nothing from it may be served), and every record's `render_dir` is checked to lie inside the root. The older renderers
+below (`tools/rerun_clips.py`, `tools/overlay_picks.py`, `tools/raw_only_clips.py`, `tools/raw_clips.py`, `tools/add_clips.py`,
+`tools/white_overlay.py`, `tools/rebuild_droid_previews.py`) are kept for reference and refuse to run unless
+`CAMX_PRIVATE_RENDER=1` is set; whatever they write is not served (`tools/shared_render_root.py` holds the rule).
+
+Legacy (before the shared root, 2026-11-05): clips that the shared render tree does not carry (every other project of the training tree, rigs without a
+URDF, re-renders) came from `tools/overlay_picks.py`: `render` runs the renderers of the camera-cross-embodiment
 checkout (`render_multiview_overlay_video.py` for every camera stream of a dataset, the fisheye bimanual tool for
 the DataClaw / GenRobot picks) for a pick table of three episodes per project, `pack` writes
 `<project_key>/<slug>/{stitched.mp4,poster.jpg,meta.json}` in the tree's layout, `encode` makes the 360p release

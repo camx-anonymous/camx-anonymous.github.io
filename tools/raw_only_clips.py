@@ -93,6 +93,8 @@ def render_one(project, dataset, ep, out, force=False):
 
 
 def main():
+    import shared_render_root
+    shared_render_root.refuse_private_render('tools/raw_only_clips.py')   # served clips come from $CAMX_RENDER_ROOT only
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('cmd', choices=['list', 'render', 'encode'])
     ap.add_argument('--out', default=os.environ.get('CAMX_OVERLAYS_EXTRA', '').split(':')[0] or None, help='clip tree (default: the first CAMX_OVERLAYS_EXTRA dir)')

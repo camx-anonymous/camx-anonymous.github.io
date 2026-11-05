@@ -70,6 +70,8 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 from fractions import Fraction
 
+import shared_render_root  # the ONE render root of every served clip
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
@@ -518,7 +520,11 @@ def cmd_encode(a):
     except (ValueError, OSError, ImportError) as exc:
         sys.exit(str(exc))
     cq_map = json.load(open(a.cq_map))
+    a.render = shared_render_root.resolve_render_tree(a.render, getattr(a, 'private_render_tree', False))
     renders = find_renders(a.render)
+    outside = [d for _, _, _, d in renders if not shared_render_root.inside(a.render, d)]
+    if outside:
+        sys.exit(f'{len(outside)} render directories resolve outside {a.render} (symlink or hidden component), e.g. {outside[0]}')
     if a.only:
         alts = [x.strip() for x in a.only.split(',') if x.strip()]
         renders = [r for r in renders if any(x in f'{key_of(r[0])}__{r[1]}__ep{r[2]}' or x in f'{r[0]}/{r[1]}' for x in alts)]
@@ -715,7 +721,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
     e = sub.add_parser('encode', help='overlay + raw panes, posters and records from a render tree')
-    e.add_argument('--render', required=True, help="the renderer's --out: <family>/<project>/<dataset>/ep<N>/")
+    e.add_argument('--render', default=None, help="the shared render root (default: $CAMX_RENDER_ROOT; every served clip comes from it): "
+                   "<family>/<project>/<dataset>/ep<N>/; another tree is refused unless --private-render-tree")
+    e.add_argument('--private-render-tree', action='store_true',
+                   help='encode a render tree other than the shared root, for review only: nothing encoded from it may be served')
     e.add_argument('--samples', required=True, help='the sample tree the renderer read: <family>/<project>/<dataset>/{meta,data,videos}')
     e.add_argument('--cq-map', required=True, help='JSON {"family/project": cq, ...}')
     e.add_argument('--out', required=True, help='clip output: videos/ raw/ posters/ records/')

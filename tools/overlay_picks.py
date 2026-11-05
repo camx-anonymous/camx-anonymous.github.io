@@ -501,6 +501,8 @@ def encode_one(project, dataset, ep, spec, out, **_):
 
 
 def main():
+    import shared_render_root
+    shared_render_root.refuse_private_render('tools/overlay_picks.py')   # served clips come from $CAMX_RENDER_ROOT only
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('cmd', choices=['render', 'pack', 'encode', 'list'])
     ap.add_argument('--out', default=os.environ.get('CAMX_OVERLAYS_EXTRA', '').split(':')[0] or None,

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""render_bimanual_urdf_overlay_video.py (camera-cross-embodiment) with every mesh drawn like the curation site's headless-Rerun
+"""
+render_bimanual_urdf_overlay_video.py (camera-cross-embodiment) with every mesh drawn like the curation site's headless-Rerun
 exports: one light grey albedo (urdf_logger.OVERLAY_COLOR 200/200/215), soft lighting, opaque when run with ``--alpha 1.0``.
 The tool-centre axes keep their colours (x red, y green, z blue). Used by tools/rerun_clips.py for the fisheye rigs, which the
 Rerun viewer cannot draw through (Kannala-Brandt / EUCM lenses).
@@ -12,6 +13,10 @@ Env:
   CAMX_VIZ  directory holding render_bimanual_urdf_overlay_video.py. Default: this file's own directory (the self-contained
             release layout, <release>/lib). From another checkout point it at <checkout>/camx/visualization.
 """
+if __name__ == '__main__':   # served clips come from $CAMX_RENDER_ROOT only; this renderer is legacy
+    import shared_render_root
+    shared_render_root.refuse_private_render('tools/white_overlay.py')   # served clips come from $CAMX_RENDER_ROOT only
+
 import os, sys, types
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
