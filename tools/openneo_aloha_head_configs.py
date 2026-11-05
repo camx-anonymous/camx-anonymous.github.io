@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """SUPERSEDED 2026-10-13 by the data backfill (camx/data_processing/openneo/scripts/backfill_aloha_head_wrist_joints.py, exports
-openneo_<sha8>_20261013 under /storage/ssd4/yihuai/camx_480p/aloha/openneo_aloha): the fitted head pose per recording-session
+openneo_<sha8>_20261013 under <camx_480p>/aloha/openneo_aloha): the fitted head pose per recording-session
 placement and the 2026-10-06 wrist mount are now IN the data, so a config written by this tool (static_pose_xyz_wxyz on the head
 video, retarget_camera_in_eef on the wrist videos) would double-apply both fits. The configs in configs/aloha_openneo_aloha/ were
 rewritten by hand on 2026-10-13 to carry the per-task hfov only; do not re-run this tool against them. It refuses to run unless
@@ -19,7 +19,7 @@ Base config: configs/openneo_aloha_fx306.json (wrist fx 306 assumption, head hfo
 """
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); REPO = os.path.dirname(HERE)
-CAMX = os.path.expanduser(os.environ.get('CAMX_REPO', '~/video-gen/repositories/camera-cross-embodiment'))
+CAMX = os.path.expanduser(os.environ.get('CAMX_REPO', '~/projects/camera-cross-embodiment'))
 TABLE = os.path.join(CAMX, 'camx/data_processing/openneo/config/aloha_head_pose_by_source_episode.json')
 WRIST = os.path.join(CAMX, 'camx/data_processing/openneo/config/aloha_wrist_camera_in_eef_fit_1006.json')   # fitted wrist camera_in_eef (both arms)
 BASE = os.path.join(HERE, 'configs', 'openneo_aloha_fx306.json'); OUT = os.path.join(HERE, 'configs', 'aloha_openneo_aloha')

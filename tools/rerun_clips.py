@@ -34,7 +34,7 @@ from overlay_sources import dataset_root
 
 HERE = os.path.dirname(os.path.abspath(__file__)); REPO = os.path.dirname(HERE)
 ROOT = os.environ.get('CAMX_ROOT', '/data/camx_480p')
-VIZ = os.path.expanduser(os.environ.get('CAMX_VIZ', '~/video-gen/repositories/camera-cross-embodiment/camx/visualization'))
+VIZ = os.path.expanduser(os.environ.get('CAMX_VIZ', '~/projects/camera-cross-embodiment/camx/visualization'))
 PY = os.environ.get('CAMX_PY', sys.executable)
 CUR = os.environ.get('CAMX_CURATION', '/data/camx_480p_browser/mv_urdf/videos')
 OUT = os.environ.get('CAMX_CLIPS_OUT', '/data/camx_clips')

@@ -114,7 +114,7 @@ def ff(*args, route=True):
         if _CODECS is not None:
             r = _CODECS.run([*FF, *args], env=_CODEC_ENV, route=route, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         else:
-            raise RuntimeError('GPU broker is not configured; pass --codec-lib with NVIDIA environment settings')
+            raise RuntimeError('GPU broker is not configured; pass --codec-lib with the GPU codec environment settings')
     except subprocess.CalledProcessError as exc:
         raise RuntimeError((exc.stderr or '').strip()[-400:] or f'ffmpeg rc={exc.returncode}') from exc
     if r.returncode != 0:
@@ -349,7 +349,7 @@ def _init(sem):
 
 
 def configure_codecs(path):
-    """Load the renderer's host-wide broker and fail closed unless NVIDIA mode is configured."""
+    """Load the renderer's host-wide broker and fail closed unless GPU codec mode is configured."""
     global _CODECS, _CODEC_ENV
     if not path:
         raise ValueError('--codec-lib (or CAMX_CODEC_LIB) must name the renderer lib directory or gpu_codecs.py')

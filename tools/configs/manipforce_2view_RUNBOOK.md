@@ -8,14 +8,15 @@ author CAD (`grippers/manipforce`) drawn through the image-fitted cameras. Pipel
 ## 0. Environment (every command below, from the website repo root)
 
 ```sh
-export CAMX_ROOT=/storage/hdd4/yihuai/camx_480p CAMX_CURATION=/storage/hdd4/yihuai/camx_480p_browser/mv_urdf/videos \
-       CAMX_CLIPS_OUT=/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003 \
-       MV_SITE_MESA=/storage/ssd1/yihuai/data/mv_urdf_work/camx_site_1003/mesa_shim \
-       CAMX_PY=~/miniforge3/envs/iphumi/bin/python \
-       CAMX_VIZ=~/video-gen/repositories/camera-cross-embodiment/camx/visualization
+export CAMX_ROOT=/data/camx_480p CAMX_CURATION=/data/camx_480p_browser/mv_urdf/videos \
+       CAMX_CLIPS_OUT=/data/camx_clips \
+       MV_SITE_MESA=/data/camx_clips/mesa_shim \
+       CAMX_PY=/path/to/render-env/bin/python \
+       CAMX_VIZ=/path/to/camera-cross-embodiment/camx/visualization
 export CAMX_VIZ_MV=$CAMX_VIZ
-cd ~/robotics/websites/camx-anonymous.github.io && git status --short
+cd /path/to/this/repo && git status --short
 ```
+(`/data/...` and `/path/to/...` stand for the local data tree, the render environment's python and the checkouts on the render machine.)
 
 ## 1. Preflight (once the backfill has landed under `$CAMX_ROOT/manipforce/manipforce/<task>`)
 

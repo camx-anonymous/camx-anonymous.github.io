@@ -6,7 +6,7 @@ an excluded source back; the module also runs on its own:
 
     python3 tools/trim_noncommercial.py                  # trim data/datasets.json in place and rerun the standard passes
     python3 tools/trim_noncommercial.py --dry-run         # only report what would change
-    python3 tools/trim_noncommercial.py --scan-rh20t /storage/ssd4/yihuai/camx_480p   # refresh configs/rh20t_scene_split.json
+    python3 tools/trim_noncommercial.py --scan-rh20t /data/camx_480p   # refresh configs/rh20t_scene_split.json
 
 Rules
   * EXCLUDED_PROJECTS: every family/project whose source is released under a licence that forbids commercial use

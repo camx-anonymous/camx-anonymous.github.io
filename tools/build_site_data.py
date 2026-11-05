@@ -9,7 +9,8 @@ Sources (the build host only):
   * data/pending.json (hand-maintained, in the repo): the sources of the paper's appendix tables with no converted data yet
 
 Usage: python3 tools/build_site_data.py [--root /data/camx_480p]
-       python3 tools/build_site_data.py --scrub-only   # re-run the anonymisation pass over data/datasets.json
+       python3 tools/build_site_data.py --scrub-only   # re-run the anonymisation pass over data/datasets.json, then sweep every tracked file
+       python3 tools/build_site_data.py --sweep-only   # only the tracked-file sweep (run before every commit)
        python3 tools/build_site_data.py --attach-samples-only   # merge the published one-episode samples
                                                                 # ($CAMX_SAMPLES/{index,published}.jsonl) into it
        python3 tools/build_site_data.py --captions-only   # re-read the captions (--root): the caption tracks of the
@@ -76,6 +77,24 @@ def anonymise(out):
     hits = sorted({m.group(0).lower() for m in FORBIDDEN.finditer(json.dumps(out))})
     if hits: sys.exit(f'anonymisation failed, still present: {hits}')
     return out
+
+BINARY_EXT = {'.mp4', '.jpg', '.jpeg', '.png', '.webp', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.pdf', '.gz', '.zip', '.tar', '.pyc'}
+def sweep_tracked():
+    """Scan every git-tracked text file (not only data/) for a forbidden term; exit non-zero on the first file set that hits.
+    Closes the gap of the data-only checks: tool docstrings, runbooks and configs reach the public Pages tree too."""
+    import subprocess
+    files = subprocess.run(['git', 'ls-files', '-z'], cwd=REPO, capture_output=True, text=True, check=True).stdout.split('\0')
+    bad = []
+    for f in filter(None, files):
+        if os.path.splitext(f)[1].lower() in BINARY_EXT: continue
+        try: raw = open(os.path.join(REPO, f), 'rb').read()
+        except OSError: continue
+        if b'\0' in raw[:8192]: continue
+        text = raw.decode('utf-8', 'replace')
+        for i, line in enumerate(text.splitlines(), 1):
+            for m in FORBIDDEN.finditer(line): bad.append(f'{f}:{i}: ...{line[max(0, m.start() - 40):m.end() + 40].strip()}...')
+    if bad: sys.exit('forbidden terms in tracked files:\n  ' + '\n  '.join(bad))
+    print(f'sweep: {sum(1 for f in files if f)} tracked files, no forbidden term', file=sys.stderr)
 
 # project (family/project) -> inventory "source"; projects spanning two embodiments resolve per leaf robot_type
 SOURCE_OF = {
@@ -855,6 +874,8 @@ def main():
     ap.add_argument('--add', default=None, metavar='PREFIXES',
                     help='incremental: comma-separated root-relative family/project[/dataset] prefixes whose leaves are '
                          '(re)built into --out; every other row of --out is kept as it is')
+    ap.add_argument('--sweep-only', action='store_true',
+                    help='only scan every tracked text file for forbidden terms (no data rewrite)')
     ap.add_argument('--scrub-only', action='store_true',
                     help='only re-run the anonymisation pass over --out (and the sources check + data/citations.bib)')
     ap.add_argument('--attach-samples-only', action='store_true',
@@ -874,7 +895,10 @@ def main():
         out = clips_pass(json.load(open(a.out)), a.root, [x.strip().strip('/') for x in a.clips_only.split(',') if x.strip()])
         out = same_task_pass(sources_pass(pending_pass(align_paper(anonymise(trim_pass(merge_projects(out)))))))
         json.dump(out, open(a.out, 'w'), separators=(',', ':'))
-        print(json.dumps(out['totals']), file=sys.stderr); return
+        print(json.dumps(out['totals']), file=sys.stderr)
+        if a.scrub_only: sweep_tracked()
+        return
+    if a.sweep_only: sweep_tracked(); return
     if a.scrub_only or a.attach_samples_only or a.captions_only or a.tasks_only or a.variants_only:
         out = json.load(open(a.out))
         if a.attach_samples_only: out = attach_samples(out, SAMPLES)
